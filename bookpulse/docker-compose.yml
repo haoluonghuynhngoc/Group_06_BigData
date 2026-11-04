@@ -1,0 +1,67 @@
+name: bookpulse
+
+services:
+  mongo:
+    image: mongo:7.0
+    command: ["--wiredTigerCacheSizeGB", "0.5"]   # leave memory for Spark
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  kafka:
+    image: apache/kafka:3.8.0
+    ports:
+      - "9094:9094"   # for tools running on the host machine
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,EXTERNAL://:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+
+  # Workbench: every Spark job, the producer and helper scripts run here with `docker compose exec spark ...`
+  spark:
+    build: .
+    image: bookpulse-spark:latest
+    command: sleep infinity
+    volumes:
+      - .:/work
+      - spark-checkpoints:/work/checkpoints
+      - ivy-cache:/root/.ivy2
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+      KAFKA_BOOTSTRAP: kafka:9092
+      SPARK_DRIVER_MEMORY: 4g
+    ports:
+      - "4040:4040"   # Spark UI while a job is running
+    depends_on:
+      - mongo
+      - kafka
+
+  app:
+    build: .
+    image: bookpulse-spark:latest
+    command: streamlit run app/app.py --server.address=0.0.0.0 --server.port=8501 --server.headless=true
+    volumes:
+      - .:/work
+    environment:
+      MONGO_URI: mongodb://mongo:27017
+    ports:
+      - "8501:8501"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:
+  spark-checkpoints:
+  ivy-cache:

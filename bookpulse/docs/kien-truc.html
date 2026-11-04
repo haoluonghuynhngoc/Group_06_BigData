@@ -1,0 +1,469 @@
+<title>Kiến trúc BookPulse</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one wide diagram in a scroll box, then two command columns and a short notes list */
+:root {
+  --bg: #f4f6f9; --panel: #ffffff; --fg: #18212d; --muted: #5a6575; --line: #c3ccd8;
+  --batch: #1d68a8; --batch-soft: #e3eef8; --stream: #b75a07; --stream-soft: #fbeedd; --bad: #b8322a; --bad-soft: #fbe6e3;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f141b; --panel: #17202b; --fg: #e3e8ef; --muted: #96a2b3; --line: #344152;
+  --batch: #6eb0ea; --batch-soft: #172a3d; --stream: #f0a252; --stream-soft: #33230f; --bad: #f2857a; --bad-soft: #3a1b18; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0f141b; --panel: #17202b; --fg: #e3e8ef; --muted: #96a2b3; --line: #344152;
+  --batch: #6eb0ea; --batch-soft: #172a3d; --stream: #f0a252; --stream-soft: #33230f; --bad: #f2857a; --bad-soft: #3a1b18; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 48px; }
+main { max-width: 1280px; margin: 0 auto; display: grid; gap: 28px; }
+header { display: grid; gap: 6px; }
+h1 { margin: 0; font-size: 28px; font-weight: 600; text-wrap: balance; }
+h2 { margin: 0 0 10px; font-size: 17px; font-weight: 600; }
+.lead { margin: 0; color: var(--muted); max-width: 70ch; }
+.chip { justify-self: start; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+  border: 1px solid var(--stream); color: var(--stream); }
+code, .mono { font-family: var(--mono); font-size: 13px; }
+
+figure { margin: 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.scroll { overflow-x: auto; }
+.scroll svg { display: block; width: 100%; min-width: 980px; height: auto; }
+figcaption { color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.key { display: inline-flex; align-items: center; gap: 8px; }
+.key svg { width: 36px; height: 10px; }
+
+/* SVG parts */
+.ctr { fill: none; stroke: var(--muted); stroke-dasharray: 6 5; stroke-width: 1.2; }
+.ctr-label { fill: var(--muted); font: 500 12px var(--mono); }
+.row-label { font: 600 11px var(--sans); letter-spacing: .08em; }
+.box { fill: var(--panel); stroke: var(--line); stroke-width: 1.2; }
+.box.b { stroke: var(--batch); fill: var(--batch-soft); }
+.box.s { stroke: var(--stream); fill: var(--stream-soft); }
+.grp { fill: none; stroke: var(--line); stroke-width: 1.2; }
+.t { fill: var(--fg); font: 600 13px var(--mono); }
+.sub { fill: var(--muted); font: 400 11.5px var(--sans); }
+.m { fill: var(--fg); font: 400 11.5px var(--mono); }
+.lbl { fill: var(--muted); font: 500 11px var(--sans); }
+.fg { fill: var(--fg); }
+.bt { fill: var(--batch); } .st { fill: var(--stream); }
+.a { fill: none; stroke: var(--fg); stroke-width: 1.4; }
+.a.b { stroke: var(--batch); } .a.s { stroke: var(--stream); }
+.a.r { stroke: var(--muted); stroke-dasharray: 5 4; }
+.ah { fill: var(--fg); } .ah.b { fill: var(--batch); } .ah.s { fill: var(--stream); } .ah.r { fill: var(--muted); }
+.box.x { stroke: var(--bad); fill: var(--bad-soft); }
+.box.d { stroke: var(--muted); stroke-dasharray: 4 3; }
+.a.x { stroke: var(--bad); } .ah.x { fill: var(--bad); }
+.xt { fill: var(--bad); } .mt { fill: var(--muted); }
+.h { fill: var(--fg); font: 600 15px var(--sans); }
+.rule { stroke: var(--line); stroke-width: 1; }
+.sm { fill: var(--fg); font: 400 10.5px var(--mono); }
+.cell { font: 500 9.5px var(--mono); fill: var(--fg); }
+.roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.roles h3 { margin: 0 0 4px; font-size: 15px; }
+.roles p { margin: 0; color: var(--muted); font-size: 14px; }
+.section-title { margin: 8px 0 0; font-size: 20px; font-weight: 600; }
+.num { fill: var(--batch); } .num-t { fill: var(--panel); font: 600 10px var(--sans); }
+
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; min-width: 0; }
+.card.b { border-top: 3px solid var(--batch); } .card.s { border-top: 3px solid var(--stream); }
+ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+ol li code { display: block; overflow-x: auto; white-space: pre; color: var(--fg); }
+ol li span { color: var(--muted); font-size: 14px; }
+ul.notes { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 80ch; }
+</style>
+
+<main>
+  <header>
+    <span class="chip">Code đã viết · chưa chạy thử</span>
+    <h1>Kiến trúc BookPulse</h1>
+    <p class="lead">Hệ thống gợi ý sách BDA501 theo đúng code hiện có trong <code>bookpulse/</code>: bốn container Docker, hai luồng xử lý chạy độc lập, cùng ghi vào MongoDB, và app Streamlit đọc kết quả.</p>
+  </header>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1250 625" role="img" aria-label="Luồng batch: CSV qua clean.py, train_als.py, write_recs.py vào MongoDB. Luồng streaming: producer.py gửi sự kiện vào Kafka, stream_stats.py đọc, kiểm tra, bỏ trùng rồi ghi vào MongoDB. App Streamlit đọc MongoDB và hiện top-10 cho người dùng.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah b" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ahs" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah s" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah r" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <!-- Data source -->
+        <rect class="box" x="20" y="100" width="150" height="88" rx="6"/>
+        <text class="t" x="34" y="122" style="font-family:var(--sans)">Dữ liệu CSV</text>
+        <text class="m" x="34" y="142">data/sample/</text>
+        <text class="m" x="34" y="160">data/goodbooks/</text>
+        <text class="m" x="34" y="178">data/ucsd/</text>
+
+        <!-- Spark container -->
+        <rect class="ctr" x="195" y="40" width="625" height="440" rx="10"/>
+        <text class="ctr-label" x="210" y="62">container spark · Spark 3.5 local[*] · Spark UI :4040</text>
+        <text class="row-label bt" x="215" y="94">LUỒNG BATCH (chạy tay, theo đợt)</text>
+        <text class="row-label st" x="215" y="288">LUỒNG STREAMING (chạy liên tục)</text>
+
+        <!-- Batch jobs -->
+        <rect class="box b" x="215" y="110" width="150" height="64" rx="6"/>
+        <text class="t" x="290" y="136" text-anchor="middle">clean.py</text>
+        <text class="sub" x="290" y="155" text-anchor="middle">lọc lỗi, bỏ trùng</text>
+
+        <rect class="box b" x="430" y="110" width="160" height="64" rx="6"/>
+        <text class="t" x="510" y="136" text-anchor="middle">train_als.py</text>
+        <text class="sub" x="510" y="155" text-anchor="middle">ALS + 2 baseline</text>
+
+        <rect class="box b" x="655" y="110" width="150" height="64" rx="6"/>
+        <text class="t" x="730" y="136" text-anchor="middle">write_recs.py</text>
+        <text class="sub" x="730" y="155" text-anchor="middle">top-30 chưa đọc / user</text>
+
+        <text class="lbl" x="290" y="196" text-anchor="middle">→ reports/clean_*.json</text>
+        <text class="lbl" x="510" y="196" text-anchor="middle">→ reports/train_als_*.json</text>
+        <text class="lbl" x="730" y="196" text-anchor="middle">→ reports/write_recs_*.json</text>
+        <text class="lbl" x="510" y="214" text-anchor="middle">RMSE, Precision@10, Recall@10</text>
+
+        <path class="a b" d="M170,142 H213" marker-end="url(#ahb)"/>
+        <path class="a b" d="M365,142 H428" marker-end="url(#ahb)"/>
+        <text class="lbl" x="397" y="134" text-anchor="middle">Parquet</text>
+        <path class="a b" d="M590,142 H653" marker-end="url(#ahb)"/>
+        <text class="lbl" x="622" y="134" text-anchor="middle">models/als</text>
+
+        <!-- Streaming jobs -->
+        <rect class="box s" x="215" y="305" width="150" height="76" rx="6"/>
+        <text class="t" x="290" y="330" text-anchor="middle">producer.py</text>
+        <text class="sub" x="290" y="349" text-anchor="middle">phát lại rating thật</text>
+        <text class="sub" x="290" y="366" text-anchor="middle">chèn 2% trùng, 1% lỗi</text>
+
+        <rect class="box s" x="520" y="300" width="285" height="140" rx="6"/>
+        <text class="t" x="536" y="324">stream_stats.py</text>
+        <text class="sub" x="536" y="346">• loại sự kiện thiếu trường, rating ngoài 1–5</text>
+        <text class="sub" x="536" y="364">• watermark 10 phút</text>
+        <text class="sub" x="536" y="382">• bỏ trùng theo event_id</text>
+        <text class="sub" x="536" y="400">• foreachBatch mỗi 5 giây</text>
+        <text class="sub" x="536" y="418">• batch đã ghi thì bỏ qua (chống đếm 2 lần)</text>
+
+        <path class="a s" d="M95,188 V343 H213" marker-end="url(#ahs)"/>
+        <text class="lbl" x="103" y="270">đọc ratings.csv</text>
+
+        <!-- Kafka container -->
+        <rect class="ctr" x="320" y="510" width="220" height="95" rx="10"/>
+        <text class="ctr-label" x="334" y="530">container kafka</text>
+        <rect class="box" x="334" y="540" width="192" height="52" rx="6"/>
+        <text class="t" x="430" y="562" text-anchor="middle">rating-events</text>
+        <text class="sub" x="430" y="580" text-anchor="middle">topic · 3 partition · :9094</text>
+
+        <path class="a s" d="M290,381 V566 H332" marker-end="url(#ahs)"/>
+        <text class="lbl" x="298" y="455">gửi JSON</text>
+        <text class="lbl" x="298" y="470">key = user_id</text>
+        <path class="a s" d="M526,566 H600 V442" marker-end="url(#ahs)"/>
+        <text class="lbl" x="608" y="500">đọc mỗi 5 s</text>
+
+        <!-- Checkpoint volume -->
+        <rect class="box" x="650" y="530" width="170" height="62" rx="6" style="stroke-dasharray:4 3"/>
+        <text class="t" x="735" y="555" text-anchor="middle" style="font-size:12px">spark-checkpoints</text>
+        <text class="sub" x="735" y="574" text-anchor="middle">offset Kafka + trạng thái</text>
+        <path class="a r" d="M735,442 V528" marker-start="url(#ahr)" marker-end="url(#ahr)"/>
+        <text class="lbl" x="743" y="500">checkpoint</text>
+
+        <!-- Mongo container -->
+        <rect class="ctr" x="860" y="40" width="200" height="565" rx="10"/>
+        <text class="ctr-label" x="874" y="62">container mongo :27017</text>
+        <text class="ctr-label" x="874" y="78">db bookpulse</text>
+
+        <rect class="grp" x="875" y="92" width="170" height="140" rx="6"/>
+        <text class="row-label bt" x="887" y="110">DO BATCH GHI</text>
+        <rect class="box" x="885" y="118" width="150" height="28" rx="4"/><text class="m" x="893" y="136">recommendations_&lt;v&gt;</text>
+        <rect class="box" x="885" y="153" width="150" height="28" rx="4"/><text class="m" x="893" y="171">meta {_id: active}</text>
+        <rect class="box" x="885" y="188" width="150" height="28" rx="4"/><text class="m" x="893" y="206">books</text>
+
+        <rect class="grp" x="875" y="300" width="170" height="175" rx="6"/>
+        <text class="row-label st" x="887" y="318">DO STREAMING GHI</text>
+        <rect class="box" x="885" y="326" width="150" height="28" rx="4"/><text class="m" x="893" y="344">rating_stats</text>
+        <rect class="box" x="885" y="361" width="150" height="28" rx="4"/><text class="m" x="893" y="379">user_seen</text>
+        <rect class="box" x="885" y="396" width="150" height="28" rx="4"/><text class="m" x="893" y="414">online_eval</text>
+        <rect class="box" x="885" y="431" width="150" height="28" rx="4"/><text class="m" x="893" y="449">stream_state</text>
+
+        <!-- write_recs -> Mongo: 1 write new collection, 2 switch active -->
+        <path class="a b" d="M805,132 H883" marker-end="url(#ahb)"/>
+        <path class="a b" d="M805,167 H883" marker-end="url(#ahb)"/>
+        <path class="a b" d="M780,174 V202 H883" marker-end="url(#ahb)"/>
+        <circle class="num" cx="842" cy="132" r="8"/><text class="num-t" x="842" y="135.5" text-anchor="middle">1</text>
+        <circle class="num" cx="842" cy="167" r="8"/><text class="num-t" x="842" y="170.5" text-anchor="middle">2</text>
+
+        <!-- stream_stats -> Mongo -->
+        <path class="a s" d="M805,385 H873" marker-end="url(#ahs)"/>
+        <text class="lbl" x="839" y="377" text-anchor="middle">upsert</text>
+
+        <!-- stream_stats reads current top-10 for online hit rate -->
+        <path class="a r" d="M960,232 V258 H760 V298" marker-end="url(#ahr)"/>
+        <text class="lbl" x="768" y="276">đọc top-10</text>
+
+        <!-- App -->
+        <rect class="box" x="1095" y="60" width="140" height="50" rx="6"/>
+        <text class="t" x="1165" y="81" text-anchor="middle" style="font-family:var(--sans)">Người dùng</text>
+        <text class="sub" x="1165" y="99" text-anchor="middle">trình duyệt</text>
+
+        <text class="ctr-label" x="1095" y="188">container app</text>
+        <rect class="box" x="1095" y="196" width="140" height="78" rx="6" style="stroke:var(--fg)"/>
+        <text class="t" x="1165" y="221" text-anchor="middle">Streamlit</text>
+        <text class="sub" x="1165" y="240" text-anchor="middle">app/app.py</text>
+        <text class="sub" x="1165" y="258" text-anchor="middle">localhost:8501</text>
+
+        <path class="a" d="M1165,110 V194" marker-end="url(#ah)"/>
+        <text class="lbl" x="1159" y="157" text-anchor="end">user ID</text>
+
+        <path class="a r" d="M1045,167 H1070 V222 H1093" marker-end="url(#ahr)"/>
+        <path class="a r" d="M1045,385 H1070 V250 H1093" marker-end="url(#ahr)"/>
+
+        <text class="lbl" x="1095" y="300">App đọc:</text>
+        <text class="sub" x="1095" y="318">• meta → bản đang dùng</text>
+        <text class="sub" x="1095" y="335">• top-30 của user, bỏ</text>
+        <text class="sub" x="1095" y="351">  sách trong user_seen</text>
+        <text class="sub" x="1095" y="368">• tên sách từ books</text>
+        <text class="sub" x="1095" y="385">• điểm TB trực tiếp</text>
+        <text class="sub" x="1095" y="402">• số sự kiện, hit rate</text>
+        <text class="sub" x="1095" y="419">• user mới: sách phổ biến</text>
+      </svg>
+    </div>
+    <figcaption>
+      <span class="key"><svg viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" class="a b"/></svg>luồng batch ghi dữ liệu</span>
+      <span class="key"><svg viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" class="a s"/></svg>luồng streaming ghi dữ liệu</span>
+      <span class="key"><svg viewBox="0 0 36 10"><line x1="0" y1="5" x2="36" y2="5" class="a r"/></svg>chỉ đọc</span>
+      <span class="key"><svg viewBox="0 0 36 10"><rect x="1" y="1" width="34" height="8" rx="2" class="ctr"/></svg>container Docker</span>
+      <span>① ghi gợi ý vào collection mới, ② xong hết mới chuyển <code>meta.active</code> sang bản mới, nên app không bao giờ đọc danh sách ghi dở.</span>
+    </figcaption>
+  </figure>
+
+  <h2 class="section-title">Một lượt chấm điểm đi qua Kafka, Spark và MongoDB</h2>
+  <p class="lead" style="margin-top:-18px">Người dùng 15 chấm sách 42 được 5 sao. Producer gửi sự kiện này, thêm một bản gửi lại và một sự kiện lỗi để kiểm tra. Các con số trong hình là ví dụ minh họa.</p>
+
+  <figure>
+    <div class="scroll">
+      <svg viewBox="0 0 1250 630" role="img" aria-label="Ba sự kiện vào Kafka partition 1. Kafka lưu cả ba mà không kiểm tra. Spark đọc theo offset, loại sự kiện lỗi ở bước kiểm tra, bỏ bản trùng ở bước bỏ trùng, chỉ sự kiện hợp lệ được upsert vào bốn collection MongoDB. Khi khởi động lại, batch đã ghi được bỏ qua.">
+        <defs>
+          <marker id="h2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="h2s" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah s" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="h2x" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah x" d="M0,0 L10,5 L0,10 z"/></marker>
+          <marker id="h2r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah r" d="M0,0 L10,5 L0,10 z"/></marker>
+        </defs>
+
+        <!-- Column headers -->
+        <text class="h" x="20" y="38">producer.py</text>
+        <text class="sub" x="20" y="57">tạo sự kiện</text>
+        <line class="rule" x1="20" y1="70" x2="220" y2="70"/>
+        <text class="h" x="255" y="38">Kafka</text>
+        <text class="sub" x="255" y="57">lưu và xếp hàng sự kiện</text>
+        <line class="rule" x1="255" y1="70" x2="465" y2="70"/>
+        <text class="h" x="510" y="38">Spark Structured Streaming</text>
+        <text class="sub" x="510" y="57">kiểm tra và tính, mỗi 5 giây một micro-batch</text>
+        <line class="rule" x1="510" y1="70" x2="925" y2="70"/>
+        <text class="h" x="945" y="38">MongoDB</text>
+        <text class="sub" x="945" y="57">lưu kết quả cho app đọc, upsert theo _id</text>
+        <line class="rule" x1="945" y1="70" x2="1230" y2="70"/>
+
+        <!-- Producer: three events -->
+        <rect class="box s" x="20" y="95" width="200" height="58" rx="6"/>
+        <text class="t st" x="32" y="116" style="font-family:var(--sans)">e1 · sự kiện thật</text>
+        <text class="m" x="32" y="139">user 15 · book 42 · 5★</text>
+
+        <rect class="box d" x="20" y="163" width="200" height="58" rx="6"/>
+        <text class="t mt" x="32" y="184" style="font-family:var(--sans)">e1 gửi lại (2%)</text>
+        <text class="m" x="32" y="207">cùng event_id với e1</text>
+
+        <rect class="box x" x="20" y="231" width="200" height="58" rx="6"/>
+        <text class="t xt" x="32" y="252" style="font-family:var(--sans)">e2 · lỗi cố ý (1%)</text>
+        <text class="m" x="32" y="275">user 15 · book 42 · ★9</text>
+
+        <rect class="box" x="20" y="320" width="200" height="150" rx="6"/>
+        <text class="lbl" x="32" y="339">Nội dung e1 (JSON)</text>
+        <text class="sm" x="32" y="358">{"event_id": "9f3c…",</text>
+        <text class="sm" x="32" y="374"> "user_id": 15,</text>
+        <text class="sm" x="32" y="390"> "book_id": 42,</text>
+        <text class="sm" x="32" y="406"> "rating": 5,</text>
+        <text class="sm" x="32" y="422"> "event_time": "…04:15:07",</text>
+        <text class="sm" x="32" y="438"> "simulated": true}</text>
+        <text class="lbl" x="32" y="458">event_time tạo mới khi gửi</text>
+
+        <path class="a" d="M220,124 H240 V165"/>
+        <path class="a" d="M220,192 H240"/>
+        <path class="a" d="M220,260 H240 V165"/>
+        <path class="a" d="M240,165 H281" marker-end="url(#h2)"/>
+        <text class="lbl" x="261" y="156" text-anchor="middle">key 15</text>
+
+        <!-- Kafka partitions -->
+        <text class="lbl" x="255" y="119">P0</text>
+        <rect class="box" x="285" y="100" width="30" height="30" rx="3"/>
+        <rect class="box" x="317" y="100" width="30" height="30" rx="3"/>
+        <rect class="box" x="349" y="100" width="30" height="30" rx="3"/>
+        <rect class="box" x="381" y="100" width="30" height="30" rx="3"/>
+
+        <text class="lbl fg" x="255" y="169" style="font-weight:600">P1</text>
+        <rect class="box" x="285" y="150" width="30" height="30" rx="3"/><text class="cell" x="300" y="168.5" text-anchor="middle">1285</text>
+        <rect class="box" x="317" y="150" width="30" height="30" rx="3"/><text class="cell" x="332" y="168.5" text-anchor="middle">1286</text>
+        <rect class="box s" x="349" y="150" width="30" height="30" rx="3"/><text class="cell" x="364" y="168.5" text-anchor="middle">1287</text>
+        <rect class="box d" x="381" y="150" width="30" height="30" rx="3"/><text class="cell" x="396" y="168.5" text-anchor="middle">1288</text>
+        <rect class="box x" x="413" y="150" width="30" height="30" rx="3"/><text class="cell" x="428" y="168.5" text-anchor="middle">1289</text>
+        <text class="lbl" x="349" y="196">e1 · e1 · e2 ở offset 1287–1289</text>
+
+        <text class="lbl" x="255" y="229">P2</text>
+        <rect class="box" x="285" y="210" width="30" height="30" rx="3"/>
+        <rect class="box" x="317" y="210" width="30" height="30" rx="3"/>
+        <rect class="box" x="349" y="210" width="30" height="30" rx="3"/>
+
+        <text class="t" x="255" y="272" style="font-family:var(--sans);font-size:12.5px">Kafka chỉ lưu, không kiểm tra:</text>
+        <text class="sub" x="255" y="290">bản trùng và sự kiện lỗi vẫn nằm</text>
+        <text class="sub" x="255" y="306">trong log như sự kiện thật.</text>
+        <text class="sub" x="255" y="334">• key = user_id, nên mọi sự kiện</text>
+        <text class="sub" x="255" y="350">  của user 15 vào P1, đúng thứ tự</text>
+        <text class="sub" x="255" y="370">• chỉ ghi nối vào cuối log</text>
+        <text class="sub" x="255" y="390">• giữ 7 ngày: Spark tắt vẫn</text>
+        <text class="sub" x="255" y="406">  đọc lại được</text>
+
+        <path class="a" d="M443,165 H478 V118 H508" marker-end="url(#h2)"/>
+        <text class="lbl" x="482" y="110">đọc</text>
+
+        <!-- Spark steps -->
+        <rect class="box" x="510" y="95" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="114" style="font-family:var(--sans)">1 · Đọc offset mới</text>
+        <text class="sub" x="524" y="132">từ 1285 đến 1289, mốc lấy trong checkpoint</text>
+        <rect class="box" x="510" y="153" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="172" style="font-family:var(--sans)">2 · Parse JSON thành cột</text>
+        <text class="sub" x="524" y="190">from_json, ép kiểu, đổi event_time</text>
+        <rect class="box" x="510" y="211" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="230" style="font-family:var(--sans)">3 · Kiểm tra hợp lệ</text>
+        <text class="sub" x="524" y="248">đủ trường, rating trong khoảng 1–5</text>
+        <rect class="box" x="510" y="269" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="288" style="font-family:var(--sans)">4 · Watermark + bỏ trùng</text>
+        <text class="sub" x="524" y="306">trễ tối đa 10 phút · khóa event_id</text>
+        <rect class="box s" x="510" y="327" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="346" style="font-family:var(--sans)">5 · foreachBatch (batch 57)</text>
+        <text class="sub" x="524" y="364">batch 57 đã ghi chưa? chưa thì ghi</text>
+        <rect class="box" x="510" y="385" width="265" height="46" rx="6"/>
+        <text class="t" x="524" y="404" style="font-family:var(--sans)">6 · Lưu checkpoint</text>
+        <text class="sub" x="524" y="422">offset đã xử lý + danh sách event_id đã thấy</text>
+
+        <path class="a" d="M642,141 V151" marker-end="url(#h2)"/>
+        <path class="a" d="M642,199 V209" marker-end="url(#h2)"/>
+        <path class="a" d="M642,257 V267" marker-end="url(#h2)"/>
+        <path class="a" d="M642,315 V325" marker-end="url(#h2)"/>
+        <path class="a" d="M642,373 V383" marker-end="url(#h2)"/>
+
+        <!-- Fates -->
+        <path class="a x" d="M775,234 H788" marker-end="url(#h2x)"/>
+        <rect class="box x" x="790" y="211" width="135" height="46" rx="6"/>
+        <text class="t xt" x="802" y="230" style="font-family:var(--sans);font-size:12px">✕ e2 bị loại</text>
+        <text class="sub" x="802" y="247">chỉ đếm, không tính</text>
+        <path class="a r" d="M775,292 H788" marker-end="url(#h2r)"/>
+        <rect class="box d" x="790" y="269" width="135" height="46" rx="6"/>
+        <text class="t mt" x="802" y="288" style="font-family:var(--sans);font-size:12px">✕ bản sao e1 bị bỏ</text>
+        <text class="sub" x="802" y="305">event_id đã thấy</text>
+
+        <!-- Spark -> Mongo -->
+        <path class="a s" d="M775,350 H930"/>
+        <text class="lbl" x="850" y="342" text-anchor="middle">chỉ còn e1 · upsert</text>
+        <path class="a s" d="M930,147 V405"/>
+        <path class="a s" d="M930,147 H943" marker-end="url(#h2s)"/>
+        <path class="a s" d="M930,237 H943" marker-end="url(#h2s)"/>
+        <path class="a s" d="M930,320 H943" marker-end="url(#h2s)"/>
+        <path class="a s" d="M930,405 H943" marker-end="url(#h2s)"/>
+
+        <!-- Mongo documents -->
+        <rect class="box" x="945" y="95" width="285" height="100" rx="6"/>
+        <text class="t st" x="957" y="114">rating_stats</text>
+        <text class="m" x="957" y="134">_id: 42</text>
+        <text class="m" x="957" y="151">n_ratings   200 → 201</text>
+        <text class="m" x="957" y="168">rating_sum  900 → 905</text>
+        <text class="m" x="957" y="185">avg_rating  4.50 → 4.502</text>
+
+        <rect class="box" x="945" y="205" width="285" height="64" rx="6"/>
+        <text class="t st" x="957" y="224">user_seen</text>
+        <text class="m" x="957" y="243">_id: "15_42"</text>
+        <text class="m" x="957" y="260">user 15 · book 42 · rating 5</text>
+
+        <rect class="box" x="945" y="279" width="285" height="82" rx="6"/>
+        <text class="t st" x="957" y="298">online_eval</text>
+        <text class="m" x="957" y="317">_id: "hit_rate@10"</text>
+        <text class="m" x="957" y="334">liked_events +1  (5★ ≥ 4)</text>
+        <text class="m" x="957" y="351">hits +1 nếu 42 ∈ top-10 của user 15</text>
+
+        <rect class="box" x="945" y="371" width="285" height="66" rx="6"/>
+        <text class="t st" x="957" y="390">stream_state</text>
+        <text class="m" x="957" y="409">valid_events     last_batch 57</text>
+        <text class="m" x="957" y="426">rejected_events  events +1 (e2)</text>
+
+        <path class="a r" d="M1087,437 V455" marker-end="url(#h2r)"/>
+        <rect class="box" x="945" y="457" width="285" height="58" rx="6" style="stroke:var(--fg)"/>
+        <text class="t" x="957" y="476" style="font-family:var(--sans)">App (localhost:8501), user 15</text>
+        <text class="sub" x="957" y="494">sách 42 bị ẩn khỏi top-10</text>
+        <text class="sub" x="957" y="509">cột “Điểm TB trực tiếp” của sách 42 = 4.5</text>
+
+        <!-- Restart -->
+        <text class="row-label fg" x="20" y="548">KHI SPARK TẮT RỒI BẬT LẠI</text>
+        <rect class="box" x="20" y="558" width="370" height="58" rx="6"/>
+        <text class="t" x="34" y="580" style="font-family:var(--sans)">Kafka</text>
+        <text class="sub" x="34" y="600">sự kiện vẫn nằm trong log, không mất</text>
+        <path class="a" d="M390,587 H428" marker-end="url(#h2)"/>
+        <rect class="box" x="430" y="558" width="390" height="58" rx="6"/>
+        <text class="t" x="444" y="580" style="font-family:var(--sans)">Spark</text>
+        <text class="sub" x="444" y="600">đọc lại offset trong checkpoint; batch 57 có thể chạy lần nữa</text>
+        <path class="a" d="M820,587 H858" marker-end="url(#h2)"/>
+        <rect class="box s" x="860" y="558" width="370" height="58" rx="6"/>
+        <text class="t" x="874" y="580" style="font-family:var(--sans)">MongoDB</text>
+        <text class="sub" x="874" y="600">stream_state.last_batch = 57, nên bỏ qua, không cộng hai lần</text>
+      </svg>
+    </div>
+    <figcaption>
+      <span class="key"><svg viewBox="0 0 36 10"><rect x="1" y="1" width="34" height="8" rx="2" class="box s"/></svg>sự kiện hợp lệ</span>
+      <span class="key"><svg viewBox="0 0 36 10"><rect x="1" y="1" width="34" height="8" rx="2" class="box d"/></svg>bản gửi trùng</span>
+      <span class="key"><svg viewBox="0 0 36 10"><rect x="1" y="1" width="34" height="8" rx="2" class="box x"/></svg>sự kiện lỗi</span>
+      <span>Kafka giữ nguyên cả ba sự kiện. Spark loại e2 ở bước 3, bỏ bản sao e1 ở bước 4, chỉ e1 được ghi vào MongoDB.</span>
+    </figcaption>
+  </figure>
+
+  <section class="roles">
+    <div class="card s">
+      <h3>Kafka: lưu và xếp hàng</h3>
+      <p>Nhận sự kiện từ producer, ghi nối vào log theo partition, giữ lại kể cả khi Spark đang tắt. Không đọc nội dung, không loại gì.</p>
+    </div>
+    <div class="card s">
+      <h3>Spark: kiểm tra và tính</h3>
+      <p>Luồng streaming: đọc theo offset, loại lỗi, bỏ trùng, cộng dồn điểm. Luồng batch: làm sạch dữ liệu, huấn luyện ALS, tính top-30 cho mỗi người.</p>
+    </div>
+    <div class="card s">
+      <h3>MongoDB: lưu kết quả để đọc nhanh</h3>
+      <p>Mỗi người dùng, mỗi cuốn sách là một document có <code>_id</code> cố định. App chỉ cần một lần tìm theo <code>_id</code>, không phải tính lại.</p>
+    </div>
+  </section>
+
+  <section class="cols">
+    <div class="card b">
+      <h2>Luồng batch: thứ tự chạy</h2>
+      <ol>
+        <li><code>python scripts/download_goodbooks.py</code><span>Tải Goodbooks-10k vào <code>data/goodbooks/</code>.</span></li>
+        <li><code>python batch/clean.py</code><span>Ép kiểu, bỏ rating ngoài 1–5 và dòng trùng (user, sách), ghi Parquet.</span></li>
+        <li><code>python batch/train_als.py</code><span>Chia train/test 80/20, chọn rank và regParam bằng TrainValidationSplit, so ALS với baseline trung bình chung, trung bình từng sách và sách phổ biến.</span></li>
+        <li><code>python batch/write_recs.py --books data/goodbooks/books.csv</code><span>Ghi top-30 sách chưa đọc cho mỗi người, kèm 100 sách phổ biến cho người dùng mới, giữ 2 phiên bản gần nhất.</span></li>
+      </ol>
+    </div>
+    <div class="card s">
+      <h2>Luồng streaming: hai terminal</h2>
+      <ol>
+        <li><code>python streaming/stream_stats.py</code><span>Hai truy vấn song song: sự kiện hợp lệ ghi vào 4 collection, sự kiện lỗi chỉ được đếm.</span></li>
+        <li><code>python streaming/producer.py --limit 2000</code><span>Gửi 20 sự kiện/giây, mỗi sự kiện có <code>event_id</code> và <code>event_time</code> mới vì dữ liệu gốc không có thời điểm chấm.</span></li>
+        <li>Mở <code>localhost:8501</code><span>Bấm “Làm mới”: điểm trung bình trực tiếp thay đổi, sách vừa chấm biến mất khỏi top-10.</span></li>
+      </ol>
+      <p class="sub" style="margin:12px 0 0;color:var(--muted);font-size:13px">Mọi lệnh chạy trong container spark: <code>docker compose exec spark …</code></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Khác với bản trình bày Session 5</h2>
+    <ul class="notes">
+      <li>Streaming cộng dồn theo từng sách, chưa gom theo cửa sổ thời gian và chưa có thống kê theo thể loại.</li>
+      <li>Có thêm phần chưa nói trong slide: đánh giá online (tỷ lệ lượt chấm 4–5 sao rơi vào top-10 hiện tại) và việc ẩn sách vừa chấm khỏi top-10.</li>
+      <li>Báo cáo hiện ghi thời gian chạy, chưa ghi bộ nhớ.</li>
+    </ul>
+  </section>
+</main>

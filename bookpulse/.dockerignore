@@ -1,0 +1,6 @@
+data
+models
+checkpoints
+reports
+.git
+**/__pycache__

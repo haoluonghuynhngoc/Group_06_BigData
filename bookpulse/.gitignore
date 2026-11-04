@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data, models and Spark state are produced locally, never committed
+data/*
+!data/README.md
+models/
+checkpoints/
+spark-warehouse/
+metastore_db/
+derby.log

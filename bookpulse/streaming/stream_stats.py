@@ -1,0 +1,162 @@
+"""Streaming job: Kafka rating events -> validate, de-duplicate -> MongoDB.
+
+Per micro-batch it writes three things:
+  rating_stats  live average rating and count per book
+  user_seen     books each user has just rated (the app hides them from the top-10)
+  online_eval   online hit rate: share of liked events (4-5 stars) whose book was in the user's top-10
+
+Spark + Kafka + checkpoint gives at-least-once delivery, so a batch can be replayed after a restart.
+The last applied batch id is stored in MongoDB and a replayed batch is skipped, so counts are not doubled.
+"""
+import argparse
+import time
+from datetime import datetime, timezone
+
+from pymongo import UpdateOne
+from pyspark.sql import functions as F
+from pyspark.sql.types import BooleanType, IntegerType, StringType, StructField, StructType
+
+from common.settings import CHECKPOINT_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC, get_db, get_spark
+
+SCHEMA = StructType([
+    StructField("event_id", StringType()),
+    StructField("user_id", IntegerType()),
+    StructField("book_id", IntegerType()),
+    StructField("rating", IntegerType()),
+    StructField("event_time", StringType()),
+    StructField("simulated", BooleanType()),
+])
+TOP_K = 10
+
+
+def already_applied(db, key, batch_id):
+    state = db.stream_state.find_one({"_id": key})
+    return state is not None and state.get("last_batch", -1) >= batch_id
+
+
+def mark_applied(db, key, batch_id, **inc):
+    update = {"$set": {"last_batch": batch_id, "updated": datetime.now(timezone.utc)}}
+    if inc:
+        update["$inc"] = inc
+    db.stream_state.update_one({"_id": key}, update, upsert=True)
+
+
+def update_online_eval(db, rows):
+    meta = db.meta.find_one({"_id": "active"})
+    if meta is None:
+        return
+    liked = [r for r in rows if r["rating"] >= 4]
+    users = list({r["user_id"] for r in liked})
+    top = {d["_id"]: {x["book_id"] for x in d["recs"]}
+           for d in db[meta["recs_collection"]].find({"_id": {"$in": users}}, {"recs": {"$slice": TOP_K}})}
+    known = [r for r in liked if r["user_id"] in top]
+    hits = sum(1 for r in known if r["book_id"] in top[r["user_id"]])
+    db.online_eval.update_one(
+        {"_id": f"hit_rate@{TOP_K}"},
+        {"$inc": {"liked_events": len(known), "hits": hits, "cold_start_events": len(liked) - len(known)},
+         "$set": {"model_version": meta["model_version"], "updated": datetime.now(timezone.utc)}},
+        upsert=True,
+    )
+
+
+def process_valid(df, batch_id):
+    db = get_db()
+    if already_applied(db, "valid_events", batch_id):
+        return
+    rows = df.select("user_id", "book_id", "rating", "event_time").collect()
+    if rows:
+        per_book = {}
+        for r in rows:
+            s, n = per_book.get(r["book_id"], (0, 0))
+            per_book[r["book_id"]] = (s + r["rating"], n + 1)
+        now = datetime.now(timezone.utc)
+        db.rating_stats.bulk_write([
+            UpdateOne({"_id": book_id}, [
+                {"$set": {"rating_sum": {"$add": [{"$ifNull": ["$rating_sum", 0]}, s]},
+                          "n_ratings": {"$add": [{"$ifNull": ["$n_ratings", 0]}, n]},
+                          "updated": now}},
+                {"$set": {"avg_rating": {"$divide": ["$rating_sum", "$n_ratings"]}}},
+            ], upsert=True)
+            for book_id, (s, n) in per_book.items()
+        ], ordered=False)
+        db.user_seen.bulk_write([
+            UpdateOne({"_id": f"{r['user_id']}_{r['book_id']}"},
+                      {"$set": {"user_id": r["user_id"], "book_id": r["book_id"], "rating": r["rating"],
+                                "event_time": r["event_time"]}}, upsert=True)
+            for r in rows
+        ], ordered=False)
+        update_online_eval(db, rows)
+    mark_applied(db, "valid_events", batch_id, events=len(rows))
+
+
+def process_rejected(df, batch_id):
+    db = get_db()
+    if not already_applied(db, "rejected_events", batch_id):
+        mark_applied(db, "rejected_events", batch_id, events=df.count())
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--watermark", default="10 minutes", help="how late an event may arrive")
+    parser.add_argument("--trigger", default="5 seconds")
+    parser.add_argument("--starting-offsets", default="earliest")
+    parser.add_argument("--run-seconds", type=int, default=0, help="0 = run until Ctrl+C")
+    args = parser.parse_args()
+
+    spark = get_spark("bookpulse-stream", kafka=True)
+    events = (
+        spark.readStream.format("kafka")
+        .option("kafka.bootstrap.servers", KAFKA_BOOTSTRAP)
+        .option("subscribe", KAFKA_TOPIC)
+        .option("startingOffsets", args.starting_offsets)
+        .option("failOnDataLoss", "false")
+        .load()
+        .select(F.from_json(F.col("value").cast("string"), SCHEMA).alias("e"))
+        .select("e.*")
+        .withColumn("event_time", F.to_timestamp("event_time"))
+    )
+    is_valid = F.coalesce(
+        F.col("event_id").isNotNull() & F.col("user_id").isNotNull() & F.col("book_id").isNotNull()
+        & F.col("event_time").isNotNull() & F.col("rating").between(1, 5),
+        F.lit(False),
+    )
+    valid = (events.filter(is_valid)
+             .withWatermark("event_time", args.watermark)
+             .dropDuplicatesWithinWatermark(["event_id"]))
+    rejected = events.filter(~is_valid)
+
+    queries = {
+        "valid": valid.writeStream.foreachBatch(process_valid)
+        .option("checkpointLocation", str(CHECKPOINT_DIR / "stream_valid"))
+        .trigger(processingTime=args.trigger).start(),
+        "rejected": rejected.writeStream.foreachBatch(process_rejected)
+        .option("checkpointLocation", str(CHECKPOINT_DIR / "stream_rejected"))
+        .trigger(processingTime=args.trigger).start(),
+    }
+    print(f"streaming from '{KAFKA_TOPIC}' at {KAFKA_BOOTSTRAP}; Ctrl+C to stop")
+    started = time.time()
+    try:
+        while all(q.isActive for q in queries.values()):
+            time.sleep(10)
+            for name, q in queries.items():
+                p = q.lastProgress
+                if p and p["numInputRows"]:
+                    dropped = sum(op.get("customMetrics", {}).get("numDroppedDuplicateRows", 0)
+                                  for op in p.get("stateOperators", []))
+                    print(f"[{name}] batch {p['batchId']}: {p['numInputRows']} rows, "
+                          f"{p.get('processedRowsPerSecond', 0):.1f} rows/s, duplicates dropped {dropped}")
+            if args.run_seconds and time.time() - started > args.run_seconds:
+                break
+        for q in queries.values():
+            if q.exception():
+                raise q.exception()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        for q in queries.values():
+            q.stop()
+        spark.stop()
+
+
+if __name__ == "__main__":
+    main()
