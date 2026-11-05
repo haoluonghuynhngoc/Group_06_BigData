@@ -2,7 +2,7 @@ name: bookpulse
 
 services:
   mongo:
-    image: mongo:7.0
+    image: mongo:7.0.14   # pinned: the floating mongo:7.0 tag pulled on 2026-11-04 had an empty entrypoint
     command: ["--wiredTigerCacheSizeGB", "0.5"]   # leave memory for Spark
     ports:
       - "27017:27017"

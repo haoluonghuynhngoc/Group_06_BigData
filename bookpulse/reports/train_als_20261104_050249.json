@@ -1,0 +1,39 @@
+{
+  "spark_master": "local[2]",
+  "rows": {
+    "train": 4780152,
+    "test": 1196327
+  },
+  "grid": [
+    {
+      "rank": 10,
+      "regParam": 0.1,
+      "validation_rmse": 0.8365
+    }
+  ],
+  "best_params": {
+    "rank": 10,
+    "regParam": 0.1,
+    "validation_rmse": 0.8365
+  },
+  "rmse_test": {
+    "baseline_global_mean": 0.9905,
+    "baseline_item_mean": 0.9532,
+    "als": 0.8319
+  },
+  "ranking_test": {
+    "als": {
+      "precision@10": 0.0055,
+      "recall@10": 0.0034,
+      "users_evaluated": 999
+    },
+    "baseline_popular": {
+      "precision@10": 0.0745,
+      "recall@10": 0.0483,
+      "users_evaluated": 999
+    }
+  },
+  "fit_seconds": 106.5,
+  "total_seconds": 187.0,
+  "model_path": "/work/models/als"
+}

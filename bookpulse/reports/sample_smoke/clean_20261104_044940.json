@@ -1,0 +1,12 @@
+{
+  "input": "data/sample/ratings.csv",
+  "output": "/work/data/parquet/ratings",
+  "spark_master": "local[*]",
+  "input_rows": 24360,
+  "rejected_invalid": 120,
+  "rejected_duplicates": 240,
+  "output_rows": 24000,
+  "users": 600,
+  "books": 300,
+  "seconds": 35.5
+}

@@ -4,3 +4,4 @@ pandas==2.2.3
 pymongo==4.10.1
 kafka-python==2.0.2
 streamlit==1.39.0
+pyarrow==17.0.0   # pulled in by streamlit; unpinned it resolves to a release that needs NumPy 2

@@ -1,0 +1,196 @@
+{
+  "spark_master": "local[*]",
+  "q1_profile": {
+    "ratings": 24000,
+    "users": 600,
+    "books": 300,
+    "avg_rating": 2.87,
+    "density_pct": "13.333"
+  },
+  "q2_rating_distribution": [
+    {
+      "rating": 1,
+      "n": 2320,
+      "pct": "9.67"
+    },
+    {
+      "rating": 2,
+      "n": 7587,
+      "pct": "31.61"
+    },
+    {
+      "rating": 3,
+      "n": 7488,
+      "pct": "31.20"
+    },
+    {
+      "rating": 4,
+      "n": 4098,
+      "pct": "17.08"
+    },
+    {
+      "rating": 5,
+      "n": 2507,
+      "pct": "10.45"
+    }
+  ],
+  "q3_ratings_per_user": {
+    "min": 40,
+    "p25": 40,
+    "median": 40,
+    "p75": 40,
+    "max": 40,
+    "users_under_10_ratings": 0
+  },
+  "sql_equals_dataframe_api": true,
+  "plan": {
+    "file": "sql_plan_20261104_045014.txt",
+    "exchange_ops": 4,
+    "broadcast_hash_join": true,
+    "sort_merge_join": false
+  },
+  "q4_most_rated": [
+    {
+      "book_id": 252,
+      "title": "Mystery book #252",
+      "n_ratings": 101,
+      "avg_rating": 2.98
+    },
+    {
+      "book_id": 28,
+      "title": "Mystery book #28",
+      "n_ratings": 100,
+      "avg_rating": 2.95
+    },
+    {
+      "book_id": 223,
+      "title": "Mystery book #223",
+      "n_ratings": 99,
+      "avg_rating": 2.909
+    },
+    {
+      "book_id": 233,
+      "title": "Fantasy book #233",
+      "n_ratings": 99,
+      "avg_rating": 2.747
+    },
+    {
+      "book_id": 241,
+      "title": "Fantasy book #241",
+      "n_ratings": 99,
+      "avg_rating": 3.111
+    },
+    {
+      "book_id": 107,
+      "title": "Mystery book #107",
+      "n_ratings": 98,
+      "avg_rating": 2.949
+    },
+    {
+      "book_id": 2,
+      "title": "Fantasy book #2",
+      "n_ratings": 96,
+      "avg_rating": 2.792
+    },
+    {
+      "book_id": 212,
+      "title": "Romance book #212",
+      "n_ratings": 96,
+      "avg_rating": 2.979
+    },
+    {
+      "book_id": 14,
+      "title": "Romance book #14",
+      "n_ratings": 95,
+      "avg_rating": 2.874
+    },
+    {
+      "book_id": 73,
+      "title": "Science book #73",
+      "n_ratings": 95,
+      "avg_rating": 2.842
+    }
+  ],
+  "q5_best_rated": {
+    "min_ratings": 50,
+    "rows": [
+      {
+        "book_id": 80,
+        "title": "Science book #80",
+        "n_ratings": 71,
+        "avg_rating": 3.197
+      },
+      {
+        "book_id": 269,
+        "title": "Science book #269",
+        "n_ratings": 91,
+        "avg_rating": 3.165
+      },
+      {
+        "book_id": 236,
+        "title": "Fantasy book #236",
+        "n_ratings": 93,
+        "avg_rating": 3.129
+      },
+      {
+        "book_id": 110,
+        "title": "Science book #110",
+        "n_ratings": 71,
+        "avg_rating": 3.113
+      },
+      {
+        "book_id": 241,
+        "title": "Fantasy book #241",
+        "n_ratings": 99,
+        "avg_rating": 3.111
+      },
+      {
+        "book_id": 299,
+        "title": "Fantasy book #299",
+        "n_ratings": 95,
+        "avg_rating": 3.095
+      },
+      {
+        "book_id": 109,
+        "title": "Mystery book #109",
+        "n_ratings": 77,
+        "avg_rating": 3.091
+      },
+      {
+        "book_id": 119,
+        "title": "Romance book #119",
+        "n_ratings": 81,
+        "avg_rating": 3.086
+      },
+      {
+        "book_id": 250,
+        "title": "Science book #250",
+        "n_ratings": 81,
+        "avg_rating": 3.086
+      },
+      {
+        "book_id": 270,
+        "title": "Mystery book #270",
+        "n_ratings": 73,
+        "avg_rating": 3.082
+      }
+    ]
+  },
+  "q6_book_stats": {
+    "output": "/work/data/parquet/book_stats",
+    "rows": 300
+  },
+  "csv_vs_parquet_seconds": {
+    "csv": 1.08,
+    "parquet": 0.43
+  },
+  "timings_seconds": {
+    "q1_profile": 4.54,
+    "q2_distribution": 1.8,
+    "q3_user_activity": 1.31,
+    "q4_most_rated": 2.14,
+    "q5_best_rated": 0.92,
+    "q6_write_book_stats": 3.96
+  },
+  "total_seconds": 30.3
+}

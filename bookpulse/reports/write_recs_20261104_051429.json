@@ -1,0 +1,9 @@
+{
+  "model_version": "20261104_051130",
+  "collection": "recommendations_20261104_051130",
+  "users_written": 53424,
+  "top_n": 30,
+  "books_loaded": 10000,
+  "dropped_old_versions": [],
+  "seconds": 179.0
+}

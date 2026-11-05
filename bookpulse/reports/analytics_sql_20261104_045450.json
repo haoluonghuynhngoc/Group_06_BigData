@@ -1,0 +1,211 @@
+{
+  "spark_master": "local[*]",
+  "q1_profile": {
+    "ratings": 5976479,
+    "users": 53424,
+    "books": 10000,
+    "avg_rating": 3.92,
+    "density_pct": 1.119
+  },
+  "q2_rating_distribution": [
+    {
+      "rating": 1,
+      "n": 124195,
+      "pct": "2.08"
+    },
+    {
+      "rating": 2,
+      "n": 359257,
+      "pct": "6.01"
+    },
+    {
+      "rating": 3,
+      "n": 1370916,
+      "pct": "22.94"
+    },
+    {
+      "rating": 4,
+      "n": 2139018,
+      "pct": "35.79"
+    },
+    {
+      "rating": 5,
+      "n": 1983093,
+      "pct": "33.18"
+    }
+  ],
+  "q3_ratings_per_user": {
+    "min": 19,
+    "p25": 96,
+    "median": 111,
+    "p75": 128,
+    "max": 200,
+    "users_under_10_ratings": 0
+  },
+  "sql_equals_dataframe_api": true,
+  "plan": {
+    "file": "sql_plan_20261104_045412.txt",
+    "operators": [
+      "Scan",
+      "Filter",
+      "Scan",
+      "Filter",
+      "Project",
+      "BroadcastExchange",
+      "BroadcastHashJoin",
+      "Project",
+      "HashAggregate",
+      "Exchange",
+      "HashAggregate",
+      "TakeOrderedAndProject",
+      "AdaptiveSparkPlan"
+    ],
+    "shuffle_exchanges": 1,
+    "broadcast_exchanges": 1,
+    "join": "BroadcastHashJoin"
+  },
+  "q4_most_rated": [
+    {
+      "book_id": 1,
+      "title": "The Hunger Games (The Hunger Games, #1)",
+      "n_ratings": 22806,
+      "avg_rating": 4.28
+    },
+    {
+      "book_id": 2,
+      "title": "Harry Potter and the Sorcerer's Stone (Harry Potter, #1)",
+      "n_ratings": 21850,
+      "avg_rating": 4.351
+    },
+    {
+      "book_id": 4,
+      "title": "To Kill a Mockingbird",
+      "n_ratings": 19088,
+      "avg_rating": 4.329
+    },
+    {
+      "book_id": 3,
+      "title": "Twilight (Twilight, #1)",
+      "n_ratings": 16931,
+      "avg_rating": 3.214
+    },
+    {
+      "book_id": 5,
+      "title": "The Great Gatsby",
+      "n_ratings": 16604,
+      "avg_rating": 3.772
+    },
+    {
+      "book_id": 17,
+      "title": "Catching Fire (The Hunger Games, #2)",
+      "n_ratings": 16549,
+      "avg_rating": 4.133
+    },
+    {
+      "book_id": 20,
+      "title": "Mockingjay (The Hunger Games, #3)",
+      "n_ratings": 15953,
+      "avg_rating": 3.853
+    },
+    {
+      "book_id": 18,
+      "title": "Harry Potter and the Prisoner of Azkaban (Harry Potter, #3)",
+      "n_ratings": 15855,
+      "avg_rating": 4.419
+    },
+    {
+      "book_id": 23,
+      "title": "Harry Potter and the Chamber of Secrets (Harry Potter, #2)",
+      "n_ratings": 15657,
+      "avg_rating": 4.229
+    },
+    {
+      "book_id": 7,
+      "title": "The Hobbit",
+      "n_ratings": 15558,
+      "avg_rating": 4.148
+    }
+  ],
+  "q5_best_rated": {
+    "min_ratings": 1000,
+    "rows": [
+      {
+        "book_id": 862,
+        "title": "Words of Radiance (The Stormlight Archive, #2)",
+        "n_ratings": 1373,
+        "avg_rating": 4.703
+      },
+      {
+        "book_id": 780,
+        "title": "Calvin and Hobbes",
+        "n_ratings": 1394,
+        "avg_rating": 4.661
+      },
+      {
+        "book_id": 422,
+        "title": "Harry Potter Boxset (Harry Potter, #1-7)",
+        "n_ratings": 1915,
+        "avg_rating": 4.66
+      },
+      {
+        "book_id": 1010,
+        "title": "The Essential Calvin and Hobbes: A Calvin and Hobbes Treasury",
+        "n_ratings": 1249,
+        "avg_rating": 4.653
+      },
+      {
+        "book_id": 1264,
+        "title": "Queen of Shadows (Throne of Glass, #4)",
+        "n_ratings": 1078,
+        "avg_rating": 4.564
+      },
+      {
+        "book_id": 562,
+        "title": "The Way of Kings (The Stormlight Archive, #1)",
+        "n_ratings": 1789,
+        "avg_rating": 4.546
+      },
+      {
+        "book_id": 25,
+        "title": "Harry Potter and the Deathly Hallows (Harry Potter, #7)",
+        "n_ratings": 15304,
+        "avg_rating": 4.526
+      },
+      {
+        "book_id": 964,
+        "title": "J.R.R. Tolkien 4-Book Boxed Set: The Hobbit and The Lord of the Rings",
+        "n_ratings": 1400,
+        "avg_rating": 4.519
+      },
+      {
+        "book_id": 192,
+        "title": "The Name of the Wind (The Kingkiller Chronicle, #1)",
+        "n_ratings": 3948,
+        "avg_rating": 4.5
+      },
+      {
+        "book_id": 1022,
+        "title": "Heir of Fire (Throne of Glass, #3)",
+        "n_ratings": 1293,
+        "avg_rating": 4.485
+      }
+    ]
+  },
+  "q6_book_stats": {
+    "output": "/work/data/parquet/book_stats",
+    "rows": 10000
+  },
+  "csv_vs_parquet_seconds": {
+    "csv": 11.97,
+    "parquet": 1.43
+  },
+  "timings_seconds": {
+    "q1_profile": 34.49,
+    "q2_distribution": 5.97,
+    "q3_user_activity": 8.7,
+    "q4_most_rated": 11.76,
+    "q5_best_rated": 3.07,
+    "q6_write_book_stats": 17.1
+  },
+  "total_seconds": 115.7
+}

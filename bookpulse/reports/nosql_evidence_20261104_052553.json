@@ -1,0 +1,82 @@
+{
+  "active": {
+    "recs_collection": "recommendations_20261104_051130",
+    "model_version": "20261104_051130",
+    "switched_at": "2026-11-04 05:14:25.643000"
+  },
+  "collections": {
+    "books": 10000,
+    "meta": 1,
+    "online_eval": 1,
+    "rating_stats": 1420,
+    "recommendations_20261104_051130": 53424,
+    "stream_state": 2,
+    "user_seen": 2000
+  },
+  "users_with_recs": 53424,
+  "indexes_on_recs": [
+    "_id_"
+  ],
+  "sample_document": {
+    "_id": 1,
+    "model_version": "20261104_051130",
+    "n_recs": 30,
+    "top_5": [
+      {
+        "rank": 1,
+        "book_id": 8946,
+        "score": 4.5461,
+        "title": "The Divan"
+      },
+      {
+        "rank": 2,
+        "book_id": 9566,
+        "score": 4.4263,
+        "title": "Attack of the Deranged Mutant Killer Monster Snow Goons"
+      },
+      {
+        "rank": 3,
+        "book_id": 7254,
+        "score": 4.4202,
+        "title": "Homicidal Psycho Jungle Cat: A Calvin and Hobbes Collection"
+      },
+      {
+        "rank": 4,
+        "book_id": 3628,
+        "score": 4.4179,
+        "title": "The Complete Calvin and Hobbes"
+      },
+      {
+        "rank": 5,
+        "book_id": 6920,
+        "score": 4.4089,
+        "title": "The Indispensable Calvin and Hobbes"
+      }
+    ]
+  },
+  "find_by_id_plan": {
+    "stage": "IDHACK → PROJECTION_DEFAULT",
+    "docs_examined": 1,
+    "keys_examined": 1
+  },
+  "read_latency_ms": {
+    "reads": 1000,
+    "p50": 0.5,
+    "p95": 1.11,
+    "max": 5.19
+  },
+  "streaming": {
+    "valid_events": 2000,
+    "rejected_events": 22,
+    "last_batch": 18,
+    "sum_n_ratings_in_rating_stats": 2000,
+    "counts_agree": true,
+    "books_with_live_stats": 1420,
+    "user_seen_pairs": 2000,
+    "online_eval": {
+      "liked_events": 1385,
+      "hits": 0,
+      "cold_start_events": 0
+    }
+  }
+}

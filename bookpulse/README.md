@@ -3,7 +3,8 @@
 Toàn bộ hệ thống chạy bằng Docker: Spark (batch + Structured Streaming), Kafka, MongoDB và app Streamlit.
 
 ```
-Luồng batch:      CSV → clean.py → Parquet → train_als.py (ALS) → write_recs.py → MongoDB
+Luồng batch:      CSV → clean.py → Parquet → analytics_sql.py (Spark SQL)
+                                          → train_als.py (ALS) → write_recs.py → MongoDB
 Luồng streaming:  producer.py → Kafka (rating-events) → stream_stats.py → MongoDB
 Phục vụ:          MongoDB → app/app.py (Streamlit, http://localhost:8501)
 ```
@@ -17,7 +18,7 @@ Phục vụ:          MongoDB → app/app.py (Streamlit, http://localhost:8501)
 ## 1. Khởi động
 
 ```bash
-cd "D:\Big Data\Group\bookpulse"
+cd "D:\Big Data\Group_06_BigData\bookpulse"
 docker compose up -d --build      # lần đầu mất vài phút để build image
 docker compose ps                 # mongo, kafka, spark, app đều phải "running"
 ```
@@ -53,10 +54,16 @@ những cuốn người dùng vừa chấm biến mất khỏi top-10.
 ```bash
 docker compose exec spark python scripts/download_goodbooks.py
 docker compose exec spark python batch/clean.py
+docker compose exec spark python batch/analytics_sql.py --books data/goodbooks/books.csv --raw-csv data/goodbooks/ratings.csv
 docker compose exec spark python batch/train_als.py
 docker compose exec spark python batch/write_recs.py --books data/goodbooks/books.csv
 docker compose exec spark python streaming/producer.py --limit 2000
+docker compose exec spark python scripts/nosql_evidence.py     # đọc lại MongoDB và kiểm chứng
+docker compose exec spark python scripts/kafka_audit.py        # đếm lại message trong Kafka để đối chiếu với streaming
+docker compose exec spark python batch/train_als.py --implicit --ranks 20 --regs 0.1   # ALS implicit, so theo Precision@10
 ```
+
+`--implicit` lưu mô hình vào `models/als_implicit`; mô hình app đang dùng (`models/als`) không bị thay.
 
 Với UCSD Book Graph: tải tay một file thể loại vào `data/ucsd/`, rồi
 `python batch/clean.py --input data/ucsd/<file>.csv` (rating 0 = chưa chấm, tự động bị loại).
@@ -68,6 +75,9 @@ Mỗi bước ghi một file JSON vào `reports/`:
 | File | Nội dung |
 |---|---|
 | `clean_*.json` | số dòng vào, số dòng lỗi, số dòng trùng, số dòng ra, thời gian |
+| `analytics_sql_*.json` | các câu hỏi phân tích bằng Spark SQL (profile, phân bố rating, top sách), kiểm tra SQL = DataFrame API, thời gian CSV so với Parquet |
+| `sql_plan_*.txt` | physical plan của truy vấn join (BroadcastHashJoin, Exchange = shuffle) |
+| `nosql_evidence_*.json` | số document mỗi collection, document mẫu, query plan và độ trễ đọc theo `_id`, đối chiếu số đếm streaming |
 | `train_als_*.json` | RMSE (ALS so với 2 baseline), Precision@10 / Recall@10 (ALS so với sách phổ biến), tham số tốt nhất, thời gian huấn luyện |
 | `write_recs_*.json` | phiên bản mô hình, số người dùng đã ghi |
 

@@ -3,6 +3,10 @@
 RMSE is compared with the global-mean and item-mean baselines; Precision@10 / Recall@10 with the
 most-popular baseline. A book is "relevant" when the user rated it 4 or 5 in the test set, and books
 the user already rated in training are never recommended.
+
+--implicit trains implicit-feedback ALS instead (ratings used as confidence weights). It optimises
+ranking rather than star error, so it is compared on Precision@10 / Recall@10 only and saved to
+models/als_implicit (the serving model in models/als is left untouched).
 """
 import argparse
 import os
@@ -45,6 +49,10 @@ def main():
     parser.add_argument("--eval-users", type=int, default=5000, help="users sampled for Precision/Recall")
     parser.add_argument("--candidates", type=int, default=200, help="ALS candidates per user before removing seen books")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--implicit", action="store_true",
+                        help="implicit-feedback ALS (ranking-oriented): ratings become confidence weights; "
+                             "uses the first --ranks/--regs value, no RMSE tuning")
+    parser.add_argument("--alpha", type=float, default=1.0, help="confidence scale for --implicit")
     args = parser.parse_args()
 
     spark = get_spark("bookpulse-train")
@@ -70,20 +78,26 @@ def main():
     # ALS is the Estimator; TrainValidationSplit picks rank/regParam on a validation slice of train
     als = ALS(userCol="user_id", itemCol="book_id", ratingCol="rating", maxIter=args.max_iter,
               coldStartStrategy="drop", nonnegative=True, seed=args.seed)
-    grid = (ParamGridBuilder()
-            .addGrid(als.rank, [int(x) for x in args.ranks.split(",")])
-            .addGrid(als.regParam, [float(x) for x in args.regs.split(",")])
-            .build())
-    tvs = TrainValidationSplit(estimator=als, estimatorParamMaps=grid, evaluator=evaluator,
-                               trainRatio=0.8, seed=args.seed)
+    ranks = [int(x) for x in args.ranks.split(",")]
+    regs = [float(x) for x in args.regs.split(",")]
     fit_started = time.time()
-    tvs_model = tvs.fit(train)
+    if args.implicit:
+        # Implicit ALS predicts a preference score, not stars, so RMSE does not apply: judge it by ranking
+        als.setImplicitPrefs(True).setAlpha(args.alpha).setRank(ranks[0]).setRegParam(regs[0])
+        model = als.fit(train)
+        tried = [{"rank": ranks[0], "regParam": regs[0], "alpha": args.alpha}]
+        best = tried[0]
+    else:
+        grid = ParamGridBuilder().addGrid(als.rank, ranks).addGrid(als.regParam, regs).build()
+        tvs = TrainValidationSplit(estimator=als, estimatorParamMaps=grid, evaluator=evaluator,
+                                   trainRatio=0.8, seed=args.seed)
+        tvs_model = tvs.fit(train)
+        model = tvs_model.bestModel
+        tried = [{**{p.name: v for p, v in params.items()}, "validation_rmse": round(m, 4)}
+                 for params, m in zip(grid, tvs_model.validationMetrics)]
+        best = min(tried, key=lambda t: t["validation_rmse"])
+        rmse["als"] = evaluator.evaluate(model.transform(test))
     fit_seconds = time.time() - fit_started
-    model = tvs_model.bestModel
-    tried = [{**{p.name: v for p, v in params.items()}, "validation_rmse": round(m, 4)}
-             for params, m in zip(grid, tvs_model.validationMetrics)]
-    best = min(tried, key=lambda t: t["validation_rmse"])
-    rmse["als"] = evaluator.evaluate(model.transform(test))
     rmse = {name: round(value, 4) for name, value in rmse.items()}
 
     # Ranking metrics on a sample of test users
@@ -97,9 +111,11 @@ def main():
     ranking = {"als": ranking_metrics(als_recs, relevant, K),
                "baseline_popular": ranking_metrics(pop_recs, relevant, K)}
 
-    model.write().overwrite().save(str(MODEL_DIR / "als"))
-    save_report("train_als", {
+    model_path = MODEL_DIR / ("als_implicit" if args.implicit else "als")
+    model.write().overwrite().save(str(model_path))
+    save_report("train_als_implicit" if args.implicit else "train_als", {
         "spark_master": os.getenv("SPARK_MASTER", "local[*]"),
+        "implicit": args.implicit,
         "rows": {"train": train.count(), "test": test.count()},
         "grid": tried,
         "best_params": best,
@@ -107,7 +123,7 @@ def main():
         "ranking_test": ranking,
         "fit_seconds": round(fit_seconds, 1),
         "total_seconds": round(time.time() - started, 1),
-        "model_path": str(MODEL_DIR / "als"),
+        "model_path": str(model_path),
     })
     spark.stop()
 

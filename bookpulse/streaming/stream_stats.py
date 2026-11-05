@@ -59,6 +59,23 @@ def update_online_eval(db, rows):
     )
 
 
+def ensure_topic(partitions):
+    """Spark stops with UnknownTopicOrPartitionException when the topic does not exist yet (Kafka only
+    auto-creates it on the producer's first send), so create it before subscribing."""
+    from kafka.admin import KafkaAdminClient, NewTopic
+    from kafka.errors import TopicAlreadyExistsError
+
+    admin = KafkaAdminClient(bootstrap_servers=KAFKA_BOOTSTRAP)
+    try:
+        if KAFKA_TOPIC not in admin.list_topics():
+            admin.create_topics([NewTopic(KAFKA_TOPIC, num_partitions=partitions, replication_factor=1)])
+            print(f"created topic '{KAFKA_TOPIC}' with {partitions} partitions")
+    except TopicAlreadyExistsError:
+        pass
+    finally:
+        admin.close()
+
+
 def process_valid(df, batch_id):
     db = get_db()
     if already_applied(db, "valid_events", batch_id):
@@ -101,8 +118,10 @@ def main():
     parser.add_argument("--trigger", default="5 seconds")
     parser.add_argument("--starting-offsets", default="earliest")
     parser.add_argument("--run-seconds", type=int, default=0, help="0 = run until Ctrl+C")
+    parser.add_argument("--partitions", type=int, default=3, help="partitions if the topic has to be created")
     args = parser.parse_args()
 
+    ensure_topic(args.partitions)
     spark = get_spark("bookpulse-stream", kafka=True)
     events = (
         spark.readStream.format("kafka")
