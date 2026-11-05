@@ -1,0 +1,20 @@
+{
+  "input": "/work/data/goodbooks/ratings.csv",
+  "output": "/work/data/parquet/ratings",
+  "spark_master": "local[*]",
+  "input_rows": 5976479,
+  "rejected_invalid": 0,
+  "stream_events": {
+    "path": "/work/data/parquet/stream_events",
+    "events": 2305,
+    "distinct_pairs": 2005,
+    "pairs_updating_a_csv_rating": 2000,
+    "new_pairs": 5,
+    "older_versions_replaced": 2300
+  },
+  "rejected_duplicates": 0,
+  "output_rows": 5976484,
+  "users": 53424,
+  "books": 10000,
+  "seconds": 62.7
+}

@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(os.getenv("BOOKPULSE_HOME", Path(__file__).resolve().parents[1]))
 DATA_DIR = ROOT / "data"
 PARQUET_DIR = DATA_DIR / "parquet"
+STREAM_EVENTS_DIR = PARQUET_DIR / "stream_events"  # valid streamed ratings, merged in by batch/clean.py
 MODEL_DIR = ROOT / "models"
 REPORT_DIR = ROOT / "reports"
 CHECKPOINT_DIR = ROOT / "checkpoints"

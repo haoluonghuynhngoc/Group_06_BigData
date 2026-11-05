@@ -7,6 +7,11 @@ Per micro-batch it writes three things:
 
 Spark + Kafka + checkpoint gives at-least-once delivery, so a batch can be replayed after a restart.
 The last applied batch id is stored in MongoDB and a replayed batch is skipped, so counts are not doubled.
+
+A third query appends every valid, de-duplicated event to Parquet (data/parquet/stream_events,
+partitioned by event_date). Spark's file sink records committed files in _spark_metadata, so this
+output is exactly-once. batch/clean.py merges these events into the training data, so the next
+retrain learns from ratings that arrived through the stream.
 """
 import argparse
 import time
@@ -16,7 +21,8 @@ from pymongo import UpdateOne
 from pyspark.sql import functions as F
 from pyspark.sql.types import BooleanType, IntegerType, StringType, StructField, StructType
 
-from common.settings import CHECKPOINT_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC, get_db, get_spark
+from common.settings import (CHECKPOINT_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC, STREAM_EVENTS_DIR, get_db,
+                             get_spark)
 
 SCHEMA = StructType([
     StructField("event_id", StringType()),
@@ -150,6 +156,12 @@ def main():
         .trigger(processingTime=args.trigger).start(),
         "rejected": rejected.writeStream.foreachBatch(process_rejected)
         .option("checkpointLocation", str(CHECKPOINT_DIR / "stream_rejected"))
+        .trigger(processingTime=args.trigger).start(),
+        # Durable copy of the stream for the next batch retrain (exactly-once file sink)
+        "events": valid.withColumn("event_date", F.to_date("event_time"))
+        .writeStream.format("parquet").outputMode("append").partitionBy("event_date")
+        .option("path", str(STREAM_EVENTS_DIR))
+        .option("checkpointLocation", str(CHECKPOINT_DIR / "stream_events"))
         .trigger(processingTime=args.trigger).start(),
     }
     print(f"streaming from '{KAFKA_TOPIC}' at {KAFKA_BOOTSTRAP}; Ctrl+C to stop")

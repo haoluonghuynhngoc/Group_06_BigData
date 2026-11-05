@@ -1,0 +1,109 @@
+# Hadoop 3.5.0 cluster for the BookPulse MapReduce component (HDFS + YARN + JobHistory + client).
+# Same image and configuration as the course Hadoop lab (Session 2); the client mounts bookpulse/ at /bookpulse.
+#
+#   cd bookpulse/mapreduce/hadoop
+#   docker compose up -d --build        # first build pulls ghcr.io/apache/hadoop:3.5.0
+#   docker compose logs -f client       # wait for "BOOKPULSE HADOOP READY"
+#   docker compose exec client bash /bookpulse/mapreduce/run_hadoop.sh
+name: bookpulse-hadoop
+
+x-hadoop-common: &hadoop-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  image: bda501-hadoop-lab:3.5.0
+  env_file:
+    - ./hadoop.env
+  networks:
+    - hadoop
+
+services:
+  namenode:
+    <<: *hadoop-common
+    hostname: namenode
+    command: ["hdfs", "namenode"]
+    environment:
+      ENSURE_NAMENODE_DIR: /data/name/current
+    ports:
+      - "9870:9870"
+    volumes:
+      - namenode_data:/data/name
+
+  datanode:
+    <<: *hadoop-common
+    hostname: datanode
+    command: ["hdfs", "datanode"]
+    environment:
+      WAITFOR: namenode:8020
+      WAITFOR_TIMEOUT: "180"
+    depends_on:
+      - namenode
+    ports:
+      - "9864:9864"
+    volumes:
+      - datanode_data:/data/data
+
+  resourcemanager:
+    <<: *hadoop-common
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    environment:
+      WAITFOR: namenode:8020
+      WAITFOR_TIMEOUT: "180"
+    depends_on:
+      - namenode
+      - datanode
+    ports:
+      - "8088:8088"
+
+  nodemanager:
+    <<: *hadoop-common
+    hostname: nodemanager
+    command: ["yarn", "nodemanager"]
+    environment:
+      WAITFOR: resourcemanager:8088
+      WAITFOR_TIMEOUT: "180"
+    depends_on:
+      - resourcemanager
+    ports:
+      - "8042:8042"
+
+  historyserver:
+    <<: *hadoop-common
+    hostname: historyserver
+    command: ["mapred", "historyserver"]
+    environment:
+      WAITFOR: namenode:8020
+      WAITFOR_TIMEOUT: "180"
+    depends_on:
+      - namenode
+      - resourcemanager
+    ports:
+      - "19888:19888"
+
+  client:
+    <<: *hadoop-common
+    hostname: client
+    # root: the job writes its output into bookpulse/reports, which the Spark container (root) created.
+    # HDFS permission checks are off (hadoop.env), so this only affects local files.
+    user: root
+    command: ["bash", "/bookpulse/mapreduce/hadoop/client-start.sh"]
+    environment:
+      WAITFOR: namenode:8020
+      WAITFOR_TIMEOUT: "180"
+    depends_on:
+      - namenode
+      - datanode
+      - resourcemanager
+      - nodemanager
+      - historyserver
+    volumes:
+      - ../..:/bookpulse
+
+networks:
+  hadoop:
+    driver: bridge
+
+volumes:
+  namenode_data:
+  datanode_data:

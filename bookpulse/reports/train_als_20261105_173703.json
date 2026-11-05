@@ -1,0 +1,57 @@
+{
+  "spark_master": "local[*]",
+  "implicit": false,
+  "rows": {
+    "train": 4780721,
+    "test": 1195763
+  },
+  "grid": [
+    {
+      "rank": 10,
+      "regParam": 0.05,
+      "validation_rmse": 0.8384
+    },
+    {
+      "rank": 10,
+      "regParam": 0.1,
+      "validation_rmse": 0.8364
+    },
+    {
+      "rank": 20,
+      "regParam": 0.05,
+      "validation_rmse": 0.8381
+    },
+    {
+      "rank": 20,
+      "regParam": 0.1,
+      "validation_rmse": 0.8314
+    }
+  ],
+  "best_params": {
+    "rank": 20,
+    "regParam": 0.1,
+    "validation_rmse": 0.8314
+  },
+  "rmse_test": {
+    "baseline_global_mean": 0.9917,
+    "baseline_item_mean": 0.9543,
+    "als": 0.8274
+  },
+  "ranking_test": {
+    "als": {
+      "precision@10": 0.0083,
+      "recall@10": 0.0065,
+      "users_evaluated": 4987,
+      "distinct_books_recommended": 1360
+    },
+    "baseline_popular": {
+      "precision@10": 0.0799,
+      "recall@10": 0.0522,
+      "users_evaluated": 4987,
+      "distinct_books_recommended": 36
+    }
+  },
+  "fit_seconds": 229.1,
+  "total_seconds": 336.0,
+  "model_path": "/work/models/als"
+}

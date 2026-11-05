@@ -2,6 +2,9 @@
 
 Recommendations go to a new collection recommendations_<version>. Only when every user is written
 does the meta document "active" point to it, so the app never reads a half-written list.
+
+Each user document also carries "fallback": the most-rated books that user has not rated, which the
+app uses to refill the top-10 once the user has read through the stored recommendations.
 """
 import argparse
 import time
@@ -24,10 +27,11 @@ def write_partition_factory(collection, version, created_at):
         ops = []
         for row in rows:
             recs = [{"rank": r["rank"], "book_id": r["book_id"], "score": round(float(r["score"]), 4)}
-                    for r in row["recs"]]
+                    for r in row["recs"] or []]
+            fallback = [r["book_id"] for r in row["fallback"] or []]
             ops.append(ReplaceOne({"_id": row["user_id"]},
-                                  {"_id": row["user_id"], "recs": recs, "model_version": version,
-                                   "created_at": created_at}, upsert=True))
+                                  {"_id": row["user_id"], "recs": recs, "fallback": fallback,
+                                   "model_version": version, "created_at": created_at}, upsert=True))
             if len(ops) == 1000:
                 coll.bulk_write(ops, ordered=False)
                 ops = []
@@ -52,6 +56,12 @@ def main():
     parser.add_argument("--top-n", type=int, default=30, help="stored per user; the app shows the first 10 unread")
     parser.add_argument("--candidates", type=int, default=200)
     parser.add_argument("--books", default=None, help="books.csv with book_id,title,authors (optional)")
+    parser.add_argument("--fallback-n", type=int, default=10,
+                        help="popular books the user has not rated, stored per user to refill the top-10")
+    parser.add_argument("--fallback-pool", type=int, default=200, help="most-rated books to pick the fallback from")
+    parser.add_argument("--model", default="als_implicit", choices=["als_implicit", "als"],
+                        help="serving model in models/: als_implicit (chosen on Precision@10, see "
+                             "docs/chon-mo-hinh.md) or als (explicit, predicts stars)")
     args = parser.parse_args()
 
     spark = get_spark("bookpulse-write-recs")
@@ -62,11 +72,23 @@ def main():
     collection = f"recommendations_{version}"
 
     ratings = spark.read.parquet(str(PARQUET_DIR / "ratings"))
-    model = ALSModel.load(str(MODEL_DIR / "als"))
-    recs = top_k_unseen(explode_recs(model.recommendForAllUsers(args.candidates)),
-                        ratings.select("user_id", "book_id"), args.top_n)
+    seen = ratings.select("user_id", "book_id")
+    model = ALSModel.load(str(MODEL_DIR / args.model))
+    model_type = "implicit" if args.model == "als_implicit" else "explicit"
+    recs = top_k_unseen(explode_recs(model.recommendForAllUsers(args.candidates)), seen, args.top_n)
     per_user = recs.groupBy("user_id").agg(
         F.sort_array(F.collect_list(F.struct("rank", "book_id", "score"))).alias("recs"))
+
+    # Per-user refill list: most-rated books this user has NOT rated. When the user reads through the
+    # stored recs, the app tops the list up from here instead of showing fewer than 10 books
+    # (a global popular list could repeat books the user already read).
+    pool = (ratings.groupBy("book_id").agg(F.count("*").alias("score"))
+            .orderBy(F.desc("score"), "book_id").limit(args.fallback_pool))
+    fallback = (top_k_unseen(seen.select("user_id").distinct().crossJoin(F.broadcast(pool)), seen,
+                             args.fallback_n)
+                .groupBy("user_id")
+                .agg(F.sort_array(F.collect_list(F.struct("rank", "book_id"))).alias("fallback")))
+    per_user = per_user.join(fallback, "user_id", "left")
     per_user.foreachPartition(write_partition_factory(collection, version, created_at))
     users_written = db[collection].count_documents({})
 
@@ -79,7 +101,8 @@ def main():
 
     # Atomic switch: the app reads whatever collection "active" points to
     db.meta.replace_one({"_id": "active"}, {"_id": "active", "recs_collection": collection,
-                                             "model_version": version, "popular": popular_docs,
+                                             "model_version": version, "model_type": model_type,
+                                             "popular": popular_docs,
                                              "switched_at": datetime.now(timezone.utc)}, upsert=True)
     old = sorted(c for c in db.list_collection_names() if c.startswith("recommendations_"))[:-KEEP_VERSIONS]
     for name in old:
@@ -88,9 +111,13 @@ def main():
     books_loaded = load_books(spark, db, args.books) if args.books else None
     save_report("write_recs", {
         "model_version": version,
+        "model": args.model,
         "collection": collection,
         "users_written": users_written,
         "top_n": args.top_n,
+        "fallback_n": args.fallback_n,
+        "users_with_full_fallback": db[collection].count_documents(
+            {f"fallback.{args.fallback_n - 1}": {"$exists": True}}),
         "books_loaded": books_loaded,
         "dropped_old_versions": old,
         "seconds": round(time.time() - started, 1),

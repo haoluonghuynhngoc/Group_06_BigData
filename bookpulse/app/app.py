@@ -26,11 +26,28 @@ if st.button("Làm mới"):
 
 seen = {d["book_id"] for d in db().user_seen.find({"user_id": user_id}, {"book_id": 1})}
 doc = db()[meta["recs_collection"]].find_one({"_id": user_id})
+# Implicit ALS scores are preference scores (roughly 0-1), not stars, so the column is labelled differently
+model_type = meta.get("model_type", "explicit")
+score_label = "Mức phù hợp" if model_type == "implicit" else "Điểm dự đoán (sao)"
+
+filled = 0
 if doc:
-    items = [r for r in doc["recs"] if r["book_id"] not in seen][:TOP_K]
-    source = f"ALS · phiên bản mô hình {meta['model_version']}"
+    items = [{**r, "source": "ALS"} for r in doc["recs"] if r["book_id"] not in seen][:TOP_K]
+    source = f"ALS {model_type} · phiên bản mô hình {meta['model_version']}"
+    # The user has read through the stored recs: top up with popular books they have not rated.
+    # "fallback" is per user (written by write_recs.py); documents from older versions lack it.
+    refill = doc["fallback"] if "fallback" in doc else [p["book_id"] for p in meta["popular"]]
+    shown = {r["book_id"] for r in items}
+    for book_id in refill:
+        if len(items) >= TOP_K:
+            break
+        if book_id not in seen and book_id not in shown:
+            items.append({"book_id": book_id, "score": None, "source": "Phổ biến (bù)"})
+            shown.add(book_id)
+            filled += 1
 else:
-    items = [{"book_id": p["book_id"], "score": None} for p in meta["popular"] if p["book_id"] not in seen][:TOP_K]
+    items = [{"book_id": p["book_id"], "score": None, "source": "Phổ biến"}
+             for p in meta["popular"] if p["book_id"] not in seen][:TOP_K]
     source = "Người dùng mới (cold start): gợi ý sách phổ biến"
 
 ids = [r["book_id"] for r in items]
@@ -41,12 +58,14 @@ table = pd.DataFrame([{
     "book_id": r["book_id"],
     "Tên sách": books.get(r["book_id"], {}).get("title", "—"),
     "Tác giả": books.get(r["book_id"], {}).get("authors", "—"),
-    "Điểm dự đoán": None if r.get("score") is None else round(r["score"], 2),
+    score_label: None if r.get("score") is None else round(r["score"], 2),
     "Điểm TB trực tiếp": round(stats[r["book_id"]]["avg_rating"], 2) if r["book_id"] in stats else None,
     "Lượt chấm (stream)": stats.get(r["book_id"], {}).get("n_ratings", 0),
+    "Nguồn": r["source"],
 } for i, r in enumerate(items)])
 
-st.caption(source + f" · đã ẩn {len(seen)} cuốn người dùng vừa đọc")
+st.caption(source + f" · đã ẩn {len(seen)} cuốn người dùng vừa đọc"
+           + (f" · bù {filled} cuốn phổ biến chưa đọc" if filled else ""))
 st.dataframe(table, hide_index=True, use_container_width=True)
 
 st.subheader("Luồng streaming")

@@ -5,8 +5,13 @@ most-popular baseline. A book is "relevant" when the user rated it 4 or 5 in the
 the user already rated in training are never recommended.
 
 --implicit trains implicit-feedback ALS instead (ratings used as confidence weights). It optimises
-ranking rather than star error, so it is compared on Precision@10 / Recall@10 only and saved to
-models/als_implicit (the serving model in models/als is left untouched).
+ranking rather than star error, so it is tuned and compared on Precision@10 / Recall@10 only: every
+rank x regParam x alpha combination is fitted on part of train and scored on a validation slice of
+train (never on the test set); the best one is refitted on all of train, evaluated once on test and
+saved to models/als_implicit. This is the serving model (see docs/chon-mo-hinh.md).
+
+Ranking results also report how many distinct books the top-10 lists cover, to show whether a
+model only repeats the same popular books.
 """
 import argparse
 import os
@@ -37,7 +42,8 @@ def ranking_metrics(recs, relevant, k):
         .first()
     )
     return {f"precision@{k}": round(row["precision"], 4), f"recall@{k}": round(row["recall"], 4),
-            "users_evaluated": row["users"]}
+            "users_evaluated": row["users"],
+            "distinct_books_recommended": recs.select("book_id").distinct().count()}
 
 
 def main():
@@ -51,8 +57,8 @@ def main():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--implicit", action="store_true",
                         help="implicit-feedback ALS (ranking-oriented): ratings become confidence weights; "
-                             "uses the first --ranks/--regs value, no RMSE tuning")
-    parser.add_argument("--alpha", type=float, default=1.0, help="confidence scale for --implicit")
+                             "tuned on validation Precision@10 instead of RMSE")
+    parser.add_argument("--alphas", default="1.0", help="--implicit: confidence scales to try (comma list)")
     args = parser.parse_args()
 
     spark = get_spark("bookpulse-train")
@@ -82,11 +88,34 @@ def main():
     regs = [float(x) for x in args.regs.split(",")]
     fit_started = time.time()
     if args.implicit:
-        # Implicit ALS predicts a preference score, not stars, so RMSE does not apply: judge it by ranking
-        als.setImplicitPrefs(True).setAlpha(args.alpha).setRank(ranks[0]).setRegParam(regs[0])
-        model = als.fit(train)
-        tried = [{"rank": ranks[0], "regParam": regs[0], "alpha": args.alpha}]
-        best = tried[0]
+        # Implicit ALS predicts a preference score, not stars, so RMSE does not apply: judge it by ranking.
+        # Each combination is scored on a validation slice of train; the test set stays untouched.
+        def implicit_als(rank, reg, alpha):
+            return als.copy().setImplicitPrefs(True).setRank(rank).setRegParam(reg).setAlpha(alpha)
+
+        combos = [(r, g, a) for r in ranks for g in regs for a in (float(x) for x in args.alphas.split(","))]
+        tried = []
+        if len(combos) > 1:
+            fit_part, val = (df.cache() for df in train.randomSplit([0.8, 0.2], seed=args.seed))
+            val_users = val.select("user_id").distinct().orderBy(F.rand(args.seed)).limit(args.eval_users).cache()
+            val_relevant = val.filter(F.col("rating") >= 4).join(val_users, "user_id").select("user_id", "book_id")
+            fit_seen = fit_part.select("user_id", "book_id")
+            for rank, reg, alpha in combos:
+                started_combo = time.time()
+                candidate = implicit_als(rank, reg, alpha).fit(fit_part)
+                recs = top_k_unseen(explode_recs(candidate.recommendForUserSubset(val_users, args.candidates)),
+                                    fit_seen, K)
+                m = ranking_metrics(recs, val_relevant, K)
+                tried.append({"rank": rank, "regParam": reg, "alpha": alpha,
+                              "validation_precision@10": m["precision@10"], "validation_recall@10": m["recall@10"],
+                              "seconds": round(time.time() - started_combo, 1)})
+                print(tried[-1], flush=True)
+            best = max(tried, key=lambda t: t["validation_precision@10"])
+        else:
+            rank, reg, alpha = combos[0]
+            best = {"rank": rank, "regParam": reg, "alpha": alpha}
+            tried.append(best)
+        model = implicit_als(best["rank"], best["regParam"], best["alpha"]).fit(train)
     else:
         grid = ParamGridBuilder().addGrid(als.rank, ranks).addGrid(als.regParam, regs).build()
         tvs = TrainValidationSplit(estimator=als, estimatorParamMaps=grid, evaluator=evaluator,
