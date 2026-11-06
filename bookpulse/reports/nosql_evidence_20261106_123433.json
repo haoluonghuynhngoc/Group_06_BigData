@@ -1,0 +1,84 @@
+{
+  "active": {
+    "recs_collection": "recommendations_20261105_173716",
+    "model_version": "20261105_173716",
+    "switched_at": "2026-11-05 17:41:21.243000"
+  },
+  "collections": {
+    "books": 10000,
+    "meta": 1,
+    "online_eval": 1,
+    "rating_stats": 2568,
+    "recommendations_20261105_155707": 53424,
+    "recommendations_20261105_173716": 53424,
+    "stream_state": 2,
+    "trending": 4411,
+    "user_seen": 4449
+  },
+  "users_with_recs": 53424,
+  "indexes_on_recs": [
+    "_id_"
+  ],
+  "sample_document": {
+    "_id": 1,
+    "model_version": "20261105_173716",
+    "n_recs": 30,
+    "top_5": [
+      {
+        "rank": 1,
+        "book_id": 5,
+        "score": 0.8228,
+        "title": "The Great Gatsby"
+      },
+      {
+        "rank": 2,
+        "book_id": 8,
+        "score": 0.7852,
+        "title": "The Catcher in the Rye"
+      },
+      {
+        "rank": 3,
+        "book_id": 195,
+        "score": 0.7692,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 4,
+        "book_id": 118,
+        "score": 0.7519,
+        "title": "The Joy Luck Club"
+      },
+      {
+        "rank": 5,
+        "book_id": 15,
+        "score": 0.7467,
+        "title": "The Diary of a Young Girl"
+      }
+    ]
+  },
+  "find_by_id_plan": {
+    "stage": "IDHACK → PROJECTION_DEFAULT",
+    "docs_examined": 1,
+    "keys_examined": 1
+  },
+  "read_latency_ms": {
+    "reads": 1000,
+    "p50": 0.49,
+    "p95": 1.18,
+    "max": 2.76
+  },
+  "streaming": {
+    "valid_events": 4749,
+    "rejected_events": 46,
+    "last_batch": 46,
+    "sum_n_ratings_in_rating_stats": 4749,
+    "counts_agree": true,
+    "books_with_live_stats": 2568,
+    "user_seen_pairs": 4449,
+    "online_eval": {
+      "liked_events": 3274,
+      "hits": 5,
+      "cold_start_events": 0
+    }
+  }
+}

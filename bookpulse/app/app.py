@@ -78,3 +78,20 @@ c2.metric("Sự kiện lỗi bị loại", rejected.get("events", 0))
 liked = online.get("liked_events", 0)
 c3.metric(f"Tỷ lệ trúng top-{TOP_K} (online)", f"{online.get('hits', 0) / liked:.1%}" if liked else "—",
           help="Trong các lượt chấm 4–5 sao của người dùng đã có gợi ý, bao nhiêu cuốn nằm trong top-10 của họ")
+
+st.subheader("Sách đang hot")
+# Sliding windows overlap: the two newest windows both contain the latest events. Show the older of the
+# two, which has been collecting for longer and so is the more complete picture.
+starts = sorted(db().trending.distinct("window_start"), reverse=True)[:2]
+if starts:
+    ws = starts[-1]
+    hot = list(db().trending.find({"window_start": ws}).sort([("n_ratings", -1), ("avg_rating", -1)]).limit(TOP_K))
+    titles = {b["_id"]: b.get("title", "—") for b in db().books.find({"_id": {"$in": [h["book_id"] for h in hot]}})}
+    st.caption(f"Cửa sổ event time {hot[0]['window_start']:%Y-%m-%d %H:%M}–{hot[0]['window_end']:%H:%M} UTC · "
+               "Spark Structured Streaming gom theo cửa sổ trượt, có watermark; sự kiện trễ quá watermark bị loại")
+    st.dataframe(pd.DataFrame([{
+        "#": i + 1, "Tên sách": titles.get(h["book_id"], "—"), "Lượt chấm trong cửa sổ": h["n_ratings"],
+        "Điểm TB trong cửa sổ": h["avg_rating"], "Lượt 4–5 sao": h["n_liked"],
+    } for i, h in enumerate(hot)]), hide_index=True, use_container_width=True)
+else:
+    st.info("Chưa có dữ liệu cửa sổ: chạy streaming/stream_stats.py và streaming/producer.py.")

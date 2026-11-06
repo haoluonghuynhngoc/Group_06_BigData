@@ -2,14 +2,15 @@
 
 Every event gets a fresh event_id and event_time (the dataset has no rating timestamps), so all
 events are labelled simulated. A small share is sent twice or sent with an invalid rating on
-purpose, to check that the streaming job drops them.
+purpose, to check that the streaming job drops them. With --late, a share of events carries an
+event_time that is --late-minutes old: older than the job's watermark, so Spark drops them.
 """
 import argparse
 import json
 import random
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 from kafka import KafkaProducer
@@ -17,8 +18,8 @@ from kafka import KafkaProducer
 from common.settings import DATA_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC
 
 
-def now_utc():
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+def now_utc(minutes_ago=0.0):
+    return (datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 def main():
@@ -28,6 +29,11 @@ def main():
     parser.add_argument("--limit", type=int, default=2000, help="number of ratings to replay")
     parser.add_argument("--dup", type=float, default=0.02, help="share of events sent twice")
     parser.add_argument("--bad", type=float, default=0.01, help="share of extra invalid events")
+    parser.add_argument("--late", type=float, default=0.0,
+                        help="share of events sent with an old event_time, to show the watermark dropping them")
+    parser.add_argument("--late-minutes", type=float, default=30, help="how old a late event is")
+    parser.add_argument("--late-after", type=int, default=200,
+                        help="send late events only after this many events, so Spark already has a watermark")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -43,11 +49,14 @@ def main():
         acks="all",
         linger_ms=10,
     )
-    counts = {"sent": 0, "duplicates": 0, "invalid": 0}
+    counts = {"sent": 0, "duplicates": 0, "invalid": 0, "late": 0}
     started = time.time()
     for row in sample.itertuples(index=False):
+        late = args.late > 0 and counts["sent"] >= args.late_after and rng.random() < args.late
         event = {"event_id": uuid.uuid4().hex, "user_id": int(row.user_id), "book_id": int(row.book_id),
-                 "rating": int(row.rating), "event_time": now_utc(), "simulated": True}
+                 "rating": int(row.rating), "event_time": now_utc(args.late_minutes if late else 0),
+                 "simulated": True}
+        counts["late"] += late
         producer.send(KAFKA_TOPIC, key=event["user_id"], value=event)
         counts["sent"] += 1
         if rng.random() < args.dup:

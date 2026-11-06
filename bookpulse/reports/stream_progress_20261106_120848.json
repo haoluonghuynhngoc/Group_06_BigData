@@ -1,0 +1,388 @@
+{
+  "settings": {
+    "watermark": "10 minutes",
+    "window": "10 minutes",
+    "slide": "5 minutes",
+    "trigger": "5 seconds",
+    "topic": "rating-events"
+  },
+  "written": "2026-11-06T12:09:39.481840+00:00",
+  "queries": {
+    "valid": {
+      "query_id": "b229a2e6-86c5-4945-a903-ff10f0fbe304",
+      "batches": 3,
+      "input_rows": 398,
+      "max_input_rows_per_second": 17.872839144447703,
+      "max_processed_rows_per_second": 43.68063014679556,
+      "max_batch_duration_ms": 13651,
+      "rows_dropped_by_watermark": 8,
+      "duplicates_dropped": 10,
+      "state_rows_now": 378,
+      "watermark_now": "2026-11-06T11:59:17.491Z",
+      "last_progress": {
+        "id": "b229a2e6-86c5-4945-a903-ff10f0fbe304",
+        "runId": "170fbf9d-4137-4f99-9ad3-bf71a1d8d675",
+        "name": "valid",
+        "timestamp": "2026-11-06T12:09:31.140Z",
+        "batchId": 28,
+        "numInputRows": 244,
+        "inputRowsPerSecond": 17.872839144447703,
+        "processedRowsPerSecond": 43.68063014679556,
+        "durationMs": {
+          "addBatch": 4260,
+          "commitOffsets": 211,
+          "getBatch": 0,
+          "latestOffset": 115,
+          "queryPlanning": 223,
+          "triggerExecution": 5586,
+          "walCommit": 762
+        },
+        "eventTime": {
+          "avg": "2026-11-06T12:08:24.602Z",
+          "max": "2026-11-06T12:09:31.187Z",
+          "min": "2026-11-06T11:39:20.982Z",
+          "watermark": "2026-11-06T11:59:17.491Z"
+        },
+        "stateOperators": [
+          {
+            "operatorName": "dedupeWithinWatermark",
+            "numRowsTotal": 378,
+            "numRowsUpdated": 227,
+            "allUpdatesTimeMs": 609,
+            "numRowsRemoved": 0,
+            "allRemovalsTimeMs": 0,
+            "commitTimeMs": 2392,
+            "memoryUsedBytes": 95872,
+            "numRowsDroppedByWatermark": 8,
+            "numShufflePartitions": 8,
+            "numStateStoreInstances": 8,
+            "customMetrics": {
+              "loadedMapCacheHitCount": 16,
+              "loadedMapCacheMissCount": 8,
+              "numDroppedDuplicateRows": 7,
+              "stateOnCurrentVersionSizeBytes": 82848
+            }
+          }
+        ],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 923,
+                "1": 782,
+                "0": 826
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 1002,
+                "1": 857,
+                "0": 916
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 1002,
+                "1": 857,
+                "0": 916
+              }
+            },
+            "numInputRows": 244,
+            "inputRowsPerSecond": 17.872839144447703,
+            "processedRowsPerSecond": 43.68063014679556,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "rejected": {
+      "query_id": "cfaec3bc-9918-49a0-a6b9-3d33b62e2b62",
+      "batches": 4,
+      "input_rows": 449,
+      "max_input_rows_per_second": 18.883643432379895,
+      "max_processed_rows_per_second": 58.2608695652174,
+      "max_batch_duration_ms": 10801,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 0,
+      "watermark_now": null,
+      "last_progress": {
+        "id": "cfaec3bc-9918-49a0-a6b9-3d33b62e2b62",
+        "runId": "30b483da-cd22-49f2-85e6-7394715b6a9c",
+        "name": "rejected",
+        "timestamp": "2026-11-06T12:09:34.166Z",
+        "batchId": 26,
+        "numInputRows": 134,
+        "inputRowsPerSecond": 16.222760290556902,
+        "processedRowsPerSecond": 58.2608695652174,
+        "durationMs": {
+          "addBatch": 1644,
+          "commitOffsets": 132,
+          "getBatch": 1,
+          "latestOffset": 42,
+          "queryPlanning": 119,
+          "triggerExecution": 2300,
+          "walCommit": 360
+        },
+        "stateOperators": [],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 977,
+                "1": 828,
+                "0": 887
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 1017,
+                "1": 875,
+                "0": 934
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 1017,
+                "1": 875,
+                "0": 934
+              }
+            },
+            "numInputRows": 134,
+            "inputRowsPerSecond": 16.222760290556902,
+            "processedRowsPerSecond": 58.2608695652174,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "events": {
+      "query_id": "406c62d4-ce47-4311-92b4-954f8edefb62",
+      "batches": 1,
+      "input_rows": 21,
+      "max_input_rows_per_second": 4.199160167966406,
+      "max_processed_rows_per_second": 0.8302035975489227,
+      "max_batch_duration_ms": 25294,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 326,
+      "watermark_now": "2026-11-05T15:44:59.378Z",
+      "last_progress": {
+        "id": "406c62d4-ce47-4311-92b4-954f8edefb62",
+        "runId": "34799956-ba55-437a-b41a-50c979c1bf96",
+        "name": "events_to_parquet",
+        "timestamp": "2026-11-06T12:09:10.001Z",
+        "batchId": 8,
+        "numInputRows": 21,
+        "inputRowsPerSecond": 4.199160167966406,
+        "processedRowsPerSecond": 0.8302035975489227,
+        "durationMs": {
+          "addBatch": 24068,
+          "commitOffsets": 601,
+          "getBatch": 1,
+          "latestOffset": 38,
+          "queryPlanning": 151,
+          "triggerExecution": 25294,
+          "walCommit": 409
+        },
+        "eventTime": {
+          "avg": "2026-11-06T12:09:09.478Z",
+          "max": "2026-11-06T12:09:09.985Z",
+          "min": "2026-11-06T12:09:08.969Z",
+          "watermark": "2026-11-05T15:44:59.378Z"
+        },
+        "stateOperators": [
+          {
+            "operatorName": "dedupeWithinWatermark",
+            "numRowsTotal": 326,
+            "numRowsUpdated": 21,
+            "allUpdatesTimeMs": 884,
+            "numRowsRemoved": 0,
+            "allRemovalsTimeMs": 0,
+            "commitTimeMs": 2055,
+            "memoryUsedBytes": 120464,
+            "numRowsDroppedByWatermark": 0,
+            "numShufflePartitions": 8,
+            "numStateStoreInstances": 8,
+            "customMetrics": {
+              "loadedMapCacheHitCount": 0,
+              "loadedMapCacheMissCount": 8,
+              "numDroppedDuplicateRows": 0,
+              "stateOnCurrentVersionSizeBytes": 73824
+            }
+          }
+        ],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 853,
+                "1": 741,
+                "0": 783
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 861,
+                "1": 748,
+                "0": 789
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 861,
+                "1": 748,
+                "0": 789
+              }
+            },
+            "numInputRows": 21,
+            "inputRowsPerSecond": 4.199160167966406,
+            "processedRowsPerSecond": 0.8302035975489227,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "FileSink[/work/data/parquet/stream_events]",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "trending": {
+      "query_id": "90735f70-d9e3-43d3-877b-a507b851cd1c",
+      "batches": 4,
+      "input_rows": 2596,
+      "max_input_rows_per_second": 17.916930594516334,
+      "max_processed_rows_per_second": 175.56688086269295,
+      "max_batch_duration_ms": 14607,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 51,
+      "state_rows_now": 624,
+      "watermark_now": "2026-11-06T11:59:09.985Z",
+      "last_progress": {
+        "id": "90735f70-d9e3-43d3-877b-a507b851cd1c",
+        "runId": "a6f0ea8f-d048-41fe-adb8-c31a4ed1231e",
+        "name": "trending",
+        "timestamp": "2026-11-06T12:09:21.052Z",
+        "batchId": 3,
+        "numInputRows": 198,
+        "inputRowsPerSecond": 17.916930594516334,
+        "processedRowsPerSecond": 13.555144793592113,
+        "durationMs": {
+          "addBatch": 13149,
+          "commitOffsets": 596,
+          "getBatch": 1,
+          "latestOffset": 24,
+          "queryPlanning": 397,
+          "triggerExecution": 14607,
+          "walCommit": 381
+        },
+        "eventTime": {
+          "avg": "2026-11-06T12:09:06.580Z",
+          "max": "2026-11-06T12:09:21.035Z",
+          "min": "2026-11-06T11:39:20.982Z",
+          "watermark": "2026-11-06T11:59:09.985Z"
+        },
+        "stateOperators": [
+          {
+            "operatorName": "stateStoreSave",
+            "numRowsTotal": 412,
+            "numRowsUpdated": 374,
+            "allUpdatesTimeMs": 2453,
+            "numRowsRemoved": 570,
+            "allRemovalsTimeMs": 128,
+            "commitTimeMs": 4929,
+            "memoryUsedBytes": 248736,
+            "numRowsDroppedByWatermark": 0,
+            "numShufflePartitions": 8,
+            "numStateStoreInstances": 8,
+            "customMetrics": {
+              "loadedMapCacheHitCount": 48,
+              "loadedMapCacheMissCount": 0,
+              "stateOnCurrentVersionSizeBytes": 104672
+            }
+          },
+          {
+            "operatorName": "dedupeWithinWatermark",
+            "numRowsTotal": 212,
+            "numRowsUpdated": 192,
+            "allUpdatesTimeMs": 2392,
+            "numRowsRemoved": 306,
+            "allRemovalsTimeMs": 0,
+            "commitTimeMs": 5226,
+            "memoryUsedBytes": 122416,
+            "numRowsDroppedByWatermark": 0,
+            "numShufflePartitions": 8,
+            "numStateStoreInstances": 8,
+            "customMetrics": {
+              "loadedMapCacheHitCount": 24,
+              "loadedMapCacheMissCount": 0,
+              "numDroppedDuplicateRows": 6,
+              "stateOnCurrentVersionSizeBytes": 50624
+            }
+          }
+        ],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 861,
+                "1": 748,
+                "0": 789
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 951,
+                "1": 796,
+                "0": 849
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 951,
+                "1": 796,
+                "0": 849
+              }
+            },
+            "numInputRows": 198,
+            "inputRowsPerSecond": 17.916930594516334,
+            "processedRowsPerSecond": 13.555144793592113,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "topic": "rating-events",
+  "messages": 3924,
+  "messages_per_partition": {
+    "0": 1323,
+    "1": 1238,
+    "2": 1363
+  },
+  "distinct_event_ids": 3847,
+  "repeated_messages": 77,
+  "distinct_valid_events": 3805,
+  "distinct_valid_late_events": 43,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 42
+}

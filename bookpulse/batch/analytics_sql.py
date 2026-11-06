@@ -6,8 +6,11 @@ project's analytical questions in Spark SQL:
   Q2 rating distribution                   Q5 best-rated books with enough ratings (HAVING)
   Q3 ratings per user (percentiles)        Q6 curated per-book table -> Parquet (data/parquet/book_stats)
 
-It also checks that one query gives the same answer through the DataFrame API, saves the physical
-plan of the join query (Exchange = shuffle) and times the same aggregation on CSV vs Parquet.
+Joins with book metadata are LEFT joins: the row count is checked to be unchanged and ratings of a
+book missing from books.csv are labelled UNKNOWN instead of being dropped by an inner join.
+It also checks that the per-book result is identical through the DataFrame API (exceptAll in both
+directions over all rows), saves the physical plan of the join query (Exchange = shuffle) and times the
+same aggregation on CSV vs Parquet.
 """
 import argparse
 import os
@@ -89,22 +92,41 @@ def main():
     }
 
     if has_books:
-        top_sql = """
-            SELECT r.book_id, b.title, COUNT(*) AS n_ratings, ROUND(AVG(r.rating), 3) AS avg_rating
-            FROM ratings r JOIN books b ON r.book_id = b.book_id
-            GROUP BY r.book_id, b.title
-            ORDER BY n_ratings DESC, r.book_id
-            LIMIT 10
+        # Join check: books has one row per book_id, so a LEFT join must keep exactly the number of ratings
+        # (nothing lost, nothing multiplied). Ratings of a book missing from books.csv are kept and
+        # labelled UNKNOWN instead of being dropped silently by an inner join.
+        check = spark.sql("""
+            SELECT COUNT(*) AS joined_rows,
+                   SUM(CASE WHEN b.book_id IS NULL THEN 1 ELSE 0 END) AS ratings_without_book_metadata
+            FROM ratings r LEFT JOIN books b ON r.book_id = b.book_id
+        """).first().asDict()
+        report["join_check"] = {**check, "ratings_rows": q1["ratings"],
+                                "rows_preserved": check["joined_rows"] == q1["ratings"],
+                                "duplicate_book_ids_in_books": spark.sql(
+                                    "SELECT COUNT(*) - COUNT(DISTINCT book_id) FROM books").first()[0]}
+
+        per_book_sql = """
+            SELECT r.book_id, COALESCE(b.title, 'UNKNOWN') AS title,
+                   COUNT(*) AS n_ratings, ROUND(AVG(r.rating), 3) AS avg_rating
+            FROM ratings r LEFT JOIN books b ON r.book_id = b.book_id
+            GROUP BY r.book_id, COALESCE(b.title, 'UNKNOWN')
         """
+        top_sql = per_book_sql + " ORDER BY n_ratings DESC, r.book_id LIMIT 10"
         # Q4 – most-rated books, enriched with title from books.csv
         q4, timings["q4_most_rated"] = timed(lambda: rows(spark.sql(top_sql)))
 
-        # Same question through the DataFrame API: both must give identical rows
+        # Same question through the DataFrame API. Equivalence is checked on the FULL per-book result
+        # with exceptAll in both directions (not only on the top-10 rows): both must be empty.
         books_df = spark.table("books")
-        df_top = (ratings.join(books_df, "book_id").groupBy("book_id", "title")
-                  .agg(F.count("*").alias("n_ratings"), F.round(F.avg("rating"), 3).alias("avg_rating"))
-                  .orderBy(F.desc("n_ratings"), "book_id").limit(10))
-        report["sql_equals_dataframe_api"] = rows(df_top) == q4
+        df_per_book = (ratings.join(books_df, "book_id", "left")
+                       .withColumn("title", F.coalesce("title", F.lit("UNKNOWN")))
+                       .groupBy("book_id", "title")
+                       .agg(F.count("*").alias("n_ratings"), F.round(F.avg("rating"), 3).alias("avg_rating")))
+        sql_per_book = spark.sql(per_book_sql)
+        only_sql, only_df = sql_per_book.exceptAll(df_per_book).count(), df_per_book.exceptAll(sql_per_book).count()
+        report["sql_vs_dataframe"] = {"rows_compared": sql_per_book.count(), "only_in_sql": only_sql,
+                                      "only_in_dataframe": only_df}
+        report["sql_equals_dataframe_api"] = only_sql == 0 and only_df == 0
 
         # Physical plan of the join + aggregation (look for Exchange / BroadcastHashJoin)
         plan = spark.sql(f"EXPLAIN FORMATTED {top_sql}").first()[0]
@@ -122,9 +144,10 @@ def main():
 
         # Q5 – best-rated books among those with enough ratings (HAVING filters after grouping)
         q5, timings["q5_best_rated"] = timed(lambda: rows(spark.sql(f"""
-            SELECT r.book_id, b.title, COUNT(*) AS n_ratings, ROUND(AVG(r.rating), 3) AS avg_rating
-            FROM ratings r JOIN books b ON r.book_id = b.book_id
-            GROUP BY r.book_id, b.title
+            SELECT r.book_id, COALESCE(b.title, 'UNKNOWN') AS title,
+                   COUNT(*) AS n_ratings, ROUND(AVG(r.rating), 3) AS avg_rating
+            FROM ratings r LEFT JOIN books b ON r.book_id = b.book_id
+            GROUP BY r.book_id, COALESCE(b.title, 'UNKNOWN')
             HAVING COUNT(*) >= {args.min_ratings}
             ORDER BY avg_rating DESC, n_ratings DESC
             LIMIT 10

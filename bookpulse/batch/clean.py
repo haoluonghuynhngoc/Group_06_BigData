@@ -3,9 +3,10 @@
 Works for Goodbooks-10k (user_id, book_id, rating) and the UCSD interactions CSV
 (user_id, book_id, is_read, rating, is_reviewed; rating 0 = shelved, not rated).
 
-When streaming/stream_stats.py has written events to data/parquet/stream_events, they are merged in:
-for a (user, book) pair rated in both places the streamed rating wins, because it is newer. This is how
-ratings collected by the stream reach the next ALS retrain.
+When streaming/stream_stats.py has archived events in data/parquet/stream_events, they are merged in.
+The archive keeps every valid event (duplicates and late events included), so duplicates are removed
+here by event_id; for a (user, book) pair rated in both places the streamed rating wins, because it is
+newer. This is how ratings collected by the stream reach the next ALS retrain.
 """
 import argparse
 import os
@@ -46,15 +47,18 @@ def main():
     stream_report = None
     if has_parquet(args.stream_events):
         # Reading the sink directory goes through _spark_metadata, so only committed files are read
-        events = (spark.read.parquet(args.stream_events)
-                  .select("user_id", "book_id", "rating", "event_time")
-                  .filter(F.col("rating").between(1, 5)).cache())
+        # The streaming archive keeps every valid event, duplicates and late events included;
+        # duplicates are removed here, exactly, by event_id
+        archived = spark.read.parquet(args.stream_events).filter(F.col("rating").between(1, 5)).cache()
+        events = (archived.dropDuplicates(["event_id"])
+                  .select("user_id", "book_id", "rating", "event_time").cache())
         stream_pairs = events.select("user_id", "book_id").distinct()
         csv_pairs = valid.select("user_id", "book_id").distinct()
         overlapping = stream_pairs.join(csv_pairs, ["user_id", "book_id"]).count()
         n_pairs = stream_pairs.count()
         stream_report = {
             "path": args.stream_events,
+            "archived_rows": archived.count(),
             "events": events.count(),
             "distinct_pairs": n_pairs,
             "pairs_updating_a_csv_rating": overlapping,
