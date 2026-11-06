@@ -155,7 +155,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
         <text class="lbl" x="293" y="322">ratings</text>
         <path class="a b" d="M585,331 H623" marker-end="url(#ahb)"/>
         <text class="lbl" x="604" y="324" text-anchor="middle">model</text>
-        <text class="lbl" x="490" y="384" text-anchor="middle">P@10 0,209 · RMSE explicit 0,827</text>
+        <text class="lbl" x="490" y="384" text-anchor="middle">P@10 0,204 · RMSE explicit 0,828</text>
 
         <!-- MapReduce vs Spark SQL check -->
         <path class="a r" d="M730,116 V196 H588" marker-end="url(#ahr)"/>
@@ -270,7 +270,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
       <tr><td>MapReduce</td><td><code>mapreduce/</code></td><td>5.976.479 dòng trên HDFS + YARN; combiner giảm 99,2% dữ liệu shuffle; khớp Spark SQL (<code>exceptAll</code> hai chiều = 0)</td><td><code>reports/mapreduce_verify_*.json</code>, <code>reports/mapreduce/</code></td></tr>
       <tr><td>Làm sạch → Parquet</td><td><code>batch/clean.py</code></td><td>Loại đúng dòng lỗi/trùng trên dữ liệu mẫu; gộp sự kiện streaming, bỏ trùng theo <code>event_id</code></td><td><code>reports/clean_*.json</code></td></tr>
       <tr><td>Spark SQL</td><td><code>batch/analytics_sql.py</code></td><td>Temp view, 6 câu hỏi; SQL = DataFrame API; BroadcastHashJoin, 1 Exchange; Parquet nhanh hơn CSV 8,4 lần</td><td><code>reports/analytics_sql_*.json</code>, <code>sql_plan_*.txt</code></td></tr>
-      <tr><td>Spark ML</td><td><code>batch/train_als.py</code></td><td>ALS implicit P@10 0,209 (sách phổ biến 0,080; explicit 0,008); chọn tham số trên validation</td><td><code>reports/train_als*.json</code>, <a href="chon-mo-hinh.md">chon-mo-hinh.md</a></td></tr>
+      <tr><td>Spark ML</td><td><code>batch/train_als.py</code></td><td>ALS implicit P@10 0,204 (sách phổ biến 0,078; explicit 0,008); chọn tham số trên validation</td><td><code>reports/train_als*.json</code>, <a href="chon-mo-hinh.md">chon-mo-hinh.md</a></td></tr>
       <tr><td>NoSQL (MongoDB)</td><td><code>batch/write_recs.py</code></td><td>53.424 document; đọc theo <code>_id</code> (IDHACK, 1 document); đổi phiên bản an toàn; danh sách bù không chứa sách đã đọc</td><td><code>reports/nosql_evidence_*.json</code>, <code>write_recs_*.json</code></td></tr>
       <tr><td>Streaming</td><td><code>streaming/</code></td><td>Khớp Kafka sau <code>kill -9</code>; watermark loại đúng sự kiện trễ; cửa sổ trượt đếm đúng; kho lưu trữ đủ</td><td><code>reports/stream_progress_*.json</code>, <code>kafka_audit_*.json</code>, <code>reports/streaming/</code>, <a href="streaming.md">streaming.md</a></td></tr>
       <tr><td>App</td><td><code>app/app.py</code></td><td>Top-10 có bù, điểm TB trực tiếp, "sách đang hot"</td><td><code>reports/streaming/app_trending.png</code></td></tr>

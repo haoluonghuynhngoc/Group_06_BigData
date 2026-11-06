@@ -1,0 +1,14 @@
+{
+  "model_version": "20261106_125827",
+  "model": "als_implicit",
+  "collection": "recommendations_20261106_125827",
+  "users_written": 53424,
+  "top_n": 30,
+  "fallback_n": 10,
+  "users_with_full_fallback": 53424,
+  "books_loaded": 10000,
+  "dropped_old_versions": [
+    "recommendations_20261105_155707"
+  ],
+  "seconds": 146.0
+}

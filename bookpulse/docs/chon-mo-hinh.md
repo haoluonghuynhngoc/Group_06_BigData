@@ -8,6 +8,11 @@ Trên cùng tập test, cùng 4.987 người dùng được đánh giá, **Preci
 
 Số liệu: `reports/train_als_20261105_173703.json` (explicit) và `reports/train_als_implicit_20261105_173110.json` (implicit).
 
+> **Lần chạy lại cuối cùng (06/11/2026).** Toàn bộ pipeline được chạy lại từ trạng thái sạch bằng `scripts/run_pipeline.sh`
+> (`reports/train_als_20261106_*.json`, `reports/train_als_implicit_20261106_*.json`). Kết quả gần như trùng và cùng kết luận:
+> ALS implicit Precision@10 **0,204** (rank 50, alpha 1 vẫn được chọn), ALS explicit 0,008, sách phổ biến 0,078; RMSE explicit 0,828.
+> Báo cáo cuối kỳ dùng số của lần chạy này; các bảng bên dưới giữ số của lần chạy 05/11.
+
 ## 1. Vấn đề của mô hình cũ
 
 ALS explicit học cách **đoán số sao** người dùng sẽ chấm, rồi gợi ý những cuốn có số sao dự đoán cao nhất. Về đoán số sao, nó làm tốt: RMSE 0,827, tốt hơn baseline tốt nhất (0,954).

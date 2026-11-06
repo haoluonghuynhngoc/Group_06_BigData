@@ -1,0 +1,71 @@
+{
+  "spark_master": "local[*]",
+  "implicit": true,
+  "rows": {
+    "train": 4780968,
+    "test": 1195511
+  },
+  "grid": [
+    {
+      "rank": 20,
+      "regParam": 0.1,
+      "alpha": 1.0,
+      "validation_precision@10": 0.119,
+      "validation_recall@10": 0.0984,
+      "seconds": 110.5
+    },
+    {
+      "rank": 20,
+      "regParam": 0.1,
+      "alpha": 10.0,
+      "validation_precision@10": 0.0935,
+      "validation_recall@10": 0.0781,
+      "seconds": 91.4
+    },
+    {
+      "rank": 50,
+      "regParam": 0.1,
+      "alpha": 1.0,
+      "validation_precision@10": 0.1409,
+      "validation_recall@10": 0.1163,
+      "seconds": 159.5
+    },
+    {
+      "rank": 50,
+      "regParam": 0.1,
+      "alpha": 10.0,
+      "validation_precision@10": 0.1025,
+      "validation_recall@10": 0.0849,
+      "seconds": 173.0
+    }
+  ],
+  "best_params": {
+    "rank": 50,
+    "regParam": 0.1,
+    "alpha": 1.0,
+    "validation_precision@10": 0.1409,
+    "validation_recall@10": 0.1163,
+    "seconds": 159.5
+  },
+  "rmse_test": {
+    "baseline_global_mean": 0.9918,
+    "baseline_item_mean": 0.9545
+  },
+  "ranking_test": {
+    "als": {
+      "precision@10": 0.2038,
+      "recall@10": 0.1352,
+      "users_evaluated": 4993,
+      "distinct_books_recommended": 1224
+    },
+    "baseline_popular": {
+      "precision@10": 0.0778,
+      "recall@10": 0.0512,
+      "users_evaluated": 4993,
+      "distinct_books_recommended": 39
+    }
+  },
+  "fit_seconds": 672.3,
+  "total_seconds": 762.3,
+  "model_path": "/work/models/als_implicit"
+}
