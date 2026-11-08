@@ -1,6 +1,6 @@
 # BookPulse – Kịch bản demo Session 10
 
-Demo trực tiếp cho Final Assessment: chạy lần lượt MapReduce → Spark SQL → Spark ML + MongoDB → Streaming, mỗi phần có một kết quả nhìn thấy được và một phép kiểm chứng. Thời lượng dự kiến 8–10 phút (đo lần tập 07/11: chuẩn bị 80 giây, Hadoop sẵn sàng sau khoảng 37 giây; job MapReduce 72 giây + kiểm chứng 30 giây; Spark SQL tức thì; mongosh khoảng 3 giây; streaming khoảng 3,5 phút kể cả `rate_from_recs.py`). Mọi lệnh chạy trong Git Bash, từ thư mục `bookpulse/` trừ khi ghi khác.
+Demo trực tiếp cho Final Assessment: chạy lần lượt MapReduce → Spark SQL → Spark ML + MongoDB → Streaming, mỗi phần có một kết quả nhìn thấy được và một phép kiểm chứng. Thời lượng dự kiến 8–10 phút (đo lần tập 07/11: chuẩn bị 80 giây, Hadoop sẵn sàng sau khoảng 37 giây; job MapReduce 72 giây tính cả khởi động (job 52 giây) + kiểm chứng 30 giây; Spark SQL tức thì; mongosh khoảng 3 giây; streaming khoảng 3,5 phút kể cả `rate_from_recs.py`). Mọi lệnh chạy trong Git Bash, từ thư mục `bookpulse/` trừ khi ghi khác.
 
 **Mỗi terminal Git Bash mở ra đều chạy trước:** `export MSYS_NO_PATHCONV=1`. Thiếu dòng này, Git Bash đổi đường dẫn trong container `/bookpulse/...` thành `C:/Program Files/Git/bookpulse/...` và lệnh MapReduce báo "No such file".
 
@@ -19,15 +19,18 @@ docker compose restart app                            # app nạp code mới nh�
 
 Tùy chọn, làm trước buổi (khoảng 3 phút): `bash scripts/stream_fault_test.sh` để có bằng chứng `kill -9` mới (mục 5), rồi chạy lại `bash scripts/reset_streaming.sh --yes`.
 
+Tùy chọn, **không** làm trong demo trực tiếp (khoảng 5 phút): `bash scripts/stream_outage_test.sh` tắt Kafka 40 giây rồi MongoDB 30 giây trong lúc producer gửi 3.000 sự kiện và job streaming đang chạy, rồi chạy `kafka_audit.py`. Script tự reset streaming lúc bắt đầu; chạy xong thì chạy lại `bash scripts/reset_streaming.sh --yes` để demo bắt đầu từ số 0. Kết quả ghi vào `reports/streaming/outage_test_<thời điểm>/` (`events.log` là dòng thời gian).
+
 Kiểm tra nhanh:
 - http://localhost:8501: app (nền sáng) hiện "ALS implicit · phiên bản mô hình 20261106_125827" và top-10 của user 1: #1 The Guernsey Literary and Potato Peel Pie Society, #2 The Great Gatsby, #3 The Catcher in the Rye.
 - http://localhost:8088: YARN có 1 NodeManager.
 - Mở sẵn 3 terminal Git Bash ở thư mục `bookpulse/` (đã `export MSYS_NO_PATHCONV=1`) và các tab trình duyệt: app (8501), YARN (8088), HDFS (9870).
 - Máy cần đủ RAM: tắt bớt ứng dụng khác. Nếu máy chậm, chạy MapReduce trước giờ demo và chỉ trình bày kết quả (mục 6).
+- **Không chạy batch khi job streaming đang chạy.** Nếu phải chạy lại `bash scripts/run_pipeline.sh` (khoảng 25–35 phút), dừng job streaming trước (Ctrl+C): hai driver 4 GB không vừa 7,7 GiB RAM. Trong lúc đó sự kiện chờ trong Kafka (giữ 7 ngày), app vẫn phục vụ gợi ý và số liệu cũ; chạy lại job thì nó đọc tiếp từ checkpoint, tối đa 20.000 offset mỗi batch.
 
 ## 2. MapReduce (Hảo, ~2 phút)
 
-Bắt đầu job **ngay đầu phần demo** vì job mất khoảng 1–2 phút (72 giây lần tập 07/11, 134 giây ngày 05/11); trong lúc chờ thì chuyển sang phần 3.
+Bắt đầu job **ngay đầu phần demo** vì job mất khoảng 1–2 phút (lần tập 07/11: job 52 giây, 72 giây tính cả khởi động; ngày 05/11: 134 giây); trong lúc chờ thì chuyển sang phần 3.
 
 ```bash
 # Terminal 1
@@ -64,7 +67,7 @@ Chỉ vào:
 ## 4. Spark ML + MongoDB (Kiệt, ~2 phút)
 
 - App: nhập user **1**, rồi **2**, rồi **3**: mỗi người một danh sách khác nhau. User 2 nghiêng về sách phi hư cấu, phát triển bản thân (The Last Lecture, The 7 Habits…, Freakonomics); user 3 nghiêng về tác phẩm kinh điển hay học ở trường (Fahrenheit 451, Romeo and Juliet, Macbeth). Không nói là ba thể loại tách bạch: Animal Farm có trong cả ba danh sách (mô hình hơi nghiêng về sách nổi tiếng). Dòng chú thích ghi "ALS implicit · phiên bản mô hình …".
-- Nói lý do chọn implicit: Precision@10 0,204 so với explicit 0,008 và sách phổ biến 0,078 (slide 7). Nếu bị hỏi: mô hình phục vụ học trên 80% dữ liệu (tập train).
+- Nói lý do chọn implicit: Precision@10 0,204 so với explicit 0,008 và sách phổ biến 0,078 (slide 7). Nếu bị hỏi: mô hình phục vụ fit trên toàn bộ tập train (80% dữ liệu).
 - MongoDB (khoảng 3 giây):
 
 ```bash
@@ -77,12 +80,17 @@ docker compose exec mongo mongosh bookpulse --quiet --eval '
 
 Nói: "Mỗi người dùng một document; truy vấn theo `_id` dùng IDHACK, đọc đúng một document." Ba gợi ý đầu của user 1: 195 (0,84), 5 (0,84), 8 (0,79).
 
+*Nếu được hỏi về `previous_collection`: database đang demo do code trước khi sửa ghi (phiên bản 20261106_125827), nên `meta` chưa có trường này; bản trước `recommendations_20261105_173716` vẫn còn trong database. Trường này có từ lần chạy `write_recs.py` sau 08/11 (đã thử trên `bookpulse_test`, xem `reports/superseded/write_recs_gate_test_20261108/`).*
+
 ## 5. Streaming (Tuấn, ~3,5 phút)
+
+Chỉ bắt đầu khi `verify_with_spark.py` ở mục 2 đã xong: không chạy job Spark batch cùng lúc với job streaming (Spark UI thứ hai sang cổng 4041, không được mở ra host; hai driver 4 GB vượt 7,7 GiB RAM của máy ảo Docker).
 
 ```bash
 # Terminal 2: job streaming (để chạy)
 docker compose exec spark python streaming/stream_stats.py
-# Terminal 3: khi Terminal 2 in "streaming from …"; khoảng 55 giây, sự kiện trễ chỉ gửi sau giây thứ 30
+# Terminal 3: khi Terminal 2 in "streaming from …"; khoảng 55 giây
+# --late 0.05: 5% số sự kiện gửi sau giây thứ 30 là sự kiện trễ (lần 08/11: 19/1.000)
 docker compose exec spark python streaming/producer.py --limit 1000 --late 0.05
 ```
 
@@ -111,9 +119,9 @@ Nói: "Đây là lúc người dùng chấm một cuốn đang được gợi ý
 docker compose exec spark python scripts/kafka_audit.py | grep -E 'distinct_valid|invalid_messages|counted|expected|_match|no_loss'
 ```
 
-Nói: "Script đếm lại toàn bộ topic Kafka rồi đọc MongoDB: `valid_events_counted` = `expected_valid_minus_late` = `sum_n_ratings_in_rating_stats`, tức hợp lệ trừ trễ, không mất, không trùng; số lỗi khớp; tổng các cửa sổ bằng 2 lần vì mỗi sự kiện nằm trong 2 cửa sổ trượt. Ba dòng `_match` / `no_loss…` đều `true`, và kết quả được lưu vào `reports/kafka_audit_*.json`." (Lần chạy 08/11: 1.002 hợp lệ, 19 trễ, 983 đếm được, 1.966 = 2 × 983, 10 lỗi.)
+Nói: "Script đếm lại toàn bộ topic Kafka rồi đọc MongoDB: `valid_events_counted` = `expected_valid_minus_late` = `sum_n_ratings_in_rating_stats`, tức hợp lệ trừ trễ, không mất, không trùng; số lỗi khớp; tổng các cửa sổ bằng 2 lần vì mỗi sự kiện nằm trong 2 cửa sổ trượt. Ba dòng `_match` / `no_loss…` đều `true`, và kết quả được lưu vào `reports/kafka_audit_*.json`." (Lần chạy 08/11: 1.002 hợp lệ, 19 trễ, 983 đếm được, 1.966 = 2 × 983, 10 lỗi.) Lệnh cũng in vài dòng `expected_…` của khối `archive_check` (kho Parquet); chỉ giải thích nếu được hỏi.
 
-**Khôi phục sau sự cố.** Không làm `kill -9` trực tiếp trên sân khấu; trình bày bằng chứng của `bash scripts/stream_fault_test.sh`: thư mục `reports/streaming/fault_test_<thời điểm>/` (`kill.log`, `audit.log`) và `reports/kafka_audit_20261107_220738.json`: 1.474 = 1.500 − 26 trễ, 2.948 = 2 × 1.474, 15 lỗi, ba phép so `true`. Nói rõ: "Lượt thử này 0 mất, 0 trùng; vẫn còn khe hở nếu job chết đúng lúc đang ghi MongoDB." Nếu còn thời gian, khôi phục nhẹ: Ctrl+C ở Terminal 2, chờ dấu nhắc, chạy lại cùng lệnh (đọc tiếp từ checkpoint), gửi thêm `producer.py --limit 200`, rồi chạy lại lệnh kiểm chứng: vẫn `true`.
+**Khôi phục sau sự cố.** Không làm `kill -9` trực tiếp trên sân khấu; trình bày bằng chứng của `bash scripts/stream_fault_test.sh`: thư mục `reports/streaming/fault_test_<thời điểm>/` (`kill.log`, `audit.log`) và `reports/kafka_audit_20261107_220738.json`: 1.474 = 1.500 − 26 trễ, 2.948 = 2 × 1.474, 15 lỗi, ba phép so `true`. Nói rõ: "Lượt thử này 0 mất, 0 trùng; đó là kết quả đo, không phải bảo đảm, và vẫn còn khe hở nếu job chết đúng lúc đang ghi MongoDB." Nếu được hỏi thêm: lượt lặp lại có kiểm tra kho Parquet (`reports/kafka_audit_20261108_040236.json`: 1.475 = 1.500 − 25, kho 1.537 = 1.537) và lượt tắt Kafka 40 giây, MongoDB 30 giây (`reports/kafka_audit_20261108_041203.json`, `reports/streaming/outage_test_20261108_110750/events.log`: Spark tự nối lại Kafka; MongoDB tắt thì job dừng, script thử nghiệm chạy lại job từ cùng checkpoint sau 11 giây, chưa có restart policy nên ngoài thử nghiệm phải chạy lại tay; 3.000 = 3.000, 0 mất, 0 trùng). Nếu còn thời gian, khôi phục nhẹ: Ctrl+C ở Terminal 2, chờ dấu nhắc, chạy lại cùng lệnh (đọc tiếp từ checkpoint), gửi thêm `producer.py --limit 200`, rồi chạy lại lệnh kiểm chứng: vẫn `true`.
 
 Kết thúc: Ctrl+C ở Terminal 2.
 
@@ -128,8 +136,9 @@ Kết thúc: Ctrl+C ở Terminal 2.
 | App không hiện thay đổi code | `docker compose restart app` |
 | Sau `rate_from_recs.py` app chưa đổi | Job streaming phải đang chạy; chờ thêm một trigger rồi bấm Làm mới. Nếu vẫn không: ảnh `docs/img/app_after_rate_from_recs.png` (trước đó: `docs/img/app_implicit_user1.png`) |
 | App không hiện streaming | Ảnh `reports/streaming/app_trending.png` (cả trang: 983 / 10 / 2 / 672 và "Sách đang hot") |
-| Một phép so của `kafka_audit.py` ra `false` | Thường do sự kiện trễ đến khi job chưa có watermark (1–2 batch đầu sau khởi động). Nói thẳng điều đó, rồi trình bày `reports/kafka_audit_20261107_221105.json` và `_220738.json` (đều `true`) |
+| Một phép so của `kafka_audit.py` ra `false` | Thường do sự kiện trễ đến khi job chưa có watermark (1–2 batch đầu sau khi khởi động mới, checkpoint trống). Nói thẳng điều đó, rồi trình bày `reports/kafka_audit_20261107_221105.json` và `_220738.json` (đều `true`) |
 | Job streaming báo lỗi topic | Job tự tạo topic; nếu vẫn lỗi: `bash scripts/reset_streaming.sh --yes` rồi chạy lại |
+| Job streaming dừng với lỗi "checkpoint and stream_state do not match" | Checkpoint bị xóa hoặc chuyển chỗ mà MongoDB vẫn giữ `stream_state`; job cố ý dừng thay vì bỏ qua batch. Chạy `bash scripts/reset_streaming.sh --yes` rồi chạy lại |
 | Máy hết RAM | Tắt cụm Hadoop sau phần MapReduce: `docker compose -f mapreduce/hadoop/docker-compose.yml stop` |
 | Mọi thứ đều hỏng | Trình bày bằng slide + ảnh trong `reports/` và `docs/` (mọi số đo đều có file); bằng chứng `kill -9` ở `reports/streaming/fault_test_20261108_050413/` |
 
@@ -152,4 +161,4 @@ mv reports/kafka_audit_<ts>.json reports/stream_progress_<ts>.json reports/mapre
    reports/mapreduce/*_<ts>.* reports/superseded/rehearsal_<ngày>/
 ```
 
-Tên file theo giờ UTC (chậm 7 giờ so với giờ Việt Nam). **Không chuyển** các file chính thức: lần chạy cuối 06/11 (`*_20261106_*`), MapReduce 05/11 (`*_20261105_*`) và bằng chứng streaming 08/11: `kafka_audit_20261107_220738.json`, `kafka_audit_20261107_221105.json`, `stream_progress_20261107_220431.json`, `_220545.json`, `_220918.json`, `nosql_evidence_20261107_221150.json`, thư mục `reports/streaming/fault_test_20261108_050413/`. File của lần tập 07/11 đã nằm ở `reports/superseded/rehearsal_20261107/`.
+Tên file theo giờ UTC (chậm 7 giờ so với giờ Việt Nam). **Không chuyển** các file chính thức: lần chạy cuối 06/11 (`*_20261106_*`), MapReduce 05/11 (`*_20261105_*`) và bằng chứng streaming 08/11: `kafka_audit_20261107_220738.json`, `kafka_audit_20261107_221105.json`, `stream_progress_20261107_220431.json`, `_220545.json`, `_220918.json`, `nosql_evidence_20261107_221150.json`, thư mục `reports/streaming/fault_test_20261108_050413/`; lượt lặp lại và lượt tắt Kafka/MongoDB: `kafka_audit_20261108_040236.json`, `kafka_audit_20261108_041203.json`, `stream_progress_20261108_035851.json`, `_040005.json` (kill -9 lần 2), `_040808.json`, `_041127.json` (tắt Kafka/MongoDB), thư mục `reports/streaming/fault_test_20261108_105833/` và `reports/streaming/outage_test_20261108_110750/`; lượt tắt Kafka với producer chưa sửa (kể cả `stream_progress_20261108_040312.json`, `_040633.json`) đã nằm ở `reports/superseded/outage_test_20261108_110251_producer_no_retry/`. File của lần tập 07/11 đã nằm ở `reports/superseded/rehearsal_20261107/`.

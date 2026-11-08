@@ -1,0 +1,33 @@
+11:07:57 streaming state reset
+11:08:09 stream job #1 running
+11:08:10 producer started (3000 events, 20/s)
+11:08:40 STOP kafka
+11:09:22 producer during the Kafka outage: {'sent': 1200, 'duplicates': 23, 'invalid': 3, 'late': 0, 'failed': 0} after 62s
+11:09:22 START kafka
+11:09:53 stream job #1 still running after the Kafka outage
+11:10:14 STOP mongo
+11:10:45 START mongo
+11:11:17 stream job #1 STOPPED after the MongoDB outage; last error: pymongo.errors.ServerSelectionTimeoutError
+11:11:28 stream job #2 running
+11:11:28 restarted from the same checkpoints as job #2
+11:11:28 producer exit code 0: done: {'sent': 3000, 'duplicates': 59, 'invalid': 19, 'late': 0, 'failed': 0} to topic 'rating-events' in 153s
+11:11:50 stream job stopped; checking Kafka vs MongoDB vs archive
+  "messages": 3078,
+  "distinct_event_ids": 3019,
+  "distinct_valid_events": 3000,
+  "distinct_valid_late_events": 0,
+  "invalid_messages": 19,
+  "valid_messages": 3059,
+    "valid_events_counted": 3000,
+    "expected_valid_minus_late": 3000,
+    "expected_trending_2x": 6000,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+    "uncommitted_files_on_disk": 0,
+    "rows": 3059,
+    "expected_rows_valid_messages": 3059,
+    "distinct_event_ids": 3000,
+    "expected_distinct_valid_events": 3000,
+    "exactly_once": true
+11:12:03 done -> reports/streaming/outage_test_20261108_110750

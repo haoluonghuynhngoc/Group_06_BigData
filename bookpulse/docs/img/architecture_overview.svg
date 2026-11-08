@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+<defs>
+<marker id="k" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#18212d"/></marker>
+<marker id="b" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d68a8"/></marker>
+<marker id="o" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b75a07"/></marker>
+<marker id="p" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b4fa3"/></marker>
+<marker id="g" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f7a5a"/></marker>
+<marker id="m" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5a6575"/></marker>
+</defs>
+<rect width="1600" height="900" fill="#ffffff"/>
+<text x="150" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">NGUỒN</text>
+<text x="420" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">THU NHẬN</text>
+<text x="835" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">XỬ LÝ</text>
+<text x="1262" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">PHỤC VỤ</text>
+<text x="1500" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">TRÌNH BÀY</text>
+<line x1="40" y1="70" x2="1560" y2="70" stroke="#c3ccd8" stroke-width="1.5"/>
+<rect x="40" y="250" width="220" height="120" rx="14" fill="#f1f3f6" stroke="#18212d" stroke-width="2"/>
+<text x="150.0" y="306.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="25" font-weight="600" fill="#18212d" text-anchor="middle">Goodbooks-10k</text>
+<text x="150.0" y="340.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="400" fill="#5a6575" text-anchor="middle">6 triệu rating</text>
+<rect x="40" y="610" width="220" height="120" rx="14" fill="#fbeedd" stroke="#b75a07" stroke-width="2"/>
+<text x="150.0" y="666.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="30" font-weight="600" fill="#18212d" text-anchor="middle">Producer</text>
+<text x="150.0" y="700.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="400" fill="#5a6575" text-anchor="middle">sự kiện chấm sao</text>
+<path d="M320,614 a100.0,14 0 0 0 200,0 V726 a100.0,14 0 0 1 -200,0 Z" fill="#fbeedd" stroke="#b75a07" stroke-width="2"/>
+<ellipse cx="420.0" cy="614" rx="100.0" ry="14" fill="#fbeedd" stroke="#b75a07" stroke-width="2"/>
+<text x="420.0" y="675.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="28" font-weight="600" fill="#18212d" text-anchor="middle">Kafka</text>
+<text x="420.0" y="705.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="400" fill="#5a6575" text-anchor="middle">3 partition</text>
+<rect x="580" y="92" width="510" height="92" rx="14" fill="#efe9f8" stroke="#6b4fa3" stroke-width="2"/>
+<text x="835" y="132" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="26" font-weight="600" fill="#18212d" text-anchor="middle">Hadoop MapReduce</text>
+<text x="835" y="162" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="400" fill="#5a6575" text-anchor="middle">HDFS + YARN · kiểm chứng</text>
+<rect x="580" y="214" width="510" height="196" rx="14" fill="#e3eef8" stroke="#1d68a8" stroke-width="2"/>
+<text x="600" y="250" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="700" fill="#1d68a8" text-anchor="start" letter-spacing="1">LỚP BATCH · Spark</text>
+<text x="1070" y="250" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="500" fill="#1d68a8" text-anchor="end">theo đợt</text>
+<rect x="600" y="272" width="150" height="46" rx="23" fill="#ffffff" stroke="#1d68a8" stroke-width="1.5"/>
+<text x="675.0" y="303" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">Làm sạch</text>
+<rect x="770" y="272" width="150" height="46" rx="23" fill="#ffffff" stroke="#1d68a8" stroke-width="1.5"/>
+<text x="845.0" y="303" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">Spark SQL</text>
+<rect x="940" y="272" width="130" height="46" rx="23" fill="#ffffff" stroke="#1d68a8" stroke-width="1.5"/>
+<text x="1005.0" y="303" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">ALS</text>
+<path d="M750,295 H766" fill="none" stroke="#1d68a8" stroke-width="3" marker-end="url(#b)"/>
+<path d="M920,295 H936" fill="none" stroke="#1d68a8" stroke-width="3" marker-end="url(#b)"/>
+<text x="835" y="370" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">→ gợi ý top-N cho mỗi người</text>
+<path d="M690,460 a145.0,14 0 0 0 290,0 V528 a145.0,14 0 0 1 -290,0 Z" fill="#ffffff" stroke="#5a6575" stroke-width="2"/>
+<ellipse cx="835.0" cy="460" rx="145.0" ry="14" fill="#ffffff" stroke="#5a6575" stroke-width="2"/>
+<text x="835.0" y="499.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="28" font-weight="600" fill="#18212d" text-anchor="middle">Parquet</text>
+<text x="835.0" y="529.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="400" fill="#5a6575" text-anchor="middle">kho dữ liệu</text>
+<rect x="580" y="566" width="510" height="196" rx="14" fill="#fbeedd" stroke="#b75a07" stroke-width="2"/>
+<text x="600" y="602" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="700" fill="#b75a07" text-anchor="start" letter-spacing="1">LỚP TỐC ĐỘ · Streaming</text>
+<text x="1070" y="602" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="500" fill="#b75a07" text-anchor="end">mỗi 5 giây</text>
+<rect x="600" y="624" width="150" height="46" rx="23" fill="#ffffff" stroke="#b75a07" stroke-width="1.5"/>
+<text x="675.0" y="655" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">Watermark</text>
+<rect x="770" y="624" width="150" height="46" rx="23" fill="#ffffff" stroke="#b75a07" stroke-width="1.5"/>
+<text x="845.0" y="655" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">Cửa sổ</text>
+<rect x="940" y="624" width="130" height="46" rx="23" fill="#ffffff" stroke="#b75a07" stroke-width="1.5"/>
+<text x="1005.0" y="655" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">Checkpoint</text>
+<text x="835" y="722" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="500" fill="#18212d" text-anchor="middle">→ thống kê realtime, sách đang hot</text>
+<rect x="1140" y="214" width="245" height="548" rx="14" fill="#e2f3ec" stroke="#1f7a5a" stroke-width="2"/>
+<text x="1262" y="262" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="30" font-weight="600" fill="#18212d" text-anchor="middle">MongoDB</text>
+<rect x="1160" y="300" width="205" height="150" rx="10" fill="#ffffff" stroke="#1d68a8" stroke-width="1.5"/>
+<text x="1262" y="362" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="24" font-weight="600" fill="#18212d" text-anchor="middle">Gợi ý</text>
+<text x="1262" y="394" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="19" font-weight="500" fill="#1d68a8" text-anchor="middle">(batch view)</text>
+<rect x="1160" y="560" width="205" height="150" rx="10" fill="#ffffff" stroke="#b75a07" stroke-width="1.5"/>
+<text x="1262" y="622" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="24" font-weight="600" fill="#18212d" text-anchor="middle">Số liệu mới</text>
+<text x="1262" y="654" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="19" font-weight="500" fill="#b75a07" text-anchor="middle">(speed view)</text>
+<rect x="1420" y="110" width="160" height="100" rx="14" fill="#ffffff" stroke="#18212d" stroke-width="2"/>
+<text x="1500.0" y="167.35" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="600" fill="#18212d" text-anchor="middle">Người dùng</text>
+<rect x="1420" y="410" width="160" height="140" rx="14" fill="#ffffff" stroke="#18212d" stroke-width="2"/>
+<text x="1500.0" y="476.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="28" font-weight="600" fill="#18212d" text-anchor="middle">Streamlit</text>
+<text x="1500.0" y="510.0" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="21" font-weight="400" fill="#5a6575" text-anchor="middle">web app</text>
+<path d="M260,310 H578" fill="none" stroke="#18212d" stroke-width="3" marker-end="url(#k)"/>
+<path d="M150,250 V138 H578" fill="none" stroke="#6b4fa3" stroke-width="3" marker-end="url(#p)"/>
+<path d="M150,370 V608" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<path d="M260,670 H318" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<path d="M520,670 H578" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<path d="M835,446 V414" fill="none" stroke="#1d68a8" stroke-width="3" marker-end="url(#b)"/>
+<path d="M835,566 V546" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<path d="M1090,375 H1158" fill="none" stroke="#1d68a8" stroke-width="3" marker-end="url(#b)"/>
+<path d="M1090,635 H1158" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<path d="M1385,450 H1418" fill="none" stroke="#1f7a5a" stroke-width="3" marker-end="url(#g)"/>
+<path d="M1500,210 V408" fill="none" stroke="#18212d" stroke-width="3" marker-end="url(#k)"/>
+<text x="1500" y="600" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">gộp hai view</text>
+<text x="1500" y="626" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">khi đọc</text>
+<rect x="40" y="800" width="1520" height="70" rx="12" fill="#f1f3f6" stroke="#c3ccd8" stroke-width="1.5"/>
+<text x="800" y="844" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="23" font-weight="500" fill="#18212d" text-anchor="middle">Theo ý tưởng Lambda:  batch tính gợi ý theo đợt  ·  speed cập nhật mỗi 5 giây  ·  MongoDB phục vụ  ·  app gộp khi đọc</text>
+</svg>

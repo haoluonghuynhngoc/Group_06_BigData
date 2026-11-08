@@ -9,15 +9,20 @@ It then reads the streaming job's counters back from MongoDB and checks them aga
   sum of rating_stats    == valid events counted
   rejected events        == invalid messages
   sum over trending windows == 2 x (valid - late)   (10-minute windows sliding every 5 minutes)
+and counts the Parquet archive (data/parquet/stream_events) through its _spark_metadata log:
+  archive rows == valid messages (no watermark, no de-duplication),  distinct ids == distinct valid
 so every streaming number in the report has a saved check. Writes reports/kafka_audit_<ts>.json.
 """
 import argparse
 import json
+import re
 from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import unquote, urlparse
 
 from kafka import KafkaConsumer
 
-from common.settings import KAFKA_BOOTSTRAP, KAFKA_TOPIC, get_db, save_report
+from common.settings import KAFKA_BOOTSTRAP, KAFKA_TOPIC, STREAM_EVENTS_DIR, get_db, save_report
 
 
 def main():
@@ -26,12 +31,13 @@ def main():
                         help="an event is 'late' when Kafka received it this much after its event_time "
                              "(the streaming job's watermark delay)")
     parser.add_argument("--no-mongo", action="store_true", help="only count Kafka, skip the MongoDB check")
+    parser.add_argument("--no-archive", action="store_true", help="skip the Parquet archive check")
     args = parser.parse_args()
 
     consumer = KafkaConsumer(KAFKA_TOPIC, bootstrap_servers=KAFKA_BOOTSTRAP, auto_offset_reset="earliest",
                              enable_auto_commit=False, group_id=None, consumer_timeout_ms=10000,
                              value_deserializer=lambda v: json.loads(v.decode("utf-8")))
-    total, seen, valid_ids, invalid = 0, set(), set(), 0
+    total, seen, valid_ids, invalid, valid_messages = 0, set(), set(), 0, 0
     late_valid_ids = set()
     partitions = {}
     for msg in consumer:
@@ -41,6 +47,7 @@ def main():
         seen.add(e.get("event_id"))
         if isinstance(e.get("rating"), int) and 1 <= e["rating"] <= 5:
             valid_ids.add(e["event_id"])
+            valid_messages += 1
             # msg.timestamp = when the producer sent it (ms); event_time = when the rating "happened"
             event_time = datetime.strptime(e["event_time"], "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=timezone.utc)
             if msg.timestamp / 1000 - event_time.timestamp() > args.late_minutes * 60:
@@ -58,6 +65,7 @@ def main():
         "distinct_valid_late_events": len(late_valid_ids),
         "late_threshold_minutes": args.late_minutes,
         "invalid_messages": invalid,
+        "valid_messages": valid_messages,
     }
     if not args.no_mongo:
         db = get_db()
@@ -82,7 +90,56 @@ def main():
             "rejected_match": rejected.get("events", 0) == invalid,
             "trending_match": trending_sum == 2 * expected,
         }
+    if not args.no_archive:
+        report["archive_check"] = archive_check(valid_messages, len(valid_ids))
     save_report("kafka_audit", report)
+
+
+def archive_check(valid_messages, distinct_valid):
+    """Count the Parquet archive the way a reader must: only files committed in _spark_metadata.
+
+    The file sink is exactly-once because a micro-batch's files only count once its entry is in
+    _spark_metadata; files of a batch killed half-way stay on disk but are not listed. The archive has
+    no watermark and no de-duplication, so it should hold every valid message, late and repeated ones
+    included, and every distinct valid event_id.
+    """
+    import pyarrow.parquet as pq
+
+    meta_dir = STREAM_EVENTS_DIR / "_spark_metadata"
+    if not meta_dir.is_dir():
+        return {"present": False}
+    # batch log files are named 0, 1, 2, ... and N.compact; skip Hadoop's .N.crc checksum files
+    logs = sorted((p for p in meta_dir.iterdir() if re.fullmatch(r"\d+(\.compact)?", p.name)),
+                  key=lambda p: int(p.name.split(".")[0]))
+    compacts = [p for p in logs if p.name.endswith(".compact")]
+    if compacts:  # a .compact file already holds every entry up to and including its batch
+        logs = [p for p in logs if int(p.name.split(".")[0]) >= int(compacts[-1].name.split(".")[0])]
+    committed = set()
+    for log in logs:
+        for line in log.read_text(encoding="utf-8").splitlines()[1:]:  # first line is the version "v1"
+            entry = json.loads(line)
+            path = Path(unquote(urlparse(entry["path"]).path))
+            if entry.get("action", "add") == "add":
+                committed.add(path)
+            else:
+                committed.discard(path)
+    on_disk = {p for p in STREAM_EVENTS_DIR.rglob("*.parquet")}
+    rows, ids = 0, set()
+    for path in committed:
+        table = pq.read_table(path, columns=["event_id"])
+        rows += table.num_rows
+        ids.update(table.column("event_id").to_pylist())
+    return {
+        "present": True,
+        "committed_batches": len([p for p in meta_dir.iterdir() if re.fullmatch(r"\d+(\.compact)?", p.name)]),
+        "committed_files": len(committed),
+        "uncommitted_files_on_disk": len(on_disk - committed),
+        "rows": rows,
+        "expected_rows_valid_messages": valid_messages,
+        "distinct_event_ids": len(ids),
+        "expected_distinct_valid_events": distinct_valid,
+        "exactly_once": rows == valid_messages and len(ids) == distinct_valid,
+    }
 
 
 if __name__ == "__main__":

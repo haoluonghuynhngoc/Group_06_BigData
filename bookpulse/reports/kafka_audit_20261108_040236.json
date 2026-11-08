@@ -1,0 +1,40 @@
+{
+  "topic": "rating-events",
+  "messages": 1550,
+  "messages_per_partition": {
+    "0": 536,
+    "1": 500,
+    "2": 514
+  },
+  "distinct_event_ids": 1513,
+  "repeated_messages": 37,
+  "distinct_valid_events": 1500,
+  "distinct_valid_late_events": 25,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 13,
+  "valid_messages": 1537,
+  "mongo_check": {
+    "valid_events_counted": 1475,
+    "expected_valid_minus_late": 1475,
+    "sum_n_ratings_in_rating_stats": 1475,
+    "rejected_events_counted": 13,
+    "user_seen_pairs": 1475,
+    "trending_windows": 2345,
+    "trending_sum_n_ratings": 2950,
+    "expected_trending_2x": 2950,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+  },
+  "archive_check": {
+    "present": true,
+    "committed_batches": 12,
+    "committed_files": 33,
+    "uncommitted_files_on_disk": 0,
+    "rows": 1537,
+    "expected_rows_valid_messages": 1537,
+    "distinct_event_ids": 1500,
+    "expected_distinct_valid_events": 1500,
+    "exactly_once": true
+  }
+}

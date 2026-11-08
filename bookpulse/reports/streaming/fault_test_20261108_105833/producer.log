@@ -1,0 +1,16 @@
+{'sent': 100, 'duplicates': 2, 'invalid': 0, 'late': 0} after 5s
+{'sent': 200, 'duplicates': 4, 'invalid': 0, 'late': 0} after 10s
+{'sent': 300, 'duplicates': 9, 'invalid': 1, 'late': 0} after 15s
+{'sent': 400, 'duplicates': 10, 'invalid': 3, 'late': 0} after 21s
+{'sent': 500, 'duplicates': 13, 'invalid': 3, 'late': 0} after 26s
+{'sent': 600, 'duplicates': 17, 'invalid': 4, 'late': 1} after 31s
+{'sent': 700, 'duplicates': 18, 'invalid': 6, 'late': 4} after 36s
+{'sent': 800, 'duplicates': 21, 'invalid': 7, 'late': 7} after 41s
+{'sent': 900, 'duplicates': 26, 'invalid': 7, 'late': 8} after 46s
+{'sent': 1000, 'duplicates': 26, 'invalid': 8, 'late': 11} after 51s
+{'sent': 1100, 'duplicates': 29, 'invalid': 9, 'late': 12} after 56s
+{'sent': 1200, 'duplicates': 32, 'invalid': 11, 'late': 17} after 62s
+{'sent': 1300, 'duplicates': 33, 'invalid': 11, 'late': 18} after 67s
+{'sent': 1400, 'duplicates': 35, 'invalid': 12, 'late': 20} after 72s
+{'sent': 1500, 'duplicates': 37, 'invalid': 13, 'late': 25} after 77s
+done: {'sent': 1500, 'duplicates': 37, 'invalid': 13, 'late': 25} to topic 'rating-events' in 77s

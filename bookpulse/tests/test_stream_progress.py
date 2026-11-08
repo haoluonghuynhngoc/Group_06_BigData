@@ -46,3 +46,35 @@ class ProgressLogTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FakeStateCollection:
+    def __init__(self, doc):
+        self.doc = doc
+
+    def find_one(self, _query):
+        return self.doc
+
+
+class FakeDb:
+    def __init__(self, last_batch=None):
+        self.stream_state = FakeStateCollection(None if last_batch is None else {"last_batch": last_batch})
+
+
+class AlreadyAppliedTest(unittest.TestCase):
+    """stream_state.last_batch makes the non-idempotent $inc writes safe when Spark replays a batch."""
+
+    def test_new_batch_is_applied(self):
+        from streaming.stream_stats import already_applied
+        self.assertFalse(already_applied(FakeDb(), "valid_events", 0))
+        self.assertFalse(already_applied(FakeDb(last_batch=4), "valid_events", 5))
+
+    def test_replayed_batch_is_skipped(self):
+        from streaming.stream_stats import already_applied
+        self.assertTrue(already_applied(FakeDb(last_batch=5), "valid_events", 5))
+
+    def test_checkpoint_mismatch_stops_instead_of_skipping(self):
+        # checkpoint deleted but MongoDB kept: batch ids restart at 0 while last_batch is 57
+        from streaming.stream_stats import already_applied
+        with self.assertRaises(RuntimeError):
+            already_applied(FakeDb(last_batch=57), "valid_events", 0)

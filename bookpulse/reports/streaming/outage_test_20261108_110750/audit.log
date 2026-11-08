@@ -1,0 +1,41 @@
+{
+  "topic": "rating-events",
+  "messages": 3078,
+  "messages_per_partition": {
+    "0": 1019,
+    "1": 1016,
+    "2": 1043
+  },
+  "distinct_event_ids": 3019,
+  "repeated_messages": 59,
+  "distinct_valid_events": 3000,
+  "distinct_valid_late_events": 0,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 19,
+  "valid_messages": 3059,
+  "mongo_check": {
+    "valid_events_counted": 3000,
+    "expected_valid_minus_late": 3000,
+    "sum_n_ratings_in_rating_stats": 3000,
+    "rejected_events_counted": 19,
+    "user_seen_pairs": 3000,
+    "trending_windows": 4156,
+    "trending_sum_n_ratings": 6000,
+    "expected_trending_2x": 6000,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+  },
+  "archive_check": {
+    "present": true,
+    "committed_batches": 23,
+    "committed_files": 66,
+    "uncommitted_files_on_disk": 0,
+    "rows": 3059,
+    "expected_rows_valid_messages": 3059,
+    "distinct_event_ids": 3000,
+    "expected_distinct_valid_events": 3000,
+    "exactly_once": true
+  }
+}
+-> reports/kafka_audit_20261108_041203.json

@@ -8,7 +8,7 @@ Trên cùng tập test, cùng 4.993 người dùng được đánh giá, **Preci
 
 Số liệu: lần chạy cuối 06/11/2026 bằng `scripts/run_pipeline.sh` từ trạng thái sạch, `reports/train_als_20261106_124521.json` (explicit) và `reports/train_als_implicit_20261106_125816.json` (implicit). Báo cáo cuối kỳ dùng cùng các số này. (Lần chạy 05/11 cho kết quả gần như trùng và cùng kết luận.)
 
-> **Mô hình app đang dùng học trên 80% dữ liệu.** Mô hình phục vụ chính là mô hình đã đánh giá, tức chỉ được fit trên tập train (4.780.968 rating); khoảng 1,2 triệu rating của tập test không được học. Khi triển khai thật, sau khi đánh giá xong nên fit lại trên 100% dữ liệu với tham số đã chọn (rank 50, alpha 1, regParam 0,1) rồi mới ghi gợi ý. Nhóm chưa làm bước này.
+> **Mô hình app đang dùng được fit trên toàn bộ tập train (80% dữ liệu).** Mô hình phục vụ chính là mô hình đã đánh giá: lưới tham số chỉ dùng 80% của tập train (phần còn lại làm validation), sau đó mô hình được fit lại trên toàn bộ tập train (4.780.968 rating); khoảng 1,2 triệu rating của tập test không được học. Khi triển khai thật, sau khi đánh giá xong nên fit lại trên 100% dữ liệu với tham số đã chọn (rank 50, alpha 1, regParam 0,1) rồi mới ghi gợi ý. Nhóm chưa làm bước này.
 
 ## 1. Vấn đề của mô hình cũ
 
@@ -115,7 +115,7 @@ Với mô hình mới, mỗi người nhận một danh sách khác nhau, dù c�
 - **Không còn đoán số sao.** Điểm của mô hình implicit là mức phù hợp (khoảng 0–1), nên app đổi tên cột "Điểm dự đoán (sao)" thành "Mức phù hợp", và RMSE không áp dụng cho mô hình này. Mô hình explicit vẫn được giữ trong `models/als` để báo cáo RMSE.
 - **Nghiêng về sách nổi tiếng hơn.** Ví dụ Animal Farm có trong danh sách của cả user 1, 2 và 3, The Great Gatsby trong danh sách của user 1 và 3, và độ phủ thấp hơn explicit một chút (1.224 so với 1.370). Đây là đặc điểm thường gặp của mô hình implicit; có thể giảm bằng cách thêm hình phạt độ phổ biến khi xếp hạng (chưa làm).
 - **Mới thử 4 bộ tham số** (rank 20 hoặc 50, alpha 1 hoặc 10). Có thể còn bộ tốt hơn, ví dụ rank lớn hơn hoặc regParam khác.
-- **Mô hình phục vụ chỉ học trên 80% dữ liệu** (tập train); chưa fit lại trên toàn bộ trước khi ghi gợi ý (xem phần Kết luận).
+- **Mô hình phục vụ được fit trên toàn bộ tập train (80% dữ liệu)**; chưa fit lại trên 100% dữ liệu trước khi ghi gợi ý (xem phần Kết luận).
 - **Chia train/test ngẫu nhiên**, vì Goodbooks-10k không có thời điểm chấm. Chia theo thời gian sẽ sát thực tế hơn, nhưng không làm được với dữ liệu này.
 - **Đánh giá online trong app chưa đo được chất lượng mô hình.** Streaming phát lại rating đã có trong dữ liệu huấn luyện, mà những sách đó đã bị loại khỏi gợi ý, nên không thể trúng; app hiện "Lượt 4–5 sao trúng top-10" dạng trúng / tổng (ví dụ 2 / 672, 2 lượt trúng do `scripts/rate_from_recs.py`) kèm giải thích. Kế hoạch Session 8 phát lại tập test giữ riêng chưa được làm. Kết luận ở tài liệu này dựa trên đánh giá offline trên tập test.
 

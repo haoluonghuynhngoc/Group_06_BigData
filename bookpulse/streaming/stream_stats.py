@@ -52,8 +52,18 @@ TOP_K = 10
 
 
 def already_applied(db, key, batch_id):
+    """True when this micro-batch was already written (Spark replays the last batch after a crash).
+
+    Only the last batch can be replayed, so batch_id is last_batch or last_batch + 1. A smaller batch_id
+    means the checkpoint and MongoDB no longer belong together (checkpoint deleted or moved, MongoDB
+    kept): skipping would silently drop every batch up to last_batch, so stop with an error instead.
+    """
     state = db.stream_state.find_one({"_id": key})
-    return state is not None and state.get("last_batch", -1) >= batch_id
+    last = -1 if state is None else state.get("last_batch", -1)
+    if batch_id < last:
+        raise RuntimeError(f"{key}: batch {batch_id} < last_batch {last} in MongoDB: checkpoint and "
+                           "stream_state do not match; reset both with scripts/reset_streaming.sh")
+    return last >= batch_id
 
 
 def mark_applied(db, key, batch_id, **inc):

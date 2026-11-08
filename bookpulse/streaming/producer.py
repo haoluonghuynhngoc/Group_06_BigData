@@ -56,8 +56,16 @@ def main():
         value_serializer=lambda v: json.dumps(v).encode("utf-8"),
         acks="all",
         linger_ms=10,
+        # Survive a broker restart: keep unsent records in the buffer up to 2 minutes and retry them.
+        # A retry can write a record twice; the stream job and clean.py drop that copy by event_id.
+        retries=10,
+        retry_backoff_ms=1000,
+        request_timeout_ms=120_000,
     )
-    counts = {"sent": 0, "duplicates": 0, "invalid": 0, "late": 0}
+    counts = {"sent": 0, "duplicates": 0, "invalid": 0, "late": 0, "failed": 0}
+
+    def failed(_exc):  # delivery callback: a record Kafka never acknowledged is counted, not silently lost
+        counts["failed"] += 1
     started = time.time()
     for row in sample.itertuples(index=False):
         late = (args.late > 0 and time.time() - started >= args.late_after_seconds
@@ -66,14 +74,14 @@ def main():
                  "rating": int(row.rating), "event_time": now_utc(args.late_minutes if late else 0),
                  "simulated": True}
         counts["late"] += late
-        producer.send(KAFKA_TOPIC, key=event["user_id"], value=event)
+        producer.send(KAFKA_TOPIC, key=event["user_id"], value=event).add_errback(failed)
         counts["sent"] += 1
         if rng.random() < args.dup:
-            producer.send(KAFKA_TOPIC, key=event["user_id"], value=event)
+            producer.send(KAFKA_TOPIC, key=event["user_id"], value=event).add_errback(failed)
             counts["duplicates"] += 1
         if rng.random() < args.bad:
             bad = dict(event, event_id=uuid.uuid4().hex, rating=9)
-            producer.send(KAFKA_TOPIC, key=bad["user_id"], value=bad)
+            producer.send(KAFKA_TOPIC, key=bad["user_id"], value=bad).add_errback(failed)
             counts["invalid"] += 1
         if counts["sent"] % 100 == 0:
             print(f"{counts} after {time.time() - started:.0f}s")

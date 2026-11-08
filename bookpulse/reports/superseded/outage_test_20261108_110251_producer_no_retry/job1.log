@@ -1,0 +1,1109 @@
+created topic 'rating-events' with 3 partitions
+:: loading settings :: url = jar:file:/usr/local/lib/python3.11/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-9d723e24-7d7b-4632-874f-938b0157b8d3;1.0
+	confs: [default]
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.3 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.3 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 772ms :: artifacts dl 36ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.3 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.3 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   11  |   0   |   0   |   0   ||   11  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-9d723e24-7d7b-4632-874f-938b0157b8d3
+	confs: [default]
+	0 artifacts copied, 11 already retrieved (0kB/15ms)
+26/11/08 04:03:04 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/11/08 04:03:11 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:03:11 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:03:11 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:03:11 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+streaming from 'rating-events' at kafka:9092; Ctrl+C to stop; progress -> stream_progress_20261108_040312.json
+26/11/08 04:03:12 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:03:12 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:03:12 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:03:12 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[Stage 0:>                                                          (0 + 0) / 1][Stage 0:>                                                          (0 + 1) / 1][Stage 0:>                  (0 + 1) / 1][Stage 2:>                  (0 + 1) / 1][Stage 0:>    (0 + 1) / 1][Stage 2:>    (0 + 1) / 1][Stage 4:>    (0 + 2) / 8][Stage 0:>    (0 + 1) / 1][Stage 2:=====(1 + 0) / 1][Stage 4:>    (0 + 4) / 8]                                                                                [Stage 4:>                  (0 + 4) / 8][Stage 6:>                  (0 + 0) / 8]26/11/08 04:03:18 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 6799 milliseconds
+[Stage 4:=========>         (4 + 4) / 8][Stage 6:>                  (0 + 0) / 8]26/11/08 04:03:18 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 6860 milliseconds
+                                                                                26/11/08 04:03:19 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 7517 milliseconds
+[Stage 6:=============================>                             (4 + 4) / 8][Stage 7:>                                                          (0 + 4) / 8][Stage 7:==============>                                            (2 + 4) / 8][Stage 7:=============================>                             (4 + 4) / 8]                                                                                26/11/08 04:03:21 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 8850 milliseconds
+[Stage 8:>                                                          (0 + 3) / 3][Stage 8:>    (0 + 3) / 3][Stage 10:>   (0 + 1) / 3][Stage 11:>   (0 + 0) / 3][Stage 8:=>   (1 + 2) / 3][Stage 10:>   (0 + 2) / 3][Stage 11:>   (0 + 0) / 3][Stage 10:>   (0 + 3) / 3][Stage 11:>   (0 + 1) / 3][Stage 13:>   (0 + 0) / 3][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 13:>   (0 + 0) / 3][Stage 9:>    (0 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:>    (1 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:=>   (2 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:=>   (3 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:==>  (4 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:===> (5 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:===> (6 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3][Stage 9:====>(7 + 1) / 8][Stage 10:>   (0 + 3) / 3][Stage 11:=>  (1 + 0) / 3]                                                                                [Stage 10:>   (0 + 3) / 3][Stage 11:==> (2 + 1) / 3][Stage 13:>   (0 + 0) / 3][Stage 10:>   (0 + 3) / 3][Stage 11:==> (2 + 1) / 3][Stage 13:>   (0 + 1) / 3][Stage 10:============>     (2 + 1) / 3][Stage 13:>                 (0 + 3) / 3]                                                                                26/11/08 04:03:34 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 9298 milliseconds
+26/11/08 04:03:34 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 9477 milliseconds
+[Stage 14:>                                                         (0 + 4) / 8][Stage 14:=====================>                                    (3 + 4) / 8][Stage 14:=============================>                            (4 + 4) / 8][Stage 16:>                                                         (0 + 3) / 3]26/11/08 04:03:36 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 11692 milliseconds
+[Stage 16:======>           (1 + 2) / 3][Stage 18:>                 (0 + 1) / 3][Stage 16:============>     (2 + 1) / 3][Stage 18:>                 (0 + 1) / 3][Stage 15:=>  (3 + 2) / 8][Stage 16:==> (2 + 1) / 3][Stage 18:>   (0 + 1) / 3][Stage 15:=========>        (4 + 4) / 8][Stage 18:======>           (1 + 0) / 3]                                                                                26/11/08 04:03:37 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 12885 milliseconds
+[Stage 17:===>(6 + 2) / 8][Stage 18:==> (2 + 1) / 3][Stage 20:>   (0 + 2) / 3][Stage 17:===>(7 + 1) / 8][Stage 18:==> (2 + 1) / 3][Stage 20:>   (0 + 2) / 3]                                                                                26/11/08 04:03:39 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 5017 milliseconds
+[Stage 20:>                                                         (0 + 3) / 3]                                                                                [Stage 23:======================================>                   (2 + 1) / 3][Stage 22:===========>      (5 + 3) / 8][Stage 25:>                 (0 + 0) / 3]                                                                                [Stage 28:======================================>                   (2 + 1) / 3]                                                                                [valid] batch 3: 92 rows, 49.7 rows/s, duplicates dropped 1
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 1: 74 rows, 5.7 rows/s, duplicates dropped 2
+26/11/08 04:03:42 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 5093 milliseconds
+26/11/08 04:03:44 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:44 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:44 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:44 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+[Stage 35:====================================>                     (5 + 3) / 8]26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+                                                                                26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:03:45 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+[valid] batch 4: 36 rows, 17.1 rows/s, duplicates dropped 0
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+[valid] batch 4: 36 rows, 17.1 rows/s, duplicates dropped 0
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+[valid] batch 4: 36 rows, 17.1 rows/s, duplicates dropped 0
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+26/11/08 04:04:17 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:17 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:22 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka: Name or service not known
+	at java.base/java.net.Inet6AddressImpl.lookupAllHostAddr(Native Method)
+	at java.base/java.net.InetAddress$PlatformNameService.lookupAllHostAddr(InetAddress.java:934)
+	at java.base/java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1543)
+	at java.base/java.net.InetAddress$NameServiceAddresses.get(InetAddress.java:852)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:22 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress$NameServiceAddresses.get(InetAddress.java:887)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:23 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+[valid] batch 4: 36 rows, 17.1 rows/s, duplicates dropped 0
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+26/11/08 04:04:23 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:24 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:24 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:25 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:25 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:25 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:25 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:26 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:26 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:26 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:26 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:27 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:27 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:27 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:27 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:28 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:28 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:28 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:28 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:29 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:29 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:29 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:29 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:30 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:30 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:30 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:30 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:31 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:31 WARN NetworkClient: [AdminClient clientId=adminclient-3] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:31 WARN NetworkClient: [AdminClient clientId=adminclient-4] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:31 WARN NetworkClient: [AdminClient clientId=adminclient-2] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:32 WARN NetworkClient: [AdminClient clientId=adminclient-1] Error connecting to node kafka:9092 (id: 1 rack: null)
+java.net.UnknownHostException: kafka
+	at java.base/java.net.InetAddress$CachedAddresses.get(InetAddress.java:801)
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1533)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1385)
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1306)
+	at org.apache.kafka.clients.DefaultHostResolver.resolve(DefaultHostResolver.java:27)
+	at org.apache.kafka.clients.ClientUtils.resolve(ClientUtils.java:110)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.currentAddress(ClusterConnectionStates.java:510)
+	at org.apache.kafka.clients.ClusterConnectionStates$NodeConnectionState.access$200(ClusterConnectionStates.java:467)
+	at org.apache.kafka.clients.ClusterConnectionStates.currentAddress(ClusterConnectionStates.java:173)
+	at org.apache.kafka.clients.NetworkClient.initiateConnect(NetworkClient.java:990)
+	at org.apache.kafka.clients.NetworkClient.ready(NetworkClient.java:301)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.sendEligibleCalls(KafkaAdminClient.java:1141)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.processRequests(KafkaAdminClient.java:1401)
+	at org.apache.kafka.clients.admin.KafkaAdminClient$AdminClientRunnable.run(KafkaAdminClient.java:1344)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+26/11/08 04:04:32 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:32 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:32 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:33 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+[valid] batch 4: 36 rows, 17.1 rows/s, duplicates dropped 0
+[rejected] batch 4: 33 rows, 19.6 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+26/11/08 04:04:33 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:33 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:33 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:34 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:34 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:34 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:35 WARN NetworkClient: [AdminClient clientId=adminclient-2] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:35 WARN NetworkClient: [AdminClient clientId=adminclient-1] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:35 WARN NetworkClient: [AdminClient clientId=adminclient-3] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+26/11/08 04:04:35 WARN NetworkClient: [AdminClient clientId=adminclient-4] Connection to node 1 (kafka/172.18.0.2:9092) could not be established. Broker may not be available.
+[Stage 36:>                                                         (0 + 3) / 3][Stage 36:>                 (0 + 3) / 3][Stage 38:>                 (0 + 1) / 3][Stage 36:======>           (1 + 2) / 3][Stage 38:>                 (0 + 3) / 3][Stage 36:=>  (1 + 2) / 3][Stage 38:>   (0 + 3) / 3][Stage 40:>   (0 + 0) / 3][Stage 38:======>           (1 + 2) / 3][Stage 40:>                 (0 + 0) / 3][Stage 38:============>     (2 + 1) / 3][Stage 40:>                 (0 + 3) / 3][Stage 40:>                                                         (0 + 3) / 3][Stage 37:>                 (0 + 1) / 8][Stage 40:>                 (0 + 3) / 3][Stage 37:>   (0 + 2) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:>   (0 + 3) / 3][Stage 37:>   (1 + 1) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:>   (0 + 3) / 3][Stage 37:>   (1 + 2) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:>   (0 + 3) / 3][Stage 37:=>  (2 + 1) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:>   (0 + 3) / 3][Stage 37:=>  (2 + 2) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:=>  (1 + 2) / 3][Stage 37:=>  (3 + 3) / 8][Stage 39:>   (0 + 0) / 1][Stage 40:==> (2 + 1) / 3]                                                                                [Stage 37:===>(6 + 2) / 8][Stage 39:>   (0 + 1) / 1][Stage 41:>   (0 + 1) / 3]                                                                                26/11/08 04:04:42 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 57156 milliseconds
+26/11/08 04:04:42 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 57843 milliseconds
+[Stage 42:>                                                         (0 + 4) / 8][valid] batch 5: 68 rows, 1.2 rows/s, duplicates dropped 2
+[rejected] batch 5: 71 rows, 1.2 rows/s, duplicates dropped 0
+[events] batch 3: 67 rows, 36.0 rows/s, duplicates dropped 0
+[trending] batch 3: 95 rows, 38.2 rows/s, duplicates dropped 0
+[Stage 42:=======>                                                  (1 + 4) / 8][Stage 42:======>           (3 + 4) / 8][Stage 44:>                 (0 + 0) / 3][Stage 42:=========>        (4 + 4) / 8][Stage 44:>                 (0 + 0) / 3]26/11/08 04:04:44 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 59240 milliseconds
+[Stage 44:>                                                         (0 + 3) / 3][Stage 46:======================================>                   (2 + 0) / 3][Stage 43:==>               (1 + 4) / 8][Stage 46:============>     (2 + 0) / 3][Stage 43:=>  (3 + 4) / 8][Stage 45:>   (0 + 0) / 1][Stage 46:==> (2 + 0) / 3][Stage 43:==> (4 + 4) / 8][Stage 45:>   (0 + 0) / 1][Stage 46:==> (2 + 0) / 3]                                                                                [Stage 47:=============================>                            (4 + 4) / 8]26/11/08 04:04:46 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 61148 milliseconds
+                                                                                [Stage 54:===================>                                      (1 + 2) / 3][Stage 53:=============================>                            (4 + 4) / 8]                                                                                [Stage 64:>                                                         (0 + 3) / 3][Stage 64:======================================>                   (2 + 1) / 3]                                                                                [valid] batch 8: 55 rows, 27.6 rows/s, duplicates dropped 2
+[rejected] batch 8: 84 rows, 76.6 rows/s, duplicates dropped 0
+[events] batch 7: 45 rows, 16.1 rows/s, duplicates dropped 0
+[trending] batch 6: 69 rows, 23.1 rows/s, duplicates dropped 3
+[Stage 68:>   (0 + 3) / 8][Stage 69:==> (2 + 1) / 3][Stage 70:=>  (1 + 0) / 3]                                                                                [Stage 73:======================================>                   (2 + 1) / 3]                                                                                [Stage 76:>                                                         (0 + 4) / 8][Stage 76:==============>                                           (2 + 4) / 8][Stage 76:=============================>                            (4 + 4) / 8][Stage 76:===========================================>              (6 + 2) / 8]                                                                                [valid] batch 9: 100 rows, 51.9 rows/s, duplicates dropped 2
+[rejected] batch 10: 99 rows, 37.1 rows/s, duplicates dropped 0
+[events] batch 8: 95 rows, 48.0 rows/s, duplicates dropped 0
+[trending] batch 7: 100 rows, 40.4 rows/s, duplicates dropped 2
+[Stage 78:=======>                                                  (1 + 4) / 8][Stage 78:=============================>                            (4 + 4) / 8][Stage 79:=========>        (4 + 4) / 8][Stage 80:>                 (0 + 0) / 3][Stage 79:===============>  (7 + 1) / 8][Stage 80:>                 (0 + 3) / 3]                                                                                26/11/08 04:05:05 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 5845 milliseconds
+[Stage 84:>                                                         (0 + 4) / 8][Stage 84:=============================>                            (4 + 4) / 8]                                                                                26/11/08 04:05:08 WARN FileStreamSinkLog: Compacting took 2391 ms for compact batch 9
+26/11/08 04:05:08 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 8440 milliseconds
+[Stage 96:======================================>                   (2 + 1) / 3]                                                                                [Stage 95:====================================>                     (5 + 3) / 8]                                                                                [valid] batch 12: 100 rows, 57.3 rows/s, duplicates dropped 5
+[rejected] batch 12: 99 rows, 115.5 rows/s, duplicates dropped 0
+[events] batch 11: 33 rows, 13.4 rows/s, duplicates dropped 0
+[trending] batch 10: 84 rows, 33.4 rows/s, duplicates dropped 5
+[Stage 100:=====================>                                   (3 + 4) / 8]                                                                                [valid] batch 13: 100 rows, 56.9 rows/s, duplicates dropped 3
+[rejected] batch 13: 100 rows, 148.8 rows/s, duplicates dropped 0
+[events] batch 13: 100 rows, 45.0 rows/s, duplicates dropped 0
+[trending] batch 11: 100 rows, 41.9 rows/s, duplicates dropped 3
+[valid] batch 13: 100 rows, 56.9 rows/s, duplicates dropped 3
+[rejected] batch 13: 100 rows, 148.8 rows/s, duplicates dropped 0
+[events] batch 15: 103 rows, 80.3 rows/s, duplicates dropped 0
+[trending] batch 11: 100 rows, 41.9 rows/s, duplicates dropped 3
+[valid] batch 13: 100 rows, 56.9 rows/s, duplicates dropped 3
+[rejected] batch 13: 100 rows, 148.8 rows/s, duplicates dropped 0
+[events] batch 17: 101 rows, 59.0 rows/s, duplicates dropped 0
+[trending] batch 11: 100 rows, 41.9 rows/s, duplicates dropped 3
+26/11/08 04:05:50 ERROR MicroBatchExecution: Query valid [id = 3ab4d657-10d4-41b3-b920-7b85cf277517, runId = 72400aff-a7b5-47eb-b415-0c9eba1a662e] terminated with error
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 120, in call
+    raise e
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 117, in call
+    self.func(DataFrame(jdf, wrapped_session_jdf), batch_id)
+  File "/work/streaming/stream_stats.py", line 103, in process_valid
+    if already_applied(db, "valid_events", batch_id):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/streaming/stream_stats.py", line 55, in already_applied
+    state = db.stream_state.find_one({"_id": key})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/collection.py", line 1730, in find_one
+    for result in cursor.limit(-1):
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1281, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1257, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1205, in _refresh
+    self._send_message(q)
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1100, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1754, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1863, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2689, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 6aeff4735ebb1a4453c4445c, topology_type: Single, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at jdk.proxy3/jdk.proxy3.$Proxy30.call(Unknown Source)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1$adapted(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.ForeachBatchSink.addBatch(ForeachBatchSink.scala:34)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$17(MicroBatchExecution.scala:732)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$6(SQLExecution.scala:125)
+	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:201)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$1(SQLExecution.scala:108)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:66)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$16(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runBatch(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$2(MicroBatchExecution.scala:286)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$1(MicroBatchExecution.scala:249)
+	at org.apache.spark.sql.execution.streaming.ProcessingTimeExecutor.execute(TriggerExecutor.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runActivatedStream(MicroBatchExecution.scala:239)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.$anonfun$runStream$1(StreamExecution.scala:311)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.org$apache$spark$sql$execution$streaming$StreamExecution$$runStream(StreamExecution.scala:289)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.$anonfun$run$1(StreamExecution.scala:211)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.run(StreamExecution.scala:211)
+26/11/08 04:05:50 ERROR MicroBatchExecution: Query rejected [id = bec53020-3b81-41e9-ac68-7b17765737d8, runId = 59b253a6-afd9-4585-8293-76f66ca3990e] terminated with error
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 120, in call
+    raise e
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 117, in call
+    self.func(DataFrame(jdf, wrapped_session_jdf), batch_id)
+  File "/work/streaming/stream_stats.py", line 133, in process_rejected
+    if not already_applied(db, "rejected_events", batch_id):
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/streaming/stream_stats.py", line 55, in already_applied
+    state = db.stream_state.find_one({"_id": key})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/collection.py", line 1730, in find_one
+    for result in cursor.limit(-1):
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1281, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1257, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1205, in _refresh
+    self._send_message(q)
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1100, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1754, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1863, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2689, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 6aeff4735ebb1a4453c4445c, topology_type: Single, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at jdk.proxy3/jdk.proxy3.$Proxy30.call(Unknown Source)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1$adapted(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.ForeachBatchSink.addBatch(ForeachBatchSink.scala:34)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$17(MicroBatchExecution.scala:732)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$6(SQLExecution.scala:125)
+	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:201)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$1(SQLExecution.scala:108)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:66)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$16(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runBatch(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$2(MicroBatchExecution.scala:286)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$1(MicroBatchExecution.scala:249)
+	at org.apache.spark.sql.execution.streaming.ProcessingTimeExecutor.execute(TriggerExecutor.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runActivatedStream(MicroBatchExecution.scala:239)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.$anonfun$runStream$1(StreamExecution.scala:311)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.org$apache$spark$sql$execution$streaming$StreamExecution$$runStream(StreamExecution.scala:289)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.$anonfun$run$1(StreamExecution.scala:211)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.run(StreamExecution.scala:211)
+26/11/08 04:05:52 ERROR MicroBatchExecution: Query trending [id = 31ec0d61-d89e-46a6-b2da-cc49a2b5639b, runId = 01218c8a-219b-43ee-ab42-b1200fb912d5] terminated with error
+py4j.Py4JException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 120, in call
+    raise e
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 117, in call
+    self.func(DataFrame(jdf, wrapped_session_jdf), batch_id)
+  File "/work/streaming/stream_stats.py", line 146, in process_trending
+    get_db().trending.bulk_write([
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/collection.py", line 791, in bulk_write
+    bulk_api_result = blk.execute(write_concern, session, _Op.INSERT)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/bulk.py", line 736, in execute
+    return self.execute_command(generator, write_concern, session, operation)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/bulk.py", line 593, in execute_command
+    _ = client._retryable_write(
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1898, in _retryable_write
+    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1784, in _retry_with_session
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+                                              ^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2662, in _write
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 6aeff4735ebb1a4453c4445c, topology_type: Single, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno 111] Connection refused (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+	at py4j.Protocol.getReturnValue(Protocol.java:476)
+	at py4j.reflection.PythonProxyHandler.invoke(PythonProxyHandler.java:108)
+	at jdk.proxy3/jdk.proxy3.$Proxy30.call(Unknown Source)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.PythonForeachBatchHelper$.$anonfun$callForeachBatch$1$adapted(ForeachBatchSink.scala:53)
+	at org.apache.spark.sql.execution.streaming.sources.ForeachBatchSink.addBatch(ForeachBatchSink.scala:34)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$17(MicroBatchExecution.scala:732)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$6(SQLExecution.scala:125)
+	at org.apache.spark.sql.execution.SQLExecution$.withSQLConfPropagated(SQLExecution.scala:201)
+	at org.apache.spark.sql.execution.SQLExecution$.$anonfun$withNewExecutionId$1(SQLExecution.scala:108)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.SQLExecution$.withNewExecutionId(SQLExecution.scala:66)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runBatch$16(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runBatch(MicroBatchExecution.scala:729)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$2(MicroBatchExecution.scala:286)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken(ProgressReporter.scala:427)
+	at org.apache.spark.sql.execution.streaming.ProgressReporter.reportTimeTaken$(ProgressReporter.scala:425)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.reportTimeTaken(StreamExecution.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.$anonfun$runActivatedStream$1(MicroBatchExecution.scala:249)
+	at org.apache.spark.sql.execution.streaming.ProcessingTimeExecutor.execute(TriggerExecutor.scala:67)
+	at org.apache.spark.sql.execution.streaming.MicroBatchExecution.runActivatedStream(MicroBatchExecution.scala:239)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.$anonfun$runStream$1(StreamExecution.scala:311)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.sql.SparkSession.withActive(SparkSession.scala:900)
+	at org.apache.spark.sql.execution.streaming.StreamExecution.org$apache$spark$sql$execution$streaming$StreamExecution$$runStream(StreamExecution.scala:289)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.$anonfun$run$1(StreamExecution.scala:211)
+	at scala.runtime.java8.JFunction0$mcV$sp.apply(JFunction0$mcV$sp.java:23)
+	at org.apache.spark.JobArtifactSet$.withActiveJobArtifactState(JobArtifactSet.scala:94)
+	at org.apache.spark.sql.execution.streaming.StreamExecution$$anon$1.run(StreamExecution.scala:211)
+[valid] batch 13: 100 rows, 56.9 rows/s, duplicates dropped 3
+[rejected] batch 13: 100 rows, 148.8 rows/s, duplicates dropped 0
+[events] batch 19: 101 rows, 47.7 rows/s, duplicates dropped 0
+[trending] batch 11: 100 rows, 41.9 rows/s, duplicates dropped 3
+Traceback (most recent call last):
+  File "/work/streaming/stream_stats.py", line 286, in <module>
+    main()
+  File "/work/streaming/stream_stats.py", line 274, in main
+    raise q.exception()
+pyspark.errors.exceptions.captured.StreamingQueryException: An exception was raised by the Python Proxy. Return Message: Traceback (most recent call last):
+  File "/usr/local/lib/python3.11/site-packages/py4j/clientserver.py", line 617, in _call_proxy
+    return_value = getattr(self.pool[obj_id], method)(*params)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 120, in call
+    raise e
+  File "/usr/local/lib/python3.11/site-packages/pyspark/sql/utils.py", line 117, in call
+    self.func(DataFrame(jdf, wrapped_session_jdf), batch_id)
+  File "/work/streaming/stream_stats.py", line 103, in process_valid
+    if already_applied(db, "valid_events", batch_id):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/work/streaming/stream_stats.py", line 55, in already_applied
+    state = db.stream_state.find_one({"_id": key})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/collection.py", line 1730, in find_one
+    for result in cursor.limit(-1):
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1281, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1257, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1205, in _refresh
+    self._send_message(q)
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/cursor.py", line 1100, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1754, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1863, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1830, in _retry_internal
+    ).run()
+      ^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2689, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 2645, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/mongo_client.py", line 1649, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 398, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 376, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 283, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.11/site-packages/pymongo/synchronous/topology.py", line 333, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 6aeff4735ebb1a4453c4445c, topology_type: Single, servers: [<ServerDescription ('mongo', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('mongo:27017: [Errno -2] Name or service not known (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+=== Streaming Query ===
+Identifier: valid [id = 3ab4d657-10d4-41b3-b920-7b85cf277517, runId = 72400aff-a7b5-47eb-b415-0c9eba1a662e]
+Current Committed Offsets: {KafkaV2[Subscribe[rating-events]]: {"rating-events":{"2":545,"1":530,"0":567}}}
+Current Available Offsets: {KafkaV2[Subscribe[rating-events]]: {"rating-events":{"2":589,"1":562,"0":591}}}
+
+Current State: ACTIVE
+Thread State: RUNNABLE
+
+Logical Plan:
+WriteToMicroBatchDataSourceV1 ForeachBatchSink, 3ab4d657-10d4-41b3-b920-7b85cf277517, [queryName=valid, checkpointLocation=/work/checkpoints/stream_valid], Append
++- DeduplicateWithinWatermark [event_id#23]
+   +- EventTimeWatermark event_time#35: timestamp, 10 minutes
+      +- Filter coalesce(((((isnotnull(event_id#23) AND isnotnull(user_id#24)) AND isnotnull(book_id#25)) AND isnotnull(event_time#35)) AND ((rating#26 >= 1) AND (rating#26 <= 5))), false)
+         +- Project [event_id#23, user_id#24, book_id#25, rating#26, to_timestamp(event_time#27, None, TimestampType, Some(UTC), false) AS event_time#35, simulated#28]
+            +- Project [e#21.event_id AS event_id#23, e#21.user_id AS user_id#24, e#21.book_id AS book_id#25, e#21.rating AS rating#26, e#21.event_time AS event_time#27, e#21.simulated AS simulated#28]
+               +- Project [from_json(StructField(event_id,StringType,true), StructField(user_id,IntegerType,true), StructField(book_id,IntegerType,true), StructField(rating,IntegerType,true), StructField(event_time,StringType,true), StructField(simulated,BooleanType,true), cast(value#8 as string), Some(UTC)) AS e#21]
+                  +- StreamingDataSourceV2Relation [key#7, value#8, topic#9, partition#10, offset#11L, timestamp#12, timestampType#13], org.apache.spark.sql.kafka010.KafkaSourceProvider$KafkaScan@3c15ffa7, KafkaV2[Subscribe[rating-events]]
+

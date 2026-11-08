@@ -1,0 +1,85 @@
+:: loading settings :: url = jar:file:/usr/local/lib/python3.11/site-packages/pyspark/jars/ivy-2.5.1.jar!/org/apache/ivy/core/settings/ivysettings.xml
+Ivy Default Cache set to: /root/.ivy2/cache
+The jars for the packages stored in: /root/.ivy2/jars
+org.apache.spark#spark-sql-kafka-0-10_2.12 added as a dependency
+:: resolving dependencies :: org.apache.spark#spark-submit-parent-4054bdd7-9665-4336-b54e-94ff3fbebf68;1.0
+	confs: [default]
+	found org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.3 in central
+	found org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.3 in central
+	found org.apache.kafka#kafka-clients;3.4.1 in central
+	found org.lz4#lz4-java;1.8.0 in central
+	found org.xerial.snappy#snappy-java;1.1.10.5 in central
+	found org.slf4j#slf4j-api;2.0.7 in central
+	found org.apache.hadoop#hadoop-client-runtime;3.3.4 in central
+	found org.apache.hadoop#hadoop-client-api;3.3.4 in central
+	found commons-logging#commons-logging;1.1.3 in central
+	found com.google.code.findbugs#jsr305;3.0.0 in central
+	found org.apache.commons#commons-pool2;2.11.1 in central
+:: resolution report :: resolve 547ms :: artifacts dl 23ms
+	:: modules in use:
+	com.google.code.findbugs#jsr305;3.0.0 from central in [default]
+	commons-logging#commons-logging;1.1.3 from central in [default]
+	org.apache.commons#commons-pool2;2.11.1 from central in [default]
+	org.apache.hadoop#hadoop-client-api;3.3.4 from central in [default]
+	org.apache.hadoop#hadoop-client-runtime;3.3.4 from central in [default]
+	org.apache.kafka#kafka-clients;3.4.1 from central in [default]
+	org.apache.spark#spark-sql-kafka-0-10_2.12;3.5.3 from central in [default]
+	org.apache.spark#spark-token-provider-kafka-0-10_2.12;3.5.3 from central in [default]
+	org.lz4#lz4-java;1.8.0 from central in [default]
+	org.slf4j#slf4j-api;2.0.7 from central in [default]
+	org.xerial.snappy#snappy-java;1.1.10.5 from central in [default]
+	---------------------------------------------------------------------
+	|                  |            modules            ||   artifacts   |
+	|       conf       | number| search|dwnlded|evicted|| number|dwnlded|
+	---------------------------------------------------------------------
+	|      default     |   11  |   0   |   0   |   0   ||   11  |   0   |
+	---------------------------------------------------------------------
+:: retrieving :: org.apache.spark#spark-submit-parent-4054bdd7-9665-4336-b54e-94ff3fbebf68
+	confs: [default]
+	0 artifacts copied, 11 already retrieved (0kB/8ms)
+26/11/08 03:59:58 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+26/11/08 04:00:04 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:00:05 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:00:05 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+26/11/08 04:00:05 WARN ResolveWriteToStream: spark.sql.adaptive.enabled is not supported in streaming DataFrames/Datasets and will be disabled.
+streaming from 'rating-events' at kafka:9092; Ctrl+C to stop; progress -> stream_progress_20261108_040005.json
+26/11/08 04:00:05 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:00:05 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:00:05 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+26/11/08 04:00:05 WARN AdminClientConfig: These configurations '[key.deserializer, value.deserializer, enable.auto.commit, max.poll.records, auto.offset.reset]' were supplied but are not used yet.
+[Stage 0:>                                                          (0 + 3) / 3][Stage 0:>    (0 + 3) / 3][Stage 1:>    (0 + 1) / 3][Stage 3:>    (0 + 0) / 3][Stage 0:>    (0 + 3) / 3][Stage 1:>    (0 + 2) / 3][Stage 3:>    (0 + 0) / 3][Stage 0:>    (0 + 3) / 3][Stage 1:===> (2 + 1) / 3][Stage 3:>    (0 + 0) / 3][Stage 0:>    (0 + 3) / 3][Stage 3:>    (0 + 1) / 3][Stage 5:>    (0 + 0) / 3][Stage 0:>    (0 + 3) / 3][Stage 3:=>   (1 + 0) / 3][Stage 5:>    (0 + 0) / 3][Stage 0:>    (0 + 3) / 3][Stage 2:>    (0 + 1) / 1][Stage 3:=>   (1 + 0) / 3]                                                                                26/11/08 04:00:10 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 5358 milliseconds
+[Stage 0:>    (0 + 3) / 3][Stage 3:===> (2 + 1) / 3][Stage 5:>    (0 + 0) / 3][Stage 0:>                  (0 + 3) / 3][Stage 5:>                  (0 + 1) / 3]                                                                                26/11/08 04:00:11 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:11 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+[Stage 4:>    (0 + 2) / 8][Stage 5:=>   (1 + 2) / 3][Stage 8:=>   (1 + 0) / 3]26/11/08 04:00:11 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:11 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+[Stage 4:>                  (0 + 4) / 8][Stage 8:======>            (1 + 0) / 3]26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+[Stage 4:==>  (4 + 4) / 8][Stage 6:>    (0 + 0) / 8][Stage 8:=>   (1 + 0) / 3]                                                                                26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:12 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 7560 milliseconds
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 8159 milliseconds
+[Stage 6:=========>         (4 + 4) / 8][Stage 8:======>            (1 + 0) / 3][Stage 8:===================>                                       (1 + 2) / 3]26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:13 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+[Stage 7:=======>                                                   (1 + 4) / 8]26/11/08 04:00:14 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:14 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:14 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+26/11/08 04:00:14 WARN HDFSBackedStateStoreProvider: The state for version 8 doesn't exist in loadedMaps. Reading snapshot file and delta files if needed...Note that this is normal for the first batch of starting query.
+[Stage 7:==>  (4 + 4) / 8][Stage 9:>    (0 + 0) / 1][Stage 10:>   (0 + 0) / 3]                                                                                26/11/08 04:00:14 WARN ProcessingTimeExecutor: Current batch is falling behind. The trigger interval is 5000 milliseconds, but spent 9479 milliseconds
+[Stage 10:======>           (1 + 2) / 3][Stage 11:============>     (2 + 1) / 3]                                                                                [valid] batch 8: 627 rows, 77.0 rows/s, duplicates dropped 15
+[rejected] batch 9: 93 rows, 22.3 rows/s, duplicates dropped 0
+[events] batch 8: 627 rows, 83.0 rows/s, duplicates dropped 0
+[trending] batch 8: 627 rows, 66.2 rows/s, duplicates dropped 15
+[Stage 12:=========>        (4 + 4) / 8][Stage 13:>                 (0 + 0) / 3][Stage 12:===============>  (7 + 1) / 8][Stage 13:>                 (0 + 3) / 3]                                                                                [Stage 18:===================>                                      (1 + 2) / 3][Stage 17:===========================================>              (6 + 2) / 8]                                                                                [Stage 20:>                                                         (0 + 3) / 3]                                                                                [Stage 22:=============================>                            (4 + 4) / 8][Stage 24:>                                                         (0 + 3) / 3][Stage 24:>                 (0 + 3) / 3][Stage 26:>                 (0 + 1) / 3][Stage 23:=>  (2 + 4) / 8][Stage 26:=>  (1 + 0) / 3][Stage 28:>   (0 + 0) / 3][Stage 23:==> (4 + 4) / 8][Stage 26:=>  (1 + 0) / 3][Stage 28:>   (0 + 0) / 3]                                                                                [rejected] batch 11: 61 rows, 27.8 rows/s, duplicates dropped 0
+[events] batch 11: 20 rows, 6.3 rows/s, duplicates dropped 0
