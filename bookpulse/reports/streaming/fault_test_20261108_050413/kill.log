@@ -1,0 +1,1 @@
+29114 sh -c pkill -9 -f "[s]treaming/stream_stats.py"; pkill -9 -f "[p]yspark-shell"; sleep 1;   ps -eo pid,args | grep -E "[s]tream_stats|[p]yspark-shell" || echo "no stream process left"

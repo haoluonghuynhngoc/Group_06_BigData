@@ -1,0 +1,3 @@
+[theme]
+# Light theme: readable on a projector and in the printed report
+base = "light"

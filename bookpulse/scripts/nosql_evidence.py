@@ -1,14 +1,16 @@
 """NoSQL evidence: read back what the batch and streaming jobs wrote to MongoDB and verify it.
 
 Reports collection sizes, one sample recommendation document, the query plan of the app's main
-access pattern (find by _id), read latency over random users, and consistency checks between
-the streaming counters. Writes reports/nosql_evidence_<timestamp>.json.
+access pattern (find by _id), read latency over random users, consistency checks between
+the streaming counters, and an independent check that no stored recommendation or fallback book is
+one the user already rated (read from data/parquet/ratings with pandas, not with the Spark code that
+wrote the lists). Writes reports/nosql_evidence_<timestamp>.json.
 """
 import argparse
 import random
 import time
 
-from common.settings import get_db, save_report
+from common.settings import PARQUET_DIR, get_db, save_report
 
 TOP_K = 10
 
@@ -18,11 +20,28 @@ def percentile(values, p):
     return values[min(len(values) - 1, int(round(p / 100 * (len(values) - 1))))]
 
 
+def seen_overlap(recs):
+    """Pairs (user, book) in the stored lists that are also in the training ratings: must be 0."""
+    import pandas as pd
+
+    rated = pd.read_parquet(PARQUET_DIR / "ratings", columns=["user_id", "book_id"])
+    rows = [(d["_id"], r["book_id"], "recs") for d in recs.find({}, {"recs.book_id": 1}) for r in d["recs"]]
+    rows += [(d["_id"], b, "fallback") for d in recs.find({}, {"fallback": 1}) for b in d.get("fallback", [])]
+    lists = pd.DataFrame(rows, columns=["user_id", "book_id", "list"])
+    hit = lists.merge(rated, on=["user_id", "book_id"])
+    return {"training_ratings": len(rated),
+            "rec_pairs": int((lists["list"] == "recs").sum()),
+            "fallback_pairs": int((lists["list"] == "fallback").sum()),
+            "rec_pairs_already_rated": int((hit["list"] == "recs").sum()),
+            "fallback_pairs_already_rated": int((hit["list"] == "fallback").sum())}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--reads", type=int, default=1000, help="random find-by-_id reads to time")
     parser.add_argument("--user", type=int, default=1, help="user shown as the sample document")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--skip-overlap", action="store_true", help="skip the recs vs training-ratings check")
     args = parser.parse_args()
 
     db = get_db()
@@ -78,6 +97,7 @@ def main():
         "read_latency_ms": {"reads": len(latencies), "p50": round(percentile(latencies, 50), 2),
                             "p95": round(percentile(latencies, 95), 2),
                             "max": round(max(latencies), 2)},
+        "recs_vs_training_ratings": None if args.skip_overlap else seen_overlap(recs),
         "streaming": {
             "valid_events": valid.get("events", 0),
             "rejected_events": rejected.get("events", 0),

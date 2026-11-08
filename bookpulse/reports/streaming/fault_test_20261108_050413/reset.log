@@ -1,0 +1,12 @@
+[1/5] stop a running stream job (if any)
+  no stream job running
+[2/5] delete the Kafka topic rating-events (the stream job recreates it with 3 partitions)
+[3/5] delete streaming checkpoints
+[4/5] delete the Parquet archive of streamed events
+[5/5] drop the streaming collections in MongoDB
+  rating_stats: true
+  user_seen: true
+  online_eval: true
+  stream_state: true
+  trending: true
+Streaming state is clean. Start it again with: docker compose exec spark python streaming/stream_stats.py

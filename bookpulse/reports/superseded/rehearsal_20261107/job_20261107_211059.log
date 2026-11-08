@@ -1,0 +1,86 @@
+packageJobJar: [/tmp/hadoop-unjar8782727062048461739/] [] /tmp/streamjob6187316536946720773.jar tmpDir=null
+2026-11-07 21:11:13 INFO  DefaultNoHARMFailoverProxyProvider:64 - Connecting to ResourceManager at resourcemanager/172.19.0.4:8032
+2026-11-07 21:11:14 INFO  DefaultNoHARMFailoverProxyProvider:64 - Connecting to ResourceManager at resourcemanager/172.19.0.4:8032
+2026-11-07 21:11:14 INFO  JobResourceUploader:907 - Disabling Erasure Coding for path: /tmp/hadoop-yarn/staging/root/.staging/job_1794085784779_0001
+2026-11-07 21:11:15 INFO  FileInputFormat:267 - Total input files to process : 1
+2026-11-07 21:11:15 INFO  JobSubmitter:203 - number of splits:3
+2026-11-07 21:11:15 INFO  JobSubmitter:299 - Submitting tokens for job: job_1794085784779_0001
+2026-11-07 21:11:15 INFO  JobSubmitter:300 - Executing with tokens: []
+2026-11-07 21:11:16 INFO  Configuration:2885 - resource-types.xml not found
+2026-11-07 21:11:16 INFO  ResourceUtils:476 - Unable to find 'resource-types.xml'.
+2026-11-07 21:11:16 INFO  YarnClientImpl:356 - Submitted application application_1794085784779_0001
+2026-11-07 21:11:16 INFO  Job:1681 - The url to track the job: http://resourcemanager:8088/proxy/application_1794085784779_0001/
+2026-11-07 21:11:16 INFO  Job:1726 - Running job: job_1794085784779_0001
+2026-11-07 21:11:25 INFO  Job:1747 - Job job_1794085784779_0001 running in uber mode : false
+2026-11-07 21:11:25 INFO  Job:1754 -  map 0% reduce 0%
+2026-11-07 21:11:40 INFO  Job:1754 -  map 33% reduce 0%
+2026-11-07 21:11:45 INFO  Job:1754 -  map 72% reduce 0%
+2026-11-07 21:11:51 INFO  Job:1754 -  map 78% reduce 0%
+2026-11-07 21:12:01 INFO  Job:1754 -  map 89% reduce 0%
+2026-11-07 21:12:02 INFO  Job:1754 -  map 100% reduce 11%
+2026-11-07 21:12:04 INFO  Job:1754 -  map 100% reduce 100%
+2026-11-07 21:12:04 INFO  Job:1765 - Job job_1794085784779_0001 completed successfully
+2026-11-07 21:12:04 INFO  Job:1772 - Counters: 55
+	File System Counters
+		FILE: Number of bytes read=2183334
+		FILE: Number of bytes written=4995106
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+		HDFS: Number of bytes read=72135318
+		HDFS: Number of bytes written=395484
+		HDFS: Number of read operations=19
+		HDFS: Number of large read operations=0
+		HDFS: Number of write operations=4
+		HDFS: Number of bytes read erasure-coded=0
+	Job Counters 
+		Killed map tasks=1
+		Launched map tasks=3
+		Launched reduce tasks=2
+		Rack-local map tasks=3
+		Total time spent by all maps in occupied slots (ms)=317140
+		Total time spent by all reduces in occupied slots (ms)=263676
+		Total time spent by all map tasks (ms)=79285
+		Total time spent by all reduce tasks (ms)=43946
+		Total vcore-milliseconds taken by all map tasks=79285
+		Total vcore-milliseconds taken by all reduce tasks=43946
+		Total megabyte-milliseconds taken by all map tasks=40593920
+		Total megabyte-milliseconds taken by all reduce tasks=33750528
+	Map-Reduce Framework
+		Map input records=5976480
+		Map output records=5976479
+		Map output bytes=109279108
+		Map output materialized bytes=1206873
+		Input split bytes=300
+		Combine input records=5976479
+		Combine output records=47087
+		Reduce input groups=10000
+		Reduce shuffle bytes=1206873
+		Reduce input records=47087
+		Reduce output records=10000
+		Spilled Records=131380
+		Shuffled Maps =6
+		Failed Shuffles=0
+		Merged Map outputs=6
+		GC time elapsed (ms)=415
+		CPU time spent (ms)=56400
+		Physical memory (bytes) snapshot=1413160960
+		Virtual memory (bytes) snapshot=11825606656
+		Total committed heap usage (bytes)=809500672
+		Peak Map Physical memory (bytes)=387706880
+		Peak Map Virtual memory (bytes)=2299932672
+		Peak Reduce Physical memory (bytes)=202285056
+		Peak Reduce Virtual memory (bytes)=2491895808
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=72135018
+	File Output Format Counters 
+		Bytes Written=395484
+2026-11-07 21:12:04 INFO  StreamJob:1029 - Output directory: /bookpulse/output/book_rating_stats
+elapsed_seconds=52

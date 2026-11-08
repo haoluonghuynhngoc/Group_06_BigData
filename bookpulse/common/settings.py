@@ -40,10 +40,17 @@ def get_spark(app_name, kafka=False):
     return spark
 
 
+_client = None
+
+
 def get_db():
+    """One MongoClient per process (it is thread-safe and pools connections), reused by every batch."""
+    global _client
     from pymongo import MongoClient
 
-    return MongoClient(MONGO_URI)[MONGO_DB]
+    if _client is None:
+        _client = MongoClient(MONGO_URI)
+    return _client[MONGO_DB]
 
 
 def save_report(name, payload):

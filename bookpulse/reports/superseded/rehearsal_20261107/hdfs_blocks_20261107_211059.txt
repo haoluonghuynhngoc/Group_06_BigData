@@ -1,0 +1,2 @@
+/bookpulse/input/ratings.csv 72126826 bytes, replicated: replication=1, 3 block(s):  OK
+ Total blocks (validated):	3 (avg. block size 24042275 B)

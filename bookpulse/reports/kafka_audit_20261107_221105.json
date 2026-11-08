@@ -1,0 +1,28 @@
+{
+  "topic": "rating-events",
+  "messages": 1028,
+  "messages_per_partition": {
+    "0": 339,
+    "1": 315,
+    "2": 374
+  },
+  "distinct_event_ids": 1012,
+  "repeated_messages": 16,
+  "distinct_valid_events": 1002,
+  "distinct_valid_late_events": 19,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 10,
+  "mongo_check": {
+    "valid_events_counted": 983,
+    "expected_valid_minus_late": 983,
+    "sum_n_ratings_in_rating_stats": 983,
+    "rejected_events_counted": 10,
+    "user_seen_pairs": 983,
+    "trending_windows": 1641,
+    "trending_sum_n_ratings": 1966,
+    "expected_trending_2x": 1966,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+  }
+}

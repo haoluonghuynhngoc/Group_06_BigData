@@ -18,8 +18,13 @@ if [ "${1:-}" != "--yes" ]; then
 fi
 
 echo "[1/5] stop a running stream job (if any)"
-docker compose exec -T spark pkill -INT -f "streaming/stream_stats.py" || true
-sleep 3
+docker compose exec -T spark pkill -INT -f "streaming/stream_stats.py" || echo "  no stream job running"
+# Wait until it has really stopped, so no batch commits into a checkpoint we are about to delete
+for i in $(seq 1 30); do
+  docker compose exec -T spark pgrep -f "streaming/stream_stats.py" >/dev/null || break
+  [ "$i" = 30 ] && { echo "  still running after 30 s, killing it"; docker compose exec -T spark pkill -9 -f "streaming/stream_stats.py" || true; }
+  sleep 1
+done
 
 echo "[2/5] delete the Kafka topic rating-events (the stream job recreates it with 3 partitions)"
 docker compose exec -T kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 \

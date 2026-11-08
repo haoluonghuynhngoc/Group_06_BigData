@@ -4,6 +4,14 @@ Every event gets a fresh event_id and event_time (the dataset has no rating time
 events are labelled simulated. A small share is sent twice or sent with an invalid rating on
 purpose, to check that the streaming job drops them. With --late, a share of events carries an
 event_time that is --late-minutes old: older than the job's watermark, so Spark drops them.
+
+Late events are only sent after --late-after-seconds. In Spark 3.5 a stateful query filters late rows
+with the watermark of the previous micro-batch, so the first two batches after a fresh start have no
+watermark yet and let late rows through. 30 s at a 5 s trigger leaves room for those first batches
+(the first one takes 6-12 s on a cold JVM).
+
+The replayed (user, book) pairs are already in the training data, so they are never on anyone's
+recommendation list. To rate a book that IS on a user's list, use scripts/rate_from_recs.py.
 """
 import argparse
 import json
@@ -32,8 +40,8 @@ def main():
     parser.add_argument("--late", type=float, default=0.0,
                         help="share of events sent with an old event_time, to show the watermark dropping them")
     parser.add_argument("--late-minutes", type=float, default=30, help="how old a late event is")
-    parser.add_argument("--late-after", type=int, default=200,
-                        help="send late events only after this many events, so Spark already has a watermark")
+    parser.add_argument("--late-after-seconds", type=float, default=30,
+                        help="send late events only after this many seconds, so Spark already has a watermark")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
 
@@ -52,7 +60,8 @@ def main():
     counts = {"sent": 0, "duplicates": 0, "invalid": 0, "late": 0}
     started = time.time()
     for row in sample.itertuples(index=False):
-        late = args.late > 0 and counts["sent"] >= args.late_after and rng.random() < args.late
+        late = (args.late > 0 and time.time() - started >= args.late_after_seconds
+                and rng.random() < args.late)
         event = {"event_id": uuid.uuid4().hex, "user_id": int(row.user_id), "book_id": int(row.book_id),
                  "rating": int(row.rating), "event_time": now_utc(args.late_minutes if late else 0),
                  "simulated": True}

@@ -1,0 +1,91 @@
+{
+  "active": {
+    "recs_collection": "recommendations_20261106_125827",
+    "model_version": "20261106_125827",
+    "switched_at": "2026-11-06 13:00:52.016000"
+  },
+  "collections": {
+    "books": 10000,
+    "meta": 1,
+    "online_eval": 1,
+    "rating_stats": 783,
+    "recommendations_20261105_173716": 53424,
+    "recommendations_20261106_125827": 53424,
+    "stream_state": 2,
+    "trending": 1641,
+    "user_seen": 983
+  },
+  "users_with_recs": 53424,
+  "indexes_on_recs": [
+    "_id_"
+  ],
+  "sample_document": {
+    "_id": 1,
+    "model_version": "20261106_125827",
+    "n_recs": 30,
+    "top_5": [
+      {
+        "rank": 1,
+        "book_id": 195,
+        "score": 0.8395,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 2,
+        "book_id": 5,
+        "score": 0.8392,
+        "title": "The Great Gatsby"
+      },
+      {
+        "rank": 3,
+        "book_id": 8,
+        "score": 0.7865,
+        "title": "The Catcher in the Rye"
+      },
+      {
+        "rank": 4,
+        "book_id": 15,
+        "score": 0.7524,
+        "title": "The Diary of a Young Girl"
+      },
+      {
+        "rank": 5,
+        "book_id": 291,
+        "score": 0.7511,
+        "title": "Cutting for Stone"
+      }
+    ]
+  },
+  "find_by_id_plan": {
+    "stage": "IDHACK → PROJECTION_DEFAULT",
+    "docs_examined": 1,
+    "keys_examined": 1
+  },
+  "read_latency_ms": {
+    "reads": 1000,
+    "p50": 0.51,
+    "p95": 1.14,
+    "max": 2.86
+  },
+  "recs_vs_training_ratings": {
+    "training_ratings": 5976479,
+    "rec_pairs": 1602720,
+    "fallback_pairs": 534240,
+    "rec_pairs_already_rated": 0,
+    "fallback_pairs_already_rated": 0
+  },
+  "streaming": {
+    "valid_events": 983,
+    "rejected_events": 10,
+    "last_batch": 14,
+    "sum_n_ratings_in_rating_stats": 983,
+    "counts_agree": true,
+    "books_with_live_stats": 783,
+    "user_seen_pairs": 983,
+    "online_eval": {
+      "liked_events": 672,
+      "hits": 2,
+      "cold_start_events": 0
+    }
+  }
+}

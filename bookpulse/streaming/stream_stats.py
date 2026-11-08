@@ -19,6 +19,11 @@ A fourth query is a stateful event-time window: ratings per book in a 10-minute 
 5 minutes ("trending"), in update mode. Events older than the watermark are dropped by Spark before
 they reach any state, which the progress report shows as numRowsDroppedByWatermark.
 
+Scale note: process_valid collects each micro-batch to the driver and writes it with one MongoDB
+client. That is fine for this project's event rate; --max-offsets bounds how much one batch can pull
+from Kafka (backpressure after downtime). At larger scale the write would move to the executors
+(foreachPartition, or pre-aggregating per book in Spark before writing).
+
 Observability: the progress of every query (input rows, rows/s, batch duration, state size, rows
 dropped by watermark or as duplicates, current watermark) is accumulated per batch and written to
 reports/stream_progress_<timestamp>.json every 10 seconds and when the job stops.
@@ -188,6 +193,8 @@ def main():
     parser.add_argument("--starting-offsets", default="earliest")
     parser.add_argument("--run-seconds", type=int, default=0, help="0 = run until Ctrl+C")
     parser.add_argument("--partitions", type=int, default=3, help="partitions if the topic has to be created")
+    parser.add_argument("--max-offsets", type=int, default=20000,
+                        help="maxOffsetsPerTrigger: most Kafka records one micro-batch reads (backpressure)")
     parser.add_argument("--window", default="10 minutes", help="trending window length (event time)")
     parser.add_argument("--slide", default="5 minutes", help="trending window slide")
     args = parser.parse_args()
@@ -204,6 +211,7 @@ def main():
         .option("subscribe", KAFKA_TOPIC)
         .option("startingOffsets", args.starting_offsets)
         .option("failOnDataLoss", "false")
+        .option("maxOffsetsPerTrigger", args.max_offsets)
         .load()
         .select(F.from_json(F.col("value").cast("string"), SCHEMA).alias("e"))
         .select("e.*")

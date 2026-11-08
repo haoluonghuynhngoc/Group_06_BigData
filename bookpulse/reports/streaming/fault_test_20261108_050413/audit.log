@@ -1,0 +1,29 @@
+{
+  "topic": "rating-events",
+  "messages": 1547,
+  "messages_per_partition": {
+    "0": 537,
+    "1": 496,
+    "2": 514
+  },
+  "distinct_event_ids": 1515,
+  "repeated_messages": 32,
+  "distinct_valid_events": 1500,
+  "distinct_valid_late_events": 26,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 15,
+  "mongo_check": {
+    "valid_events_counted": 1474,
+    "expected_valid_minus_late": 1474,
+    "sum_n_ratings_in_rating_stats": 1474,
+    "rejected_events_counted": 15,
+    "user_seen_pairs": 1474,
+    "trending_windows": 2356,
+    "trending_sum_n_ratings": 2948,
+    "expected_trending_2x": 2948,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+  }
+}
+-> reports/kafka_audit_20261107_220738.json

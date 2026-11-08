@@ -28,6 +28,11 @@ services:
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_NUM_PARTITIONS: 3
       KAFKA_HEAP_OPTS: -Xms256m -Xmx512m
+      # Keep the log on a named volume: without it the topic lives in the container and
+      # `docker compose down` deletes it while the Spark checkpoints (another volume) survive.
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka-data:/var/lib/kafka/data
 
   # Workbench: every Spark job, the producer and helper scripts run here with `docker compose exec spark ...`
   spark:
@@ -63,5 +68,6 @@ services:
 
 volumes:
   mongo-data:
+  kafka-data:
   spark-checkpoints:
   ivy-cache:

@@ -16,11 +16,13 @@ Ghi lại câu hỏi giảng viên đặt ra khi nhóm thuyết trình Session 8
 
 Nếu trả lời ở Buổi 10, nói thêm: "Sau câu hỏi của thầy/cô ở Buổi 8, nhóm phát hiện rating từ streaming chưa được đưa vào lần huấn luyện sau, nên đã bổ sung và kiểm thử."
 
+> **Ghi chú trung thực (cập nhật 08/11).** Hiệu ứng "cuốn vừa đọc bị ẩn, lấy cuốn tiếp theo" chỉ xảy ra khi người dùng chấm một cuốn **đang nằm trong** danh sách gợi ý. `producer.py` phát lại cặp (user, sách) đã có trong dữ liệu huấn luyện, mà gợi ý đã loại mọi sách người dùng đã chấm, nên sự kiện phát lại không bao giờ nằm trong danh sách và không làm đổi top-10. Ở Buổi 10, hiệu ứng được demo bằng `scripts/rate_from_recs.py` (user 1 chấm 2 cuốn đầu trong top-10 của mình → hai cuốn bị ẩn, cuốn tiếp theo lên). Kế hoạch nêu ở Buổi 8 là phát lại một tập test giữ riêng để đo đánh giá online **chưa được làm**; app hiện chỉ số "Lượt 4–5 sao trúng top-10" dạng trúng / tổng (ví dụ 2 / 672) kèm giải thích vì sao sự kiện phát lại không thể trúng.
+
 ## Ý chính cần nhớ
 
 | Loại thay đổi | Xử lý | Bao lâu |
 |---|---|---|
-| Vừa đọc hoặc chấm một cuốn trong top-10 | Streaming ghi vào `user_seen`; app ẩn cuốn đó, lấy cuốn tiếp theo trong 30 cuốn đã lưu | Vài giây |
+| Vừa đọc hoặc chấm một cuốn trong top-10 | Streaming ghi vào `user_seen`; app ẩn cuốn đó, lấy cuốn tiếp theo trong 30 cuốn đã lưu (demo bằng `rate_from_recs.py`; sự kiện phát lại của producer không nằm trong top-10) | Vài giây |
 | Đọc gần hết danh sách | App bù từ `fallback`: 10 sách phổ biến người đó chưa chấm; cột "Nguồn" ghi "Phổ biến (bù)" | Ngay |
 | Điểm trung bình của sách thay đổi | Cộng dồn tổng điểm và số lượt trong `rating_stats`, rồi mới chia | Vài giây |
 | Gu đọc thay đổi, người dùng mới, sách mới | Sự kiện được lưu ra Parquet → `clean.py` gộp (lấy rating mới nhất) → huấn luyện lại ALS | Theo lịch batch |
@@ -30,7 +32,7 @@ Vì sao không huấn luyện lại sau mỗi sự kiện: một lần huấn lu
 
 ## Bằng chứng đã kiểm thử
 
-- Gửi 5 rating mới qua Kafka: dữ liệu huấn luyện tăng đúng 5 dòng (5.976.479 lên 5.976.484), và 5 cuốn đó biến khỏi gợi ý của người dùng.
+- Gửi 5 rating mới qua Kafka: dữ liệu huấn luyện tăng đúng 5 dòng so với 5.976.479 dòng gốc (lần chạy 05/11), và 5 cuốn đó biến khỏi gợi ý của người dùng.
 - Kafka, Parquet và MongoDB cùng đếm đúng 2.300 sự kiện hợp lệ: không mất, không trùng.
 - 534.240 cặp trong danh sách bù: 0 cuốn người dùng đã đọc.
 - Giả lập người dùng đã đọc 25 trên 30 gợi ý: app vẫn hiện đủ 10 cuốn (5 cuốn ALS, 5 cuốn bù).
@@ -43,7 +45,7 @@ File report: `bookpulse/reports/clean_20261105_155646.json`, `bookpulse/reports/
 Thiết kế là mỗi đêm. Hiện nhóm chạy bằng tay; phần chạy tự động theo lịch nằm trong kế hoạch Buổi 10.
 
 **2. Job streaming chết thì sao?**
-Sự kiện vẫn nằm trong Kafka; bật lại thì Spark đọc tiếp từ checkpoint. Nhóm đã thử restart: không mất, không trùng sự kiện nào. Riêng phần ghi ra Parquet dùng file sink của Spark nên đảm bảo exactly-once.
+Sự kiện vẫn nằm trong Kafka; bật lại thì Spark đọc tiếp từ checkpoint. Nhóm đã thử restart: không mất, không trùng sự kiện nào. Riêng phần ghi ra Parquet dùng file sink của Spark nên đảm bảo exactly-once. (Cập nhật Buổi 10: lượt `kill -9` ngày 08/11 cũng 0 mất, 0 trùng, nhưng ghi MongoDB chưa exactly-once hoàn toàn: nếu job chết đúng lúc đang ghi, batch phát lại có thể cộng lặp một phần.)
 
 **3. Muốn gợi ý cập nhật nhanh hơn, không chờ đến đêm?**
 Vector của sách cố định giữa các lần huấn luyện, nên có thể tính lại vector của một người dùng từ các rating mới của họ bằng một phép giải bình phương tối thiểu nhỏ (fold-in), mất vài giây. Đây là hướng nâng cao, nhóm chưa làm.

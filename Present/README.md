@@ -8,7 +8,7 @@ Thư mục này chứa tài liệu các buổi thuyết trình nhóm của BDA50
 | Session 8 | Báo cáo tiến độ, số đo thật ngày 04/11/2026 | `BookPulse - BDA501 Session 8 Team Presentation.pptx`, script, hỏi đáp, câu hỏi của giảng viên |
 | **Session 10** | **Final Assessment: báo cáo, thuyết trình, demo** | `BookPulse - Bao cao cuoi ky BDA501 Nhom 06.docx`, `BookPulse - BDA501 Session 10 Final Presentation.pptx`, script, hỏi đáp, kịch bản demo |
 
-Tài liệu mỗi buổi giữ đúng số liệu tại thời điểm trình bày. Một số số liệu Session 8 đã được cập nhật sau đó (ví dụ app chuyển sang ALS implicit, Precision@10 = 0,209); số mới nhất nằm trong `bookpulse/reports/` và báo cáo cuối kỳ.
+Tài liệu mỗi buổi giữ đúng số liệu tại thời điểm trình bày. Một số số liệu Session 8 đã được cập nhật sau đó (ví dụ app chuyển sang ALS implicit, Precision@10 = 0,204 ở lần chạy cuối 06/11); số mới nhất nằm trong `bookpulse/reports/` và báo cáo cuối kỳ.
 
 ---
 
