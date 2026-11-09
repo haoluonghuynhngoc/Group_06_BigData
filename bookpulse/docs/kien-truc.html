@@ -116,7 +116,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
 
   <figure>
     <div class="scroll">
-      <svg class="arch" viewBox="0 0 1612 830" role="img" aria-label="Kiến trúc theo ý tưởng Lambda. Nguồn: Goodbooks-10k CSV và producer gửi sự kiện vào Kafka. Nhánh kiểm chứng: CSV lên HDFS, MapReduce trên YARN, kết quả đối chiếu với Spark SQL. Lớp batch trong container Spark: clean.py ghi Parquet, analytics_sql.py truy vấn, train_als.py huấn luyện ALS, write_recs.py ghi gợi ý vào collection mới rồi chuyển meta.active. Lớp tốc độ: stream_stats.py đọc Kafka mỗi 5 giây, ghi số liệu vào MongoDB và lưu sự kiện ra kho Parquet, kho này được gộp vào clean.py ở lần batch sau. Lớp phục vụ: MongoDB với batch view và speed view. App Streamlit chỉ đọc MongoDB và gộp hai view lúc đọc.">
+      <svg class="arch" viewBox="0 0 1640 852" role="img" aria-label="Kiến trúc theo ý tưởng Lambda. Nguồn: Goodbooks-10k CSV và producer gửi sự kiện vào Kafka. Nhánh kiểm chứng: CSV lên HDFS, MapReduce trên YARN, kết quả đối chiếu với Spark SQL. Lớp batch trong container Spark: clean.py ghi Parquet, analytics_sql.py truy vấn, train_als.py huấn luyện ALS, write_recs.py ghi gợi ý vào collection mới rồi chuyển meta.active. Lớp tốc độ: stream_stats.py đọc Kafka mỗi 5 giây, ghi số liệu vào MongoDB và lưu sự kiện ra kho Parquet, kho này được gộp vào clean.py ở lần batch sau. Lớp phục vụ: MongoDB với batch view và speed view. App Streamlit đọc MongoDB, gộp hai view lúc đọc, và nút Chấm sao gửi sự kiện chấm sao vào Kafka.">
 <defs>
 <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M0,0 L10,5 L0,10 z"/></marker>
 <marker id="ahb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah b" d="M0,0 L10,5 L0,10 z"/></marker>
@@ -280,35 +280,37 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
 <text class="t" x="1505" y="302" text-anchor="middle">Streamlit</text>
 <text class="sub" x="1505" y="325" text-anchor="middle">app/app.py</text>
 <text class="sub" x="1505" y="347" text-anchor="middle">:8501</text>
-<text class="sub" x="1505" y="369" text-anchor="middle">chỉ đọc MongoDB</text>
+<text class="sub" x="1505" y="369" text-anchor="middle">đọc Mongo · gửi Kafka</text>
 <path class="a " d="M1565,218 V272" marker-end="url(#ah)"/>
 <path class="a r" d="M1375,280 H1423" marker-end="url(#ahr)"/>
 <path class="a r" d="M1375,494 H1400 V350 H1423" marker-end="url(#ahr)"/>
 <text class="lbl2" x="1420" y="424">Gộp lúc đọc:</text>
+<path class="a s" d="M1585,330 H1620 V648 H140 V622" marker-end="url(#ahs)"/>
+<text class="lbl" x="300" y="668">nút Chấm sao trong app: gửi sự kiện chấm sao vào Kafka (app không ghi MongoDB)</text>
 <text class="sub" x="1420" y="448">• gợi ý batch, ẩn</text>
 <text class="sub" x="1420" y="470">  sách trong user_seen</text>
 <text class="sub" x="1420" y="492">• điểm TB, sách hot</text>
 <text class="sub" x="1420" y="514">  từ speed view</text>
 <text class="sub" x="1420" y="536">• user mới: sách</text>
 <text class="sub" x="1420" y="558">  phổ biến (meta)</text>
-<line class="a m" x1="20" y1="668" x2="54" y2="668"/>
-<text class="leg" x="64" y="673">MapReduce (Hadoop)</text>
-<line class="a b" x1="252.79999999999998" y1="668" x2="286.79999999999995" y2="668"/>
-<text class="leg" x="296.79999999999995" y="673">lớp batch</text>
-<line class="a s" x1="408.19999999999993" y1="668" x2="442.19999999999993" y2="668"/>
-<text class="leg" x="452.19999999999993" y="673">lớp tốc độ</text>
-<line class="a r" x1="572.1999999999999" y1="668" x2="606.1999999999999" y2="668"/>
-<text class="leg" x="616.1999999999999" y="673">đọc / đối chiếu</text>
-<rect class="ctr" x="779.1999999999999" y="660" width="34" height="16" rx="3"/>
-<text class="leg" x="823.1999999999999" y="673">container Docker</text>
-<path class="box" d="M998.8,662 a13,4 0 0 0 26,0 V674 a13,4 0 0 1 -26,0 Z"/><ellipse class="box" cx="1011.8" cy="662" rx="13" ry="4"/>
-<text class="leg" x="1038.8" y="673">kho dữ liệu</text>
-<rect class="badge b" x="1167.3999999999999" y="658" width="16" height="20" rx="8"/><rect class="badge s" x="1185.3999999999999" y="658" width="16" height="20" rx="8"/>
-<text class="leg" x="1211.3999999999999" y="673">bước batch / stream</text>
-<text class="note" x="20" y="706">①  write_recs ghi gợi ý vào collection mới   ②  xong hết mới chuyển meta.active (giữ 2 bản)  →  app không bao giờ đọc danh sách ghi dở</text>
-<text class="note" x="20" y="732">Một máy host, Docker: compose bookpulse (spark · kafka · mongo · app) + compose bookpulse-hadoop; hai bên chỉ nối qua thư mục chung bookpulse/</text>
-<text class="note" x="20" y="758">Đọc phụ: stream_stats đọc meta + top-10 để tính online_eval · rate_from_recs đọc top-10 rồi gửi sự kiện vào Kafka (demo)</text>
-<text class="note" x="20" y="784">books.csv → analytics_sql.py và write_recs.py (collection books) · verify_with_spark đọc lại ratings.csv để đối chiếu</text>
+<line class="a m" x1="20" y1="692" x2="54" y2="692"/>
+<text class="leg" x="64" y="697">MapReduce (Hadoop)</text>
+<line class="a b" x1="252.79999999999998" y1="692" x2="286.79999999999995" y2="692"/>
+<text class="leg" x="296.79999999999995" y="697">lớp batch</text>
+<line class="a s" x1="408.19999999999993" y1="692" x2="442.19999999999993" y2="692"/>
+<text class="leg" x="452.19999999999993" y="697">lớp tốc độ</text>
+<line class="a r" x1="572.1999999999999" y1="692" x2="606.1999999999999" y2="692"/>
+<text class="leg" x="616.1999999999999" y="697">đọc / đối chiếu</text>
+<rect class="ctr" x="779.1999999999999" y="684" width="34" height="16" rx="3"/>
+<text class="leg" x="823.1999999999999" y="697">container Docker</text>
+<path class="box" d="M998.8,686 a13,4 0 0 0 26,0 V698 a13,4 0 0 1 -26,0 Z"/><ellipse class="box" cx="1011.8" cy="686" rx="13" ry="4"/>
+<text class="leg" x="1038.8" y="697">kho dữ liệu</text>
+<rect class="badge b" x="1167.3999999999999" y="682" width="16" height="20" rx="8"/><rect class="badge s" x="1185.3999999999999" y="682" width="16" height="20" rx="8"/>
+<text class="leg" x="1211.3999999999999" y="697">bước batch / stream</text>
+<text class="note" x="20" y="730">①  write_recs ghi gợi ý vào collection mới   ②  xong hết mới chuyển meta.active (giữ 2 bản)  →  app không bao giờ đọc danh sách ghi dở</text>
+<text class="note" x="20" y="756">Một máy host, Docker: compose bookpulse (spark · kafka · mongo · app) + compose bookpulse-hadoop; hai bên chỉ nối qua thư mục chung bookpulse/</text>
+<text class="note" x="20" y="782">Đọc phụ: stream_stats đọc meta + top-10 để tính online_eval · rate_from_recs (dòng lệnh) đọc top-10 rồi gửi sự kiện vào Kafka (demo)</text>
+<text class="note" x="20" y="808">books.csv → analytics_sql.py và write_recs.py (collection books) · verify_with_spark đọc lại ratings.csv để đối chiếu</text>
 </svg>
     </div>
   </figure>
@@ -324,7 +326,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
       <tr><td>Spark ML</td><td><code>batch/train_als.py</code></td><td>ALS implicit P@10 0,204 (sách phổ biến 0,078; explicit 0,008); chọn tham số trên validation</td><td><code>reports/train_als*.json</code>, <a href="chon-mo-hinh.md">chon-mo-hinh.md</a></td></tr>
       <tr><td>NoSQL (MongoDB)</td><td><code>batch/write_recs.py</code></td><td>53.424 document; đọc theo <code>_id</code> (IDHACK, 1 document); đổi phiên bản an toàn cho collection gợi ý: cổng kiểm tra đủ số người dùng trước khi chuyển, <code>books</code> upsert trước khi chuyển, giữ phiên bản trước (<code>previous_collection</code>) để quay lại (đã sửa 08/11, thử trên database riêng <code>bookpulse_test</code>); còn lại: cổng không so chất lượng, mô hình và Parquet không có phiên bản; gợi ý và danh sách bù không chứa sách đã chấm (kiểm tra độc lập: 0 / 1.602.720 và 0 / 534.240 cặp)</td><td><code>reports/nosql_evidence_*.json</code>, <code>write_recs_*.json</code></td></tr>
       <tr><td>Streaming</td><td><code>streaming/</code></td><td>Khớp Kafka sau <code>kill -9</code>: 1.474 = 1.500 − 26 trễ, 0 mất, 0 trùng (<code>scripts/stream_fault_test.sh</code>); 26 sự kiện trễ bị loại (suy từ kafka_audit: 1.474 = 1.500 − 26; file progress chỉ ghi 0 + 23 vì batch commit ngay trước <code>kill -9</code> không nằm trong file nào); cửa sổ trượt đếm đúng (2 × 1.474). Lặp lại lần 2, thêm kiểm tra kho Parquet qua <code>_spark_metadata</code>: 1.475 = 1.500 − 25, kho 1.537 dòng = 1.537 message hợp lệ, 1.500 <code>event_id</code>, exactly-once. Thử ngắt Kafka 40 s và MongoDB 30 s (<code>scripts/stream_outage_test.sh</code>): 3.000 = 3.000, kho 3.059 = 3.059, 0 mất, 0 trùng; lượt đầu tìm ra producer mất 571 message (kafka-python hủy bản ghi chờ trong buffer quá <code>request_timeout_ms</code> 30 giây, không có callback kiểm tra), đã sửa bằng <code>request_timeout_ms</code> 120 giây, retry và callback đếm <code>failed</code>. Kết quả đo, không phải bảo đảm: <code>failOnDataLoss=false</code>; <code>kill -9</code> ở thời điểm bất kỳ gần như chắc chắn không thử tới khe hở cộng lặp (chú thích (*) ở hình dưới)</td><td><code>reports/kafka_audit_20261107_220738.json</code>, <code>kafka_audit_20261108_040236.json</code>, <code>kafka_audit_20261108_041203.json</code>, <code>stream_progress_*.json</code>, <code>reports/streaming/</code>, <a href="streaming.md">streaming.md</a></td></tr>
-      <tr><td>App</td><td><code>app/app.py</code></td><td>Top-10 có bù, "Điểm TB (stream)", "sách đang hot", "Lượt 4–5 sao trúng top-10" (trúng / tổng); sách vừa chấm bị ẩn khi chấm bằng <code>rate_from_recs.py</code></td><td><code>reports/streaming/app_trending.png</code>, <code>docs/img/app_after_rate_from_recs.png</code></td></tr>
+      <tr><td>App</td><td><code>app/app.py</code></td><td>Top-10 có bù, "Điểm TB (stream)", "sách đang hot", "Lượt 4–5 sao trúng top-10" (trúng / tổng); mục "Chấm sao": chọn sách trong top-10 và số sao, app gửi sự kiện vào Kafka (không ghi MongoDB); sau một trigger sách vừa chấm bị ẩn (dòng lệnh tương đương: <code>rate_from_recs.py</code>)</td><td><code>reports/streaming/app_trending.png</code>, <code>docs/img/app_after_rate_from_recs.png</code></td></tr>
     </table>
     </div>
   </section>
@@ -564,7 +566,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
       <ol>
         <li><code>python streaming/stream_stats.py</code><span>Bốn query: valid, rejected, trending, events_to_parquet; ghi tiến độ ra <code>reports/stream_progress_*.json</code>.</span></li>
         <li><code>python streaming/producer.py --limit 1000 --late 0.05</code><span>20 sự kiện/giây, có bản trùng, sự kiện lỗi; 5% số sự kiện gửi sau giây thứ 30 (khi job đã có watermark) là sự kiện trễ 30 phút, để thấy watermark loại chúng (lượt demo: 19/1.000).</span></li>
-        <li><code>python scripts/rate_from_recs.py --user 1 --n 2 --rating 5</code><span>User 1 chấm 2 cuốn đầu trong top-10 của mình; sau một trigger, app ẩn hai cuốn đó và đẩy cuốn tiếp theo lên.</span></li>
+        <li>App → mục "Chấm sao" (hoặc <code>python scripts/rate_from_recs.py --user 1 --n 2 --rating 5</code>)<span>User 1 chấm sách trong top-10 của mình; app chỉ gửi sự kiện vào Kafka; sau một trigger, job streaming ghi <code>user_seen</code>, app ẩn cuốn đó và đẩy cuốn tiếp theo lên.</span></li>
         <li>Mở <code>localhost:8501</code> và <code>localhost:4040</code><span>App: "Điểm TB (stream)", "sách đang hot", lượt trúng top-10. Spark UI: tab Structured Streaming.</span></li>
         <li><code>python scripts/kafka_audit.py</code><span>Đếm lại Kafka và đối chiếu MongoDB trong một lệnh: <code>no_loss_no_double_count</code>, <code>rejected_match</code>, <code>trending_match</code>; thêm <code>archive_check</code>: đếm kho Parquet qua <code>_spark_metadata</code> (số dòng = message hợp lệ, <code>event_id</code> khác nhau = hợp lệ khác nhau).</span></li>
         <li><code>bash scripts/stream_fault_test.sh</code><span>Chạy trên máy host, khoảng 3 phút: <code>kill -9</code> job giữa chừng, chạy lại từ checkpoint, rồi đối chiếu Kafka.</span></li>

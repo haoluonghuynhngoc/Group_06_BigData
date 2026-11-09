@@ -40,7 +40,7 @@ Nguồn là Goodbooks-10k, 6 triệu rating. Dữ liệu đi theo hai đường.
 
 Đường dưới là lớp tốc độ, màu cam: producer mô phỏng người dùng chấm sao, gửi sự kiện vào Kafka; Spark Structured Streaming đọc mỗi 5 giây, dùng watermark cho sự kiện trễ, cửa sổ thời gian cho "sách đang hot", và checkpoint để chạy lại không mất dữ liệu. Mọi sự kiện hợp lệ cũng được lưu vào kho Parquet, để lần batch sau học thêm.
 
-Cả hai lớp ghi vào MongoDB, là lớp phục vụ: gợi ý từ batch, số liệu mới từ streaming. App Streamlit chỉ đọc MongoDB và gộp hai phần khi đọc, ví dụ ẩn ngay cuốn sách người dùng vừa chấm.
+Cả hai lớp ghi vào MongoDB, là lớp phục vụ: gợi ý từ batch, số liệu mới từ streaming. App Streamlit đọc MongoDB và gộp hai phần khi đọc, ví dụ ẩn ngay cuốn sách người dùng vừa chấm. Mũi tên cam dưới cùng: khi người dùng bấm chấm sao trong app, app chỉ gửi sự kiện vào Kafka, không ghi thẳng vào MongoDB; sự kiện đi qua lớp tốc độ như mọi sự kiện khác.
 
 Hadoop MapReduce phía trên là nhánh riêng, dùng để kiểm chứng: đếm lại trên HDFS và YARN, kết quả khớp 100% với Spark SQL.
 
@@ -150,6 +150,6 @@ Hàng xanh dương là lớp batch, chạy theo đợt bằng run_pipeline.sh. B
 
 Hàng cam là lớp tốc độ, chạy liên tục, trigger 5 giây. S1: producer gửi vào Kafka. S2: stream_stats.py đọc bằng 4 query. S3: upsert số liệu vào speed view trong MongoDB. S4: lưu sự kiện hợp lệ ra kho stream_events. S5: clean.py gộp kho này ở lần batch sau.
 
-Bên phải là lớp phục vụ: MongoDB chứa batch view và speed view. Rồi lớp trình bày: app Streamlit chỉ đọc MongoDB và gộp lúc đọc: gợi ý từ batch view, ẩn sách vừa chấm trong user_seen, điểm trung bình và sách hot từ speed view. Nhóm chưa hợp nhất hai view thành một số liệu.
+Bên phải là lớp phục vụ: MongoDB chứa batch view và speed view. Rồi lớp trình bày: app Streamlit đọc MongoDB và gộp lúc đọc, còn nút Chấm sao chỉ gửi sự kiện vào Kafka (mũi tên cam dưới cùng): gợi ý từ batch view, ẩn sách vừa chấm trong user_seen, điểm trung bình và sách hot từ speed view. Nhóm chưa hợp nhất hai view thành một số liệu.
 
 Khung tím trên cùng là cụm Hadoop riêng: MapReduce trên HDFS và YARN, nhánh kiểm chứng, app không dùng. Nét đứt xám là đọc hoặc đối chiếu.

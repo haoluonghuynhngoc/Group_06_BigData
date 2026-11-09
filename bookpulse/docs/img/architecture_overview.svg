@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 910" width="1600" height="910">
 <defs>
 <marker id="k" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#18212d"/></marker>
 <marker id="b" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1d68a8"/></marker>
@@ -7,7 +7,7 @@
 <marker id="g" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f7a5a"/></marker>
 <marker id="m" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5a6575"/></marker>
 </defs>
-<rect width="1600" height="900" fill="#ffffff"/>
+<rect width="1600" height="910" fill="#ffffff"/>
 <text x="150" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">NGUỒN</text>
 <text x="420" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">THU NHẬN</text>
 <text x="835" y="52" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="22" font-weight="600" fill="#5a6575" text-anchor="middle" letter-spacing="2">XỬ LÝ</text>
@@ -77,8 +77,10 @@
 <path d="M1090,635 H1158" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
 <path d="M1385,450 H1418" fill="none" stroke="#1f7a5a" stroke-width="3" marker-end="url(#g)"/>
 <path d="M1500,210 V408" fill="none" stroke="#18212d" stroke-width="3" marker-end="url(#k)"/>
-<text x="1500" y="600" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">gộp hai view</text>
-<text x="1500" y="626" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">khi đọc</text>
-<rect x="40" y="800" width="1520" height="70" rx="12" fill="#f1f3f6" stroke="#c3ccd8" stroke-width="1.5"/>
-<text x="800" y="844" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="23" font-weight="500" fill="#18212d" text-anchor="middle">Theo ý tưởng Lambda:  batch tính gợi ý theo đợt  ·  speed cập nhật mỗi 5 giây  ·  MongoDB phục vụ  ·  app gộp khi đọc</text>
+<text x="1478" y="600" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">gộp hai view</text>
+<text x="1478" y="626" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="20" font-weight="600" fill="#1f7a5a" text-anchor="middle">khi đọc</text>
+<path d="M1560,550 V786 H420 V746" fill="none" stroke="#b75a07" stroke-width="3" marker-end="url(#o)"/>
+<text x="990" y="810" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="19" font-weight="600" fill="#b75a07" text-anchor="middle">chấm sao trong app → Kafka</text>
+<rect x="40" y="826" width="1520" height="64" rx="12" fill="#f1f3f6" stroke="#c3ccd8" stroke-width="1.5"/>
+<text x="800" y="867" font-family="'IBM Plex Sans', 'Segoe UI', sans-serif" font-size="23" font-weight="500" fill="#18212d" text-anchor="middle">Theo ý tưởng Lambda:  batch tính gợi ý theo đợt  ·  speed cập nhật mỗi 5 giây  ·  MongoDB phục vụ  ·  app gộp khi đọc</text>
 </svg>
