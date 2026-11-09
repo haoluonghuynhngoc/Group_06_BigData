@@ -97,7 +97,7 @@ docker compose exec spark python streaming/producer.py --limit 1000 --late 0.05
 
 Trong lúc producer chạy:
 - Mở http://localhost:4040 → tab **Structured Streaming**: 4 query có tên (`valid`, `rejected`, `events_to_parquet`, `trending`); bấm vào `trending` để thấy tốc độ vào (khoảng 20 sự kiện/giây), thời gian batch (batch đầu 7–12 giây vì JVM còn lạnh, sau đó 3–6 giây), watermark.
-- App → bấm **Làm mới**: số sự kiện tăng, cột "Điểm TB (stream)", mục **"Sách đang hot"** xuất hiện.
+- App → bấm **Làm mới**: số sự kiện tăng, cột "Điểm TB (stream)", mục **"Sách đang hot"** xuất hiện (chỉ sách có lượt 4–5 sao, xếp theo số lượt 4–5 sao; lượt 1–3 sao không đẩy sách lên bảng, K37).
 - Chỉ số "Lượt 4–5 sao trúng top-10" hiện **0 / N**. Nói: "Producer phát lại rating đã có trong dữ liệu huấn luyện, mà gợi ý đã loại mọi sách người dùng đã chấm, nên các sự kiện này không thể trúng. Dòng chú thích dưới chỉ số giải thích điều đó."
 
 **Sách vừa chấm biến khỏi top-10 (chấm ngay trong app).** Khi producer báo `done`, nhập user **1** trong app, chỉ vào #1 The Guernsey Literary and Potato Peel Pie Society. Kéo xuống mục **Chấm sao**: chọn sách "#1 · The Guernsey…", số sao ★★★★★, bấm **Gửi lượt chấm**. App báo "Đã gửi vào Kafka: user 1 chấm 5 sao cho #1 · …". Muốn chấm thêm #2 The Great Gatsby thì chọn "#2 · The Great Gatsby" rồi bấm gửi lần nữa (chưa cần làm mới).

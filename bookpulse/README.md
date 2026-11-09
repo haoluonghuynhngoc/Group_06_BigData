@@ -59,7 +59,8 @@ docker compose exec spark python streaming/producer.py --file data/sample/rating
 docker compose exec spark python scripts/rate_from_recs.py --user 1 --n 2 --rating 5
 ```
 
-Bấm "Làm mới" trong app: cột "Điểm TB (stream)", các chỉ số luồng streaming và mục "Sách đang hot" (cửa sổ
+Bấm "Làm mới" trong app: cột "Điểm TB (stream)", các chỉ số luồng streaming và mục "Sách đang hot" (chỉ sách có lượt
+4–5 sao, xếp theo số lượt 4–5 sao rồi điểm TB, nên lượt 1–3 sao không đẩy sách lên bảng; cửa sổ
 event time 10 phút, trượt 5 phút) thay đổi. `producer.py` phát lại rating **đã có trong dữ liệu huấn luyện**,
 mà gợi ý đã loại mọi sách người dùng đã chấm, nên sự kiện phát lại không bao giờ làm đổi top-10 và không thể
 "trúng" (chỉ số "Lượt 4–5 sao trúng top-10" hiện dạng trúng / tổng; với riêng producer, số trúng luôn là 0). Muốn thấy sách vừa chấm
@@ -162,8 +163,12 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
   xóa kho `stream_events` trước mỗi lượt demo/thử, nên lần làm sạch của mô hình cuối (`clean_20261106_123904.json`)
   có `stream_events` = null: mô hình cuối (P@10 0,204) được huấn luyện không có sự kiện streaming. Kho giữ sự kiện cho
   lần huấn luyện sau cho đến khi chạy `reset_streaming.sh`; production: kho sự kiện là dữ liệu gốc bất biến, không reset.
-  `producer.py`, `rate_from_recs.py` và nút Chấm sao của app đánh dấu `simulated=true` nhưng `clean.py` chưa lọc, nên một lượt chấm demo
-  sẽ vào lần huấn luyện sau; production cần lọc sự kiện mô phỏng. Kho là file sink trigger 5 giây, chia theo
+  `producer.py`, `rate_from_recs.py` và nút Chấm sao của app đánh dấu `simulated=true`. `clean.py` mặc định gộp cả sự
+  kiện mô phỏng (để demo được vòng chấm sao → huấn luyện lại → gợi ý mới) và bỏ chúng khi chạy với `--exclude-simulated`;
+  report `clean_*.json` đếm riêng `real_events` và `simulated_events`. Kết quả làm sạch có cột `from_stream`, và
+  `train_als.py` luôn đưa rating đến từ streaming vào tập train (rating CSV mới chia ngẫu nhiên 80/20), nên mô hình phục vụ
+  học được mọi lượt chấm mới; trước 10/11, chia ngẫu nhiên cả bảng làm khoảng 1/5 lượt chấm mới rơi vào tập test và không
+  được học (thử 10/11: 1/11 lượt, `A Game of Thrones` của user 22). Kho là file sink trigger 5 giây, chia theo
   `event_date`, không compaction, nên sinh nhiều file nhỏ (production: trigger dài hơn cho query này, hoặc compaction /
   Delta Lake / Iceberg).
 - **Lớp nhanh bỏ sự kiện trễ, lớp batch giữ lại:** thống kê trực tiếp và "sách đang hot" dùng watermark 10 phút
@@ -229,8 +234,10 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
   trong `clean.py`, phần ghi MongoDB của `valid` và `trending` sang executor). Thiết kế cluster nằm trong báo cáo.
 - **Chưa có bảo mật:** cổng MongoDB (27017) và Kafka (9094) mở ra máy host, MongoDB không xác thực, Kafka PLAINTEXT;
   chỉ chấp nhận được trên laptop. Sự kiện lỗi chỉ được đếm, không lưu (chưa có dead-letter topic).
-- **Chia train/test ngẫu nhiên** vì CSV không có thời điểm chấm. Nếu dùng dữ liệu UCSD bản JSON có ngày tháng,
-  nên đổi sang chia theo thời gian (train trước một mốc, test sau mốc).
+- **Chia train/test ngẫu nhiên** vì CSV không có thời điểm chấm (seed 42: 4.780.968 / 1.195.511 dòng; rating từ
+  streaming luôn vào train). Nếu dùng dữ liệu UCSD bản JSON có ngày tháng, nên đổi sang chia theo thời gian (train trước
+  một mốc, test sau mốc). Khi có thêm rating từ streaming, cách chia của `randomSplit` xáo lại một phần tập test của CSV,
+  nên Precision@10 dao động nhẹ giữa các lần (thử 10/11: 0,201–0,208); chia theo hash của (user, sách) sẽ ổn định hơn.
 
 ## 7. Dừng và làm lại từ đầu
 
@@ -306,10 +313,10 @@ docker compose exec spark python -m unittest discover -s tests -t . -v      # t�
 | File | Kiểm tra |
 |---|---|
 | `tests/test_mapreduce.py` | mapper loại đúng từng loại dòng lỗi; combiner chạy 0/1/nhiều lần cho cùng kết quả; điểm TB chỉ làm tròn một lần |
-| `tests/test_recs.py` | không gợi ý sách đã đọc; xếp hạng top-k đúng |
+| `tests/test_recs.py` | không gợi ý sách đã đọc; xếp hạng top-k đúng; rating từ streaming luôn nằm trong tập train (2 test) |
 | `tests/test_stream_progress.py` | file tiến độ streaming cộng đúng mỗi batch một lần dù đọc lại nhiều lần; `AlreadyAppliedTest` (3 test): bỏ qua batch đã ghi, dừng với lỗi khi batch id nhỏ hơn `last_batch` |
 
-11/11 test đều qua (chạy trong container `spark`; trên máy host chỉ chạy được `test_mapreduce` vì thiếu pyspark/pymongo).
+13/13 test đều qua (chạy trong container `spark`; trên máy host chỉ chạy được `test_mapreduce` vì thiếu pyspark/pymongo).
 
 Ngoài unit test, mỗi thành phần có kiểm chứng trên dữ liệu thật: `mapreduce/verify_with_spark.py` (MapReduce so với Spark SQL),
 `scripts/kafka_audit.py` (đếm Kafka và so với số đếm streaming trong MongoDB, khối `mongo_check`),

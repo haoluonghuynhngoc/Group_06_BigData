@@ -116,7 +116,7 @@ Với mô hình mới, mỗi người nhận một danh sách khác nhau, dù c�
 - **Nghiêng về sách nổi tiếng hơn.** Ví dụ Animal Farm có trong danh sách của cả user 1, 2 và 3, The Great Gatsby trong danh sách của user 1 và 3, và độ phủ thấp hơn explicit một chút (1.224 so với 1.370). Đây là đặc điểm thường gặp của mô hình implicit; có thể giảm bằng cách thêm hình phạt độ phổ biến khi xếp hạng (chưa làm).
 - **Mới thử 4 bộ tham số** (rank 20 hoặc 50, alpha 1 hoặc 10). Có thể còn bộ tốt hơn, ví dụ rank lớn hơn hoặc regParam khác.
 - **Mô hình phục vụ được fit trên toàn bộ tập train (80% dữ liệu)**; chưa fit lại trên 100% dữ liệu trước khi ghi gợi ý (xem phần Kết luận).
-- **Chia train/test ngẫu nhiên**, vì Goodbooks-10k không có thời điểm chấm. Chia theo thời gian sẽ sát thực tế hơn, nhưng không làm được với dữ liệu này.
+- **Chia train/test ngẫu nhiên**, vì Goodbooks-10k không có thời điểm chấm. Chia theo thời gian sẽ sát thực tế hơn, nhưng không làm được với dữ liệu này. Rating đến từ streaming (cột `from_stream`) luôn được đưa vào tập train, để mô hình học mọi lượt chấm mới (sửa 10/11).
 - **Đánh giá online trong app chưa đo được chất lượng mô hình.** Streaming phát lại rating đã có trong dữ liệu huấn luyện, mà những sách đó đã bị loại khỏi gợi ý, nên không thể trúng; app hiện "Lượt 4–5 sao trúng top-10" dạng trúng / tổng (ví dụ 2 / 672, 2 lượt trúng do `scripts/rate_from_recs.py`) kèm giải thích. Kế hoạch Session 8 phát lại tập test giữ riêng chưa được làm. Kết luận ở tài liệu này dựa trên đánh giá offline trên tập test.
 
 ## 8. Chạy lại
