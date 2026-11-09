@@ -11,11 +11,11 @@ Mọi con số trong script lấy từ `bookpulse/reports/` (lần chạy ngày 
 | Lương Huỳnh Ngọc Hảo | 1–6 | Mở đầu, tiến độ, kiến trúc cập nhật, ingestion, Spark SQL, query plan | ~5 phút 30 giây |
 | Nguyễn Tấn Kiệt | 7–9 | Spark ML, hiệu năng theo số core, MongoDB; điều phối hỏi đáp | ~3 phút 30 giây + hỏi đáp |
 | Đinh Trần Quốc Tuấn | 10–13 | Streaming, bên trong job streaming, rủi ro và khắc phục, kế hoạch Buổi 10 | ~4 phút 30 giây |
-| Lương Huỳnh Ngọc Hảo | 14–16 | Cập nhật sau Buổi 8, câu hỏi của giảng viên, cảm ơn | ~2 phút 30 giây |
+| Lương Huỳnh Ngọc Hảo | 14–17 | Cập nhật sau Buổi 8, kiến trúc hiện tại, câu hỏi của giảng viên, cảm ơn | ~3 phút 30 giây |
 
-Slide 17 là phụ lục (kiến trúc theo từng luồng, bản cũ của slide 3), chỉ mở khi được hỏi.
+Slide 18 là phụ lục (kiến trúc chi tiết: tên file, collection, bước B1–B4, S1–S5), chỉ mở khi được hỏi.
 
-Tổng thời gian nói khoảng 16 phút. Nếu lớp quy định 10–12 phút: Hảo rút slide 6 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 8 còn 30 giây, Tuấn nói slide 11 trong 30 giây (chỉ hai nhánh hợp lệ / lỗi và last_batch), Hảo nói slide 14 trong 45 giây (chỉ đọc cột trạng thái).
+Tổng thời gian nói khoảng 17 phút. Nếu lớp quy định 10–12 phút: Hảo rút slide 6 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 8 còn 30 giây, Tuấn nói slide 11 trong 30 giây (chỉ hai nhánh hợp lệ / lỗi và last_batch), Hảo nói slide 14 trong 45 giây (chỉ đọc cột trạng thái) và slide 15 trong 30 giây (chỉ ba điểm khác slide 3).
 
 So với Session 5, thông điệp chính của buổi này là: **hệ thống đã chạy thật end-to-end, mọi số trên slide đều là số đo, và khi chạy thật nhóm tìm ra 6 vấn đề: 2 đã sửa xong, 1 đã có thử nghiệm khắc phục kèm số liệu, 3 còn lại có kế hoạch cho Buổi 10.**
 
@@ -187,7 +187,7 @@ Sản phẩm nộp Buổi 10 gồm báo cáo cuối kỳ, repo kèm README và c
 
 ---
 
-## Phần 4 – Lương Huỳnh Ngọc Hảo (slide 14–16)
+## Phần 4 – Lương Huỳnh Ngọc Hảo (slide 14–17)
 
 ### Slide 14 – Cập nhật sau Buổi 8 (~1 phút 15 giây)
 
@@ -199,7 +199,19 @@ Làm một phần: đưa sự kiện streaming vào lần huấn luyện sau đ�
 
 Chưa làm, nhóm nói thẳng: chạy tập con UCSD, và đánh giá online bằng dữ liệu giữ lại. Hai mục này được ghi rõ trong phần giới hạn của báo cáo cuối kỳ.
 
-### Slide 15 – Câu hỏi của giảng viên: dữ liệu thay đổi thì sao? (~1 phút)
+### Slide 15 – Kiến trúc hiện tại: kế hoạch đã thành hệ thống (~1 phút)
+
+Đây là kiến trúc của hệ thống bây giờ, cùng bố cục năm cột như slide 3 để thầy cô dễ so. Ba điểm khác so với slide 3.
+
+Một, khung Hadoop MapReduce phía trên đã chuyển từ kế hoạch sang đã chạy: dữ liệu lên HDFS, job chạy trên YARN, kết quả khớp 100% với Spark SQL.
+
+Hai, ở giữa có kho Parquet nối hai lớp: lớp tốc độ lưu mọi sự kiện hợp lệ vào kho này, và lớp batch gộp chúng ở lần huấn luyện sau. Đây là mũi tên nét đứt "huấn luyện lại" ở slide 3, nay đã có đường đi thật.
+
+Ba, mũi tên cam dưới cùng: người dùng chấm sao ngay trong app, app chỉ gửi sự kiện vào Kafka, không ghi thẳng vào MongoDB; sự kiện đi qua lớp tốc độ như mọi sự kiện khác.
+
+Phần còn lại vẫn là kế hoạch hoặc giới hạn: chưa chạy bộ UCSD, cluster mới ở mức thiết kế, và huấn luyện lại vẫn chạy bằng tay chứ chưa tự động theo lịch. Sơ đồ chi tiết với tên từng file và collection nằm ở slide phụ lục cuối.
+
+### Slide 16 – Câu hỏi của giảng viên: dữ liệu thay đổi thì sao? (~1 phút)
 
 Ở Buổi 8, thầy cô hỏi: dữ liệu lưu sẵn 10 cuốn gợi ý cho mỗi người, nhưng dữ liệu sẽ thay đổi, vậy hệ thống xử lý thế nào. Nhóm chia thay đổi thành hai tốc độ.
 
@@ -209,7 +221,7 @@ Thay đổi chậm như gu đọc đổi, người dùng mới, sách mới thì
 
 Sau câu hỏi của thầy cô, nhóm phát hiện rating từ streaming chưa được đưa vào lần huấn luyện sau, nên đã bổ sung và kiểm thử: gửi 5 rating mới qua Kafka thì dữ liệu huấn luyện tăng đúng 5 dòng và 5 cuốn đó biến khỏi gợi ý. Không huấn luyện lại sau mỗi sự kiện vì một lần huấn luyện mất khoảng 4 phút: cập nhật số liệu rẻ nên làm ngay, học lại mô hình đắt nên làm theo đợt.
 
-### Slide 16 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
+### Slide 17 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
 
 Phần trình bày của nhóm đến đây là hết. Mã nguồn và toàn bộ số đo nằm trên GitHub của nhóm. Cảm ơn thầy cô và các bạn đã lắng nghe, nhóm rất mong nhận câu hỏi và góp ý.
 
@@ -219,9 +231,9 @@ Phần trình bày của nhóm đến đây là hết. Mã nguồn và toàn b�
 
 ## Phụ lục
 
-### Slide 17 – Phụ lục · Kiến trúc theo từng luồng
+### Slide 18 – Phụ lục · Kiến trúc chi tiết
 
-Bản cũ của slide 3, vẽ mỗi luồng thành một hàng hộp. Chỉ mở khi được hỏi về thứ tự các bước trong từng luồng.
+Sơ đồ chi tiết của hệ thống hiện tại: tên từng file, từng collection MongoDB, các bước batch B1–B4 và stream S1–S5, container Docker. Chỉ mở khi được hỏi sâu về một thành phần. Đọc từ trái sang phải: nguồn và Kafka, lớp batch (xanh), lớp tốc độ (cam), MongoDB với batch view và speed view, rồi app; cụm Hadoop phía trên là nhánh kiểm chứng.
 
 ---
 

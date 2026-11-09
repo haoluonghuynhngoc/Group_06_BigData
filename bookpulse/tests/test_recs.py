@@ -5,7 +5,7 @@ import unittest
 
 from pyspark.sql import SparkSession
 
-from common.recs import explode_recs, top_k_unseen
+from common.recs import explode_recs, split_train_test, top_k_unseen
 
 
 class RecsTest(unittest.TestCase):
@@ -15,6 +15,23 @@ class RecsTest(unittest.TestCase):
                      .config("spark.sql.shuffle.partitions", "1").config("spark.ui.enabled", "false")
                      .getOrCreate())
         cls.spark.sparkContext.setLogLevel("ERROR")
+
+    def test_split_keeps_every_streamed_rating_in_train(self):
+        csv = [(u, b, 4, False) for u in range(1, 21) for b in range(1, 21)]
+        streamed = [(u, 100 + u, 5, True) for u in range(1, 21)]
+        ratings = self.spark.createDataFrame(csv + streamed, "user_id int, book_id int, rating int, from_stream boolean")
+        train, test, n_streamed = split_train_test(ratings, 0.2, 42)
+        test_books = {r.book_id for r in test.collect()}
+        self.assertEqual(n_streamed, 20)
+        self.assertTrue(all(b < 100 for b in test_books))  # no streamed rating held out
+        self.assertEqual(train.filter("book_id >= 100").count(), 20)
+        self.assertEqual(train.count() + test.count(), 420)
+        self.assertGreater(test.count(), 0)
+
+    def test_split_works_on_parquet_without_from_stream(self):
+        ratings = self.spark.createDataFrame([(1, b, 3) for b in range(50)], "user_id int, book_id int, rating int")
+        train, test, n_streamed = split_train_test(ratings, 0.2, 42)
+        self.assertEqual((n_streamed, train.count() + test.count()), (0, 50))
 
     @classmethod
     def tearDownClass(cls):

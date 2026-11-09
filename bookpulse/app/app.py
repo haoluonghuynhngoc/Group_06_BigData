@@ -53,6 +53,17 @@ if doc:
             items.append({"book_id": book_id, "score": None, "source": "Phổ biến (bù)"})
             shown.add(book_id)
             filled += 1
+    # Last resort: the per-user refill is used up too, so take globally popular books the user has not rated
+    for p in meta["popular"]:
+        if len(items) >= TOP_K:
+            break
+        if p["book_id"] not in seen and p["book_id"] not in shown:
+            items.append({"book_id": p["book_id"], "score": None, "source": "Phổ biến (bù)"})
+            shown.add(p["book_id"])
+            filled += 1
+    if not any(r["source"] == "ALS" for r in items):
+        st.info("Người dùng này đã chấm hết danh sách gợi ý đã tính sẵn: tạm hiện sách phổ biến chưa đọc. "
+                "Gợi ý cá nhân mới sẽ có sau lần huấn luyện lại tiếp theo (lượt chấm mới được đưa vào dữ liệu huấn luyện).")
 else:
     items = [{"book_id": p["book_id"], "score": None, "source": "Phổ biến"}
              for p in meta["popular"] if p["book_id"] not in seen][:TOP_K]
@@ -121,13 +132,23 @@ st.subheader("Sách đang hot")
 starts = sorted(db().trending.distinct("window_start"), reverse=True)[:2]
 if starts:
     ws = starts[-1]
-    hot = list(db().trending.find({"window_start": ws}).sort([("n_ratings", -1), ("avg_rating", -1)]).limit(TOP_K))
-    titles = {b["_id"]: b.get("title", "—") for b in db().books.find({"_id": {"$in": [h["book_id"] for h in hot]}})}
-    st.caption(f"Cửa sổ event time {hot[0]['window_start']:%Y-%m-%d %H:%M}–{hot[0]['window_end']:%H:%M} UTC · "
-               "Spark Structured Streaming gom theo cửa sổ trượt, có watermark; sự kiện trễ quá watermark bị loại")
-    st.dataframe(pd.DataFrame([{
-        "#": i + 1, "Tên sách": titles.get(h["book_id"], "—"), "Lượt chấm trong cửa sổ": h["n_ratings"],
-        "Điểm TB trong cửa sổ": h["avg_rating"], "Lượt 4–5 sao": h["n_liked"],
-    } for i, h in enumerate(hot)]), hide_index=True, use_container_width=True)
+    window_end = db().trending.find_one({"window_start": ws})["window_end"]
+    # "Hot" = liked right now: only books with at least one 4-5 star rating in the window are listed, ranked
+    # by the number of 4-5 star ratings, then average. A 1-2 star rating adds to n_ratings but can never push
+    # a book onto (or up) this list. The stream job still stores every rating per window (n_ratings).
+    hot = list(db().trending.find({"window_start": ws, "n_liked": {"$gte": 1}})
+               .sort([("n_liked", -1), ("avg_rating", -1), ("book_id", 1)]).limit(TOP_K))
+    st.caption(f"Cửa sổ event time {ws:%Y-%m-%d %H:%M}–{window_end:%H:%M} UTC (thời điểm người dùng chấm) · "
+               "cửa sổ 10 phút trượt 5 phút, watermark 10 phút · chỉ tính sách có lượt 4–5 sao, xếp theo số lượt "
+               "4–5 sao rồi điểm TB; lượt 1–3 sao không đẩy sách lên bảng")
+    if hot:
+        titles = {b["_id"]: b.get("title", "—")
+                  for b in db().books.find({"_id": {"$in": [h["book_id"] for h in hot]}})}
+        st.dataframe(pd.DataFrame([{
+            "#": i + 1, "Tên sách": titles.get(h["book_id"], "—"), "Lượt 4–5 sao": h["n_liked"],
+            "Điểm TB trong cửa sổ": h["avg_rating"], "Lượt chấm trong cửa sổ": h["n_ratings"],
+        } for i, h in enumerate(hot)]), hide_index=True, use_container_width=True)
+    else:
+        st.info("Trong cửa sổ này chưa có sách nào được chấm 4–5 sao.")
 else:
     st.info("Chưa có dữ liệu cửa sổ: chạy streaming/stream_stats.py và streaming/producer.py.")

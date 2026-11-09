@@ -22,7 +22,7 @@ from pyspark.ml.recommendation import ALS
 from pyspark.ml.tuning import ParamGridBuilder, TrainValidationSplit
 from pyspark.sql import functions as F
 
-from common.recs import explode_recs, top_k_unseen
+from common.recs import explode_recs, split_train_test, top_k_unseen
 from common.settings import CHECKPOINT_DIR, MODEL_DIR, PARQUET_DIR, get_spark, save_report
 
 K = 10
@@ -66,8 +66,8 @@ def main():
     started = time.time()
 
     ratings = spark.read.parquet(str(PARQUET_DIR / "ratings"))
-    # No reliable rating timestamps in the CSV, so the split is random; see README for the time-based variant.
-    train, test = ratings.randomSplit([1 - args.test_ratio, args.test_ratio], seed=args.seed)
+    # CSV ratings: random seeded split (no timestamps); streamed ratings: always train (see split_train_test)
+    train, test, n_streamed = split_train_test(ratings, args.test_ratio, args.seed)
     train, test = train.cache(), test.cache()
     evaluator = RegressionEvaluator(metricName="rmse", labelCol="rating", predictionCol="prediction")
 
@@ -145,7 +145,7 @@ def main():
     save_report("train_als_implicit" if args.implicit else "train_als", {
         "spark_master": os.getenv("SPARK_MASTER", "local[*]"),
         "implicit": args.implicit,
-        "rows": {"train": train.count(), "test": test.count()},
+        "rows": {"train": train.count(), "test": test.count(), "streamed_in_train": n_streamed},
         "grid": tried,
         "best_params": best,
         "rmse_test": rmse,
