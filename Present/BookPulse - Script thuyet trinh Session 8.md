@@ -10,9 +10,12 @@ Mọi con số trong script lấy từ `bookpulse/reports/` (lần chạy ngày 
 | --- | --- | --- | --- |
 | Lương Huỳnh Ngọc Hảo | 1–6 | Mở đầu, tiến độ, kiến trúc cập nhật, ingestion, Spark SQL, query plan | ~5 phút 30 giây |
 | Nguyễn Tấn Kiệt | 7–9 | Spark ML, hiệu năng theo số core, MongoDB; điều phối hỏi đáp | ~3 phút 30 giây + hỏi đáp |
-| Đinh Trần Quốc Tuấn | 10–13 | Streaming, rủi ro và khắc phục, kế hoạch Buổi 10, cảm ơn | ~3 phút 30 giây |
+| Đinh Trần Quốc Tuấn | 10–13 | Streaming, bên trong job streaming, rủi ro và khắc phục, kế hoạch Buổi 10 | ~4 phút 30 giây |
+| Lương Huỳnh Ngọc Hảo | 14–16 | Cập nhật sau Buổi 8, câu hỏi của giảng viên, cảm ơn | ~2 phút 30 giây |
 
-Tổng thời gian nói khoảng 12–13 phút. Nếu lớp quy định 10 phút: Hảo rút slide 6 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 8 còn 30 giây.
+Slide 17 là phụ lục (kiến trúc theo từng luồng, bản cũ của slide 3), chỉ mở khi được hỏi.
+
+Tổng thời gian nói khoảng 16 phút. Nếu lớp quy định 10–12 phút: Hảo rút slide 6 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 8 còn 30 giây, Tuấn nói slide 11 trong 30 giây (chỉ hai nhánh hợp lệ / lỗi và last_batch), Hảo nói slide 14 trong 45 giây (chỉ đọc cột trạng thái).
 
 So với Session 5, thông điệp chính của buổi này là: **hệ thống đã chạy thật end-to-end, mọi số trên slide đều là số đo, và khi chạy thật nhóm tìm ra 6 vấn đề: 2 đã sửa xong, 1 đã có thử nghiệm khắc phục kèm số liệu, 3 còn lại có kế hoạch cho Buổi 10.**
 
@@ -40,15 +43,15 @@ Bốn: luồng streaming xử lý 2.000 sự kiện, có tắt và bật lại g
 
 Khung xanh bên trái là những gì đã chạy và đo được trong Buổi 6 đến 8. Khung cam bên phải là phần còn lại đến Buổi 10: chạy dữ liệu lớn hơn là bộ UCSD, thêm thành phần MapReduce mà bài cuối kỳ yêu cầu, sửa cách đánh giá online, và thiết kế triển khai trên cluster.
 
-### Slide 3 – Kiến trúc cập nhật (~1 phút)
+### Slide 3 – Kiến trúc cập nhật: đã chạy và kế hoạch (~1 phút 15 giây)
 
-Đây là kiến trúc của Buổi 5, nay ghi rõ phần nào đã chạy và phần nào còn là kế hoạch. Các khối tô màu là đã chạy, các khối viền nét đứt là chưa xây dựng.
+Đây là kiến trúc của Buổi 5, nay ghi rõ phần nào đã chạy và phần nào còn là kế hoạch. Đọc từ trái sang phải theo năm cột: nguồn, thu nhận, xử lý bằng Spark, lưu trữ và phục vụ, rồi ứng dụng. Nét liền là đã chạy và đo ở Buổi 8; khung tím nét đứt là kế hoạch đến Buổi 10.
 
-Hàng trên là luồng batch, chạy bằng Spark trong Docker. So với Buổi 5 có hai thay đổi. Thứ nhất, nhóm thêm bước Spark SQL để trả lời các câu hỏi phân tích trên dữ liệu đã làm sạch; lát nữa em trình bày. Thứ hai, MongoDB lưu sẵn 30 gợi ý cho mỗi người thay vì 10. Khi người dùng vừa chấm một cuốn, app chỉ cần bỏ cuốn đó đi và lấy 10 cuốn tiếp theo, không phải huấn luyện lại.
+Khung xanh phía trên là luồng batch: CSV Goodbooks đi qua làm sạch, lưu Parquet, phân tích bằng Spark SQL, huấn luyện ALS, rồi ghi top-30 gợi ý cho mỗi người vào MongoDB. So với Buổi 5 có hai thay đổi. Thứ nhất, nhóm thêm bước Spark SQL để trả lời các câu hỏi phân tích; lát nữa em trình bày. Thứ hai, MongoDB lưu sẵn 30 gợi ý thay vì 10: khi người dùng vừa chấm một cuốn, app chỉ cần bỏ cuốn đó đi và lấy cuốn tiếp theo, không phải huấn luyện lại.
 
-Hàng giữa là luồng streaming: producer gửi sự kiện vào Kafka, Spark Structured Streaming đọc ra, tính số liệu rồi ghi vào MongoDB, và app đọc lên.
+Khung xanh phía dưới là luồng streaming: producer phát lại rating thật thành sự kiện, gửi vào Kafka 3 partition; Spark Structured Streaming cứ 5 giây xử lý một micro-batch, lọc lỗi, bỏ trùng, có watermark và checkpoint, rồi ghi số liệu mới vào MongoDB. App Streamlit đọc cả hai phần từ MongoDB.
 
-Hàng dưới là bốn việc còn lại đến Buổi 10: chạy tập con UCSD, job MapReduce, bản thiết kế triển khai cluster hoặc cloud, và huấn luyện lại theo lịch.
+Các khung tím là việc còn lại: tập con UCSD để chạy dữ liệu lớn hơn, job Hadoop MapReduce đối chiếu với Spark SQL, bản thiết kế cluster hoặc cloud, và mũi tên giữa hai luồng: lưu sự kiện streaming để lần huấn luyện sau học được, chạy theo lịch. Hiện mọi thứ chạy bằng Docker trên một máy.
 
 ### Slide 4 – Ingestion: CSV → làm sạch → Parquet (~1 phút)
 
@@ -142,7 +145,17 @@ Phần quan trọng là thử restart. Nhóm dừng job streaming sau khoảng 4
 
 Về thông lượng, một micro-batch xử lý tối đa 168 dòng mỗi giây. Đầu vào chỉ có 20 sự kiện mỗi giây, nên đây chưa phải giới hạn của hệ thống.
 
-### Slide 11 – Rủi ro, vấn đề hiệu năng và hướng khắc phục (~1 phút 30 giây)
+### Slide 11 – Bên trong job streaming (~1 phút)
+
+Slide này giải thích vì sao kết quả vừa rồi khớp. Sự kiện từ Kafka được đọc theo schema JSON, rồi qua bước kiểm tra: đủ các trường và số sao từ 1 đến 5.
+
+Nhánh trên là sự kiện hợp lệ. Watermark 10 phút cho phép sự kiện đến trễ tối đa 10 phút và giới hạn bộ nhớ trạng thái; bước bỏ trùng theo event_id loại các bản producer gửi lặp. Sau đó ghi vào ba collection của MongoDB: rating_stats là điểm trung bình theo sách, user_seen là sách người dùng vừa chấm để app ẩn đi, và online_eval là phép đo trúng top-10.
+
+Nhánh dưới là sự kiện lỗi: chỉ đếm, không tính vào điểm.
+
+Hai cơ chế chống mất và chống trùng. Checkpoint lưu offset Kafka và trạng thái, nên job chết thì đọc tiếp đúng chỗ, không mất; nhưng một batch có thể bị chạy lại, tức at-least-once. Vì vậy mỗi lần ghi xong, job lưu số batch vào stream_state; batch nào bị phát lại sẽ bị bỏ qua, nên không đếm trùng. Đó là lý do thử restart ra đúng 2.000 trên 2.000.
+
+### Slide 12 – Rủi ro, vấn đề hiệu năng và hướng khắc phục (~1 phút 30 giây)
 
 Đây là các vấn đề nhóm phát hiện khi chạy thật. Mỗi dòng có bằng chứng và hướng khắc phục.
 
@@ -158,7 +171,7 @@ Năm, giới hạn của một máy: 4 core chỉ nhanh 1,95 lần, RAM đã dù
 
 Sáu, nhóm chưa có thành phần MapReduce mà bài cuối kỳ yêu cầu. Kế hoạch là một job Hadoop Streaming đếm rating theo sách, rồi đối chiếu với kết quả Spark SQL.
 
-### Slide 12 – Kế hoạch hoàn thiện đến Buổi 10 (~45 giây)
+### Slide 13 – Kế hoạch hoàn thiện đến Buổi 10 (~45 giây)
 
 Kế hoạch đến Buổi 10 chia theo người.
 
@@ -170,11 +183,45 @@ Em phụ trách streaming và đánh giá: sửa cách đánh giá online bằng
 
 Sản phẩm nộp Buổi 10 gồm báo cáo cuối kỳ, repo kèm README và các file đo, và demo trực tiếp. Nếu thiếu thời gian, nhóm ưu tiên MapReduce và mô hình theo Precision@10 trước, UCSD sau.
 
-### Slide 13 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
+*Chuyển lượt:* Hảo cập nhật kế hoạch này đã làm được đến đâu.
+
+---
+
+## Phần 4 – Lương Huỳnh Ngọc Hảo (slide 14–16)
+
+### Slide 14 – Cập nhật sau Buổi 8 (~1 phút 15 giây)
+
+Cảm ơn Tuấn. Slide này cập nhật kế hoạch vừa rồi đã làm được đến đâu, tính đến ngày 9/11.
+
+Đã xong. Job MapReduce trên Hadoop cho kết quả khớp 100% với Spark SQL, combiner giảm 99,2% bản ghi phải shuffle. Mô hình được chọn theo Precision@10: ALS implicit đạt 0,204, gấp 2,6 lần gợi ý sách phổ biến, và app đang dùng mô hình này. Thử giết đột ngột job streaming bằng kill -9: 1.474 bằng 1.500 trừ 26 sự kiện trễ, không mất, không trùng. Streaming có thêm cửa sổ trượt cho sách đang hot và kho Parquet lưu sự kiện, ghi đúng một lần. Thử tắt Kafka rồi MongoDB khi đang gửi 3.000 sự kiện: 3.000 bằng 3.000; lượt đầu của thử nghiệm này lộ ra lỗi producer làm mất 571 tin, nhóm đã sửa. Và đã có bản thiết kế cluster, cloud.
+
+Làm một phần: đưa sự kiện streaming vào lần huấn luyện sau đã chạy thử, gộp 4.901 dòng, nhưng chưa chạy tự động theo lịch.
+
+Chưa làm, nhóm nói thẳng: chạy tập con UCSD, và đánh giá online bằng dữ liệu giữ lại. Hai mục này được ghi rõ trong phần giới hạn của báo cáo cuối kỳ.
+
+### Slide 15 – Câu hỏi của giảng viên: dữ liệu thay đổi thì sao? (~1 phút)
+
+Ở Buổi 8, thầy cô hỏi: dữ liệu lưu sẵn 10 cuốn gợi ý cho mỗi người, nhưng dữ liệu sẽ thay đổi, vậy hệ thống xử lý thế nào. Nhóm chia thay đổi thành hai tốc độ.
+
+Thay đổi nhanh đi qua streaming, xử lý trong vài giây. Người dùng chấm một cuốn đang nằm trong top-10 thì app ẩn cuốn đó và lấy cuốn tiếp theo trong 30 cuốn đã lưu. Đọc gần hết danh sách thì app bù bằng sách phổ biến người đó chưa đọc, nên luôn đủ 10 cuốn. Điểm trung bình của sách được cộng dồn tổng điểm và số lượt rồi mới chia.
+
+Thay đổi chậm như gu đọc đổi, người dùng mới, sách mới thì cần huấn luyện lại, và việc này chạy theo đợt. Sự kiện streaming được lưu ra Parquet, bước làm sạch gộp vào dữ liệu huấn luyện, lấy rating mới nhất, rồi huấn luyện lại. Mô hình mới ghi sang collection mới, xong mới chuyển meta.active, nên app không gián đoạn.
+
+Sau câu hỏi của thầy cô, nhóm phát hiện rating từ streaming chưa được đưa vào lần huấn luyện sau, nên đã bổ sung và kiểm thử: gửi 5 rating mới qua Kafka thì dữ liệu huấn luyện tăng đúng 5 dòng và 5 cuốn đó biến khỏi gợi ý. Không huấn luyện lại sau mỗi sự kiện vì một lần huấn luyện mất khoảng 4 phút: cập nhật số liệu rẻ nên làm ngay, học lại mô hình đắt nên làm theo đợt.
+
+### Slide 16 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
 
 Phần trình bày của nhóm đến đây là hết. Mã nguồn và toàn bộ số đo nằm trên GitHub của nhóm. Cảm ơn thầy cô và các bạn đã lắng nghe, nhóm rất mong nhận câu hỏi và góp ý.
 
-*Kiệt điều phối hỏi đáp: ai trình bày phần nào thì trả lời phần đó (xem file Hỏi đáp Session 8).*
+*Kiệt điều phối hỏi đáp: ai trình bày phần nào thì trả lời phần đó (xem file Hỏi đáp Session 8 và file Câu hỏi giảng viên Session 8).*
+
+---
+
+## Phụ lục
+
+### Slide 17 – Phụ lục · Kiến trúc theo từng luồng
+
+Bản cũ của slide 3, vẽ mỗi luồng thành một hàng hộp. Chỉ mở khi được hỏi về thứ tự các bước trong từng luồng.
 
 ---
 

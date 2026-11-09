@@ -2,7 +2,8 @@
 import pandas as pd
 import streamlit as st
 
-from common.settings import get_db
+from common.events import make_producer, rating_event
+from common.settings import KAFKA_TOPIC, get_db
 
 TOP_K = 10
 
@@ -13,6 +14,11 @@ st.title("📚 BookPulse – gợi ý sách")
 @st.cache_resource
 def db():
     return get_db()
+
+
+@st.cache_resource
+def producer():
+    return make_producer()
 
 
 meta = db().meta.find_one({"_id": "active"})
@@ -71,6 +77,29 @@ st.caption(source + f" · {len(seen)} lượt chấm mới qua streaming, {hidde
            + (f" · bù {filled} cuốn phổ biến chưa đọc" if filled else ""))
 st.dataframe(table, hide_index=True, use_container_width=True)
 
+# Rate a book from the list: the app only sends the event to Kafka. The stream job (streaming/stream_stats.py,
+# must be running) validates it and writes user_seen; on the next refresh the book is hidden and the next
+# recommendation moves up. Nothing is written to MongoDB from here.
+st.subheader("Chấm sao")
+with st.form("rate", clear_on_submit=False):
+    c_book, c_star, c_send = st.columns([6, 2, 2])
+    labels = {r["book_id"]: f'#{i + 1} · {books.get(r["book_id"], {}).get("title", r["book_id"])}'
+              for i, r in enumerate(items)}
+    book_id = c_book.selectbox("Sách", list(labels), format_func=labels.get) if labels else None
+    stars = c_star.selectbox("Số sao", [5, 4, 3, 2, 1], format_func=lambda n: "★" * n)
+    c_send.write("")
+    sent = c_send.form_submit_button("Gửi lượt chấm", use_container_width=True, disabled=book_id is None)
+if sent and book_id is not None:
+    try:
+        producer().send(KAFKA_TOPIC, key=user_id, value=rating_event(user_id, book_id, stars)).get(timeout=10)
+        st.session_state["last_rating"] = (user_id, labels[book_id], stars)
+    except Exception as exc:  # Kafka down or unreachable: say so instead of failing the page
+        st.error(f"Không gửi được vào Kafka ({type(exc).__name__}). Kafka có đang chạy không?")
+if st.session_state.get("last_rating", (None,))[0] == user_id:
+    _, label, n = st.session_state["last_rating"]
+    st.success(f"Đã gửi vào Kafka: user {user_id} chấm {n} sao cho {label}. Job streaming xử lý trong khoảng "
+               "5–10 giây; bấm **Làm mới** để thấy cuốn này bị ẩn và cuốn tiếp theo được đẩy lên.")
+
 st.subheader("Luồng streaming")
 valid = db().stream_state.find_one({"_id": "valid_events"}) or {}
 rejected = db().stream_state.find_one({"_id": "rejected_events"}) or {}
@@ -84,7 +113,7 @@ c3.metric(f"Lượt 4–5 sao trúng top-{TOP_K}", f"{online.get('hits', 0)} / {
 if liked:
     st.caption("producer.py phát lại rating đã có trong dữ liệu huấn luyện; những sách đó đã bị loại khỏi gợi ý "
                "nên không thể trúng. Một cuốn trúng top-10 chỉ khi người dùng chấm sách đang được gợi ý "
-               "(scripts/rate_from_recs.py).")
+               "(mục Chấm sao ở trên, hoặc scripts/rate_from_recs.py).")
 
 st.subheader("Sách đang hot")
 # Sliding windows overlap: the two newest windows both contain the latest events. Show the older of the

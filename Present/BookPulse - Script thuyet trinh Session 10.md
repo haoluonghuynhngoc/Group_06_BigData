@@ -130,7 +130,7 @@ Hướng phát triển: dùng UCSD theo thể loại, có thời gian thật, đ
 
 ### Slide 15 – Demo trực tiếp (8–10 phút)
 
-Làm theo file `Present/BookPulse - Kich ban demo Session 10.md`: Hảo chạy MapReduce và trình bày Spark SQL, Kiệt trình bày app và MongoDB, Tuấn chạy streaming, chạy rate_from_recs.py cho user 1 (2 cuốn đầu danh sách bị ẩn, cuốn thứ 3 lên đầu, chỉ số "Lượt 4–5 sao trúng top-10" tăng lên) và kiểm chứng Kafka với MongoDB bằng kafka_audit.
+Làm theo file `Present/BookPulse - Kich ban demo Session 10.md`: Hảo chạy MapReduce và trình bày Spark SQL, Kiệt trình bày app và MongoDB, Tuấn chạy streaming, cho user 1 chấm 5 sao ngay trong app ở mục Chấm sao (dự phòng: rate_from_recs.py) (2 cuốn đầu danh sách bị ẩn, cuốn thứ 3 lên đầu, chỉ số "Lượt 4–5 sao trúng top-10" tăng lên) và kiểm chứng Kafka với MongoDB bằng kafka_audit.
 
 ### Slide 16 – Xin cảm ơn
 

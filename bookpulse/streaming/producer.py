@@ -11,7 +11,7 @@ watermark yet and let late rows through. 30 s at a 5 s trigger leaves room for t
 (the first one takes 6-12 s on a cold JVM).
 
 The replayed (user, book) pairs are already in the training data, so they are never on anyone's
-recommendation list. To rate a book that IS on a user's list, use scripts/rate_from_recs.py.
+recommendation list. To rate a book that IS on a user's list, use the app's "Chấm sao" form or scripts/rate_from_recs.py.
 """
 import argparse
 import json

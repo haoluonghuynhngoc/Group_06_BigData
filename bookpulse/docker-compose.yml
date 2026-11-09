@@ -61,10 +61,12 @@ services:
       - .:/work
     environment:
       MONGO_URI: mongodb://mongo:27017
+      KAFKA_BOOTSTRAP: kafka:9092   # the "Chấm sao" form sends rating events to Kafka
     ports:
       - "8501:8501"
     depends_on:
       - mongo
+      - kafka
 
 volumes:
   mongo-data:

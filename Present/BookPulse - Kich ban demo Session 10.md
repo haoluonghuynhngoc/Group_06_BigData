@@ -13,6 +13,7 @@ docker compose up -d                                  # spark, kafka, mongo, app
 docker compose ps                                     # 4 service "running"
 cd mapreduce/hadoop && docker compose up -d && cd ../..
 docker compose -f mapreduce/hadoop/docker-compose.yml logs client | grep "BOOKPULSE HADOOP READY"   # phải in ra dòng này; chưa có thì chờ rồi chạy lại
+docker compose -f mapreduce/hadoop/docker-compose.yml exec -T client hdfs dfsadmin -safemode wait   # chờ đến "Safe mode is OFF"
 bash scripts/reset_streaming.sh --yes                 # streaming bắt đầu từ số 0
 docker compose restart app                            # app nạp code mới nhất
 ```
@@ -99,21 +100,22 @@ Trong lúc producer chạy:
 - App → bấm **Làm mới**: số sự kiện tăng, cột "Điểm TB (stream)", mục **"Sách đang hot"** xuất hiện.
 - Chỉ số "Lượt 4–5 sao trúng top-10" hiện **0 / N**. Nói: "Producer phát lại rating đã có trong dữ liệu huấn luyện, mà gợi ý đã loại mọi sách người dùng đã chấm, nên các sự kiện này không thể trúng. Dòng chú thích dưới chỉ số giải thích điều đó."
 
-**Sách vừa chấm biến khỏi top-10.** Khi producer báo `done`, nhập user **1** trong app, chỉ vào #1 The Guernsey Literary and Potato Peel Pie Society và #2 The Great Gatsby, rồi chạy:
+**Sách vừa chấm biến khỏi top-10 (chấm ngay trong app).** Khi producer báo `done`, nhập user **1** trong app, chỉ vào #1 The Guernsey Literary and Potato Peel Pie Society. Kéo xuống mục **Chấm sao**: chọn sách "#1 · The Guernsey…", số sao ★★★★★, bấm **Gửi lượt chấm**. App báo "Đã gửi vào Kafka: user 1 chấm 5 sao cho #1 · …". Muốn chấm thêm #2 The Great Gatsby thì chọn "#2 · The Great Gatsby" rồi bấm gửi lần nữa (chưa cần làm mới).
+
+Chờ 5–10 giây (một trigger), bấm **Làm mới**. Chỉ vào:
+- Cuốn vừa chấm đã biến mất, các cuốn sau dồn lên, cuốn mới vào cuối danh sách, lấy từ 30 gợi ý đã lưu. Nếu chấm cả #1 và #2: The Catcher in the Rye lên #1, hai cuốn mới vào #9–10 (lần chạy 08/11: The Immortal Life of Henrietta Lacks, The Da Vinci Code).
+- Dòng chú thích: "… lượt chấm mới qua streaming, N cuốn trong số đó đã bị ẩn khỏi danh sách".
+- Chỉ số "Lượt 4–5 sao trúng top-10" tăng đúng bằng số lượt vừa chấm (lần chạy 08/11 chấm 2 cuốn: 2 / 672).
+
+Nói: "Nút này không ghi MongoDB. App chỉ gửi một sự kiện chấm sao vào Kafka, giống producer; job Spark Structured Streaming kiểm tra, bỏ trùng rồi ghi `user_seen` trong MongoDB; app đọc lại thì ẩn cuốn đó và đẩy cuốn tiếp theo lên, không cần huấn luyện lại."
+
+Dự phòng nếu trình duyệt có vấn đề: cùng việc đó bằng dòng lệnh (2 cuốn đầu một lượt):
 
 ```bash
-# Terminal 3: user 1 chấm 5 sao 2 cuốn đầu trong top-10 hiện tại của mình
 docker compose exec spark python scripts/rate_from_recs.py --user 1 --n 2 --rating 5
 ```
 
-Chờ 5–10 giây (một trigger), bấm **Làm mới**. Chỉ vào:
-- Hai cuốn vừa chấm đã biến mất; The Catcher in the Rye lên #1; hai cuốn mới vào #9–10 (lần chạy 08/11: The Immortal Life of Henrietta Lacks, The Da Vinci Code), lấy từ 30 gợi ý đã lưu.
-- Dòng chú thích: "… lượt chấm mới qua streaming, 2 cuốn trong số đó đã bị ẩn khỏi danh sách".
-- Chỉ số "Lượt 4–5 sao trúng top-10" tăng thêm 2 (lần chạy 08/11: 2 / 672).
-
-Nói: "Đây là lúc người dùng chấm một cuốn đang được gợi ý: Kafka → Spark → `user_seen` trong MongoDB → app ẩn cuốn đó và đẩy cuốn tiếp theo lên, không cần huấn luyện lại."
-
-**Kiểm chứng** (chờ khoảng 15 giây sau `rate_from_recs.py`), một lệnh:
+**Kiểm chứng** (chờ khoảng 15 giây sau lượt chấm), một lệnh:
 
 ```bash
 docker compose exec spark python scripts/kafka_audit.py | grep -E 'distinct_valid|invalid_messages|counted|expected|_match|no_loss'
@@ -131,10 +133,12 @@ Kết thúc: Ctrl+C ở Terminal 2.
 |---|---|
 | Lệnh MapReduce báo "C:/Program Files/Git/bookpulse/...: No such file" | Chưa `export MSYS_NO_PATHCONV=1` trong terminal đó; chạy rồi chạy lại lệnh |
 | `grep "BOOKPULSE HADOOP READY"` không in gì | Cụm chưa sẵn sàng (khoảng 40 giây sau `up -d`); chờ rồi chạy lại |
+| `run_hadoop.sh` báo "Name node is in safe mode" | NameNode vừa khởi động (gặp khi chạy thử 09/11 dù đã có dòng READY); chạy `hdfs dfsadmin -safemode wait` trong container client rồi chạy lại |
 | Job MapReduce chậm hoặc lỗi | Trình bày kết quả đã chạy: `reports/mapreduce/job_*.log`, `reports/mapreduce_verify_*.json`, ảnh `reports/mapreduce/yarn_applications.png` |
 | Spark UI không mở được | Ảnh `reports/streaming/spark_ui_*.png`; số liệu trong `reports/stream_progress_*.json` |
 | App không hiện thay đổi code | `docker compose restart app` |
-| Sau `rate_from_recs.py` app chưa đổi | Job streaming phải đang chạy; chờ thêm một trigger rồi bấm Làm mới. Nếu vẫn không: ảnh `docs/img/app_after_rate_from_recs.png` (trước đó: `docs/img/app_implicit_user1.png`) |
+| App báo "Không gửi được vào Kafka" khi bấm Gửi lượt chấm | Kafka chưa chạy hoặc container app cũ chưa có biến `KAFKA_BOOTSTRAP`: `docker compose up -d kafka app`, rồi bấm lại; hoặc dùng `rate_from_recs.py` |
+| Sau khi chấm sao (nút trong app hoặc `rate_from_recs.py`) app chưa đổi | Job streaming phải đang chạy; chờ thêm một trigger rồi bấm Làm mới. Nếu vẫn không: ảnh `docs/img/app_after_rate_from_recs.png` (trước đó: `docs/img/app_implicit_user1.png`) |
 | App không hiện streaming | Ảnh `reports/streaming/app_trending.png` (cả trang: 983 / 10 / 2 / 672 và "Sách đang hot") |
 | Một phép so của `kafka_audit.py` ra `false` | Thường do sự kiện trễ đến khi job chưa có watermark (1–2 batch đầu sau khi khởi động mới, checkpoint trống). Nói thẳng điều đó, rồi trình bày `reports/kafka_audit_20261107_221105.json` và `_220738.json` (đều `true`) |
 | Job streaming báo lỗi topic | Job tự tạo topic; nếu vẫn lỗi: `bash scripts/reset_streaming.sh --yes` rồi chạy lại |

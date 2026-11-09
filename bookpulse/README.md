@@ -54,7 +54,8 @@ docker compose exec spark python streaming/stream_stats.py
 # (mặc định 30 giây, khi Spark đã có watermark) là sự kiện trễ 30 phút (watermark sẽ loại)
 docker compose exec spark python streaming/producer.py --file data/sample/ratings.csv --limit 1000 --late 0.05
 
-# Terminal 2, khi job đang chạy: user 1 chấm 5 sao 2 cuốn đầu trong top-10 hiện tại của mình
+# Chấm sao: trong app, mục "Chấm sao" (chọn sách trong top-10, chọn số sao, bấm "Gửi lượt chấm"),
+# hoặc bằng dòng lệnh khi job đang chạy: user 1 chấm 5 sao 2 cuốn đầu trong top-10 hiện tại của mình
 docker compose exec spark python scripts/rate_from_recs.py --user 1 --n 2 --rating 5
 ```
 
@@ -62,8 +63,9 @@ Bấm "Làm mới" trong app: cột "Điểm TB (stream)", các chỉ số luồ
 event time 10 phút, trượt 5 phút) thay đổi. `producer.py` phát lại rating **đã có trong dữ liệu huấn luyện**,
 mà gợi ý đã loại mọi sách người dùng đã chấm, nên sự kiện phát lại không bao giờ làm đổi top-10 và không thể
 "trúng" (chỉ số "Lượt 4–5 sao trúng top-10" hiện dạng trúng / tổng; với riêng producer, số trúng luôn là 0). Muốn thấy sách vừa chấm
-biến mất khỏi top-10 và cuốn tiếp theo được đẩy lên, dùng `scripts/rate_from_recs.py`: script đọc top-10 hiện
-tại của người dùng trong MongoDB và gửi rating cho những cuốn đó; sau một trigger (5–10 giây) app ẩn chúng.
+biến mất khỏi top-10 và cuốn tiếp theo được đẩy lên, dùng mục **Chấm sao** của app (app chỉ gửi sự kiện vào Kafka,
+không ghi MongoDB) hoặc `scripts/rate_from_recs.py` (đọc top-10 hiện tại trong MongoDB và gửi rating cho `--n` cuốn
+đầu); sau một trigger (5–10 giây) job streaming ghi `user_seen` và app ẩn chúng.
 Trong lúc job chạy, Spark UI → tab **Structured Streaming** (http://localhost:4040) hiện 4 query có tên;
 `reports/stream_progress_*.json` ghi tiến độ từng query. Chi tiết thiết kế và bằng chứng: [docs/streaming.md](docs/streaming.md).
 
@@ -160,7 +162,7 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
   xóa kho `stream_events` trước mỗi lượt demo/thử, nên lần làm sạch của mô hình cuối (`clean_20261106_123904.json`)
   có `stream_events` = null: mô hình cuối (P@10 0,204) được huấn luyện không có sự kiện streaming. Kho giữ sự kiện cho
   lần huấn luyện sau cho đến khi chạy `reset_streaming.sh`; production: kho sự kiện là dữ liệu gốc bất biến, không reset.
-  `producer.py` và `rate_from_recs.py` đánh dấu `simulated=true` nhưng `clean.py` chưa lọc, nên một lượt chấm demo
+  `producer.py`, `rate_from_recs.py` và nút Chấm sao của app đánh dấu `simulated=true` nhưng `clean.py` chưa lọc, nên một lượt chấm demo
   sẽ vào lần huấn luyện sau; production cần lọc sự kiện mô phỏng. Kho là file sink trigger 5 giây, chia theo
   `event_date`, không compaction, nên sinh nhiều file nhỏ (production: trigger dài hơn cho query này, hoặc compaction /
   Delta Lake / Iceberg).
@@ -215,7 +217,7 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
   giây, phần lớn là chi phí cố định (4 query chia 4 core); 20.000 offset/batch chưa được hiệu chỉnh.
 - **Đánh giá online:** mỗi lượt chấm 4–5 sao được đối chiếu với 10 gợi ý đầu đã lưu của phiên bản active (không trừ
   sách đã ẩn, không tính sách bù); bộ đếm cộng dồn qua các phiên bản. Với `producer.py`
-  kết quả luôn là 0 trúng (sách phát lại đã bị loại khỏi gợi ý); chỉ `rate_from_recs.py` tạo được lượt trúng.
+  kết quả luôn là 0 trúng (sách phát lại đã bị loại khỏi gợi ý); chỉ lượt chấm sách đang được gợi ý (nút Chấm sao hoặc `rate_from_recs.py`) tạo được lượt trúng.
 - **Một máy:** Kafka 1 broker (replication 1), MongoDB standalone, Spark `local[*]`, Hadoop 1 DataNode (replication 1),
   không có restart policy hay supervisor (khi MongoDB dừng, job streaming dừng theo và phải chạy lại bằng tay): mỗi
   thành phần là một điểm lỗi đơn. Spark đọc ổ đĩa local, không đọc HDFS: `local[*]` là một JVM trên một máy, nên HDFS
