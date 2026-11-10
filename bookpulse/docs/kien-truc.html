@@ -332,7 +332,7 @@ table.ev td:first-child { font-weight: 600; white-space: nowrap; }
   </section>
 
   <h2 class="section-title">Một lượt chấm điểm đi qua Kafka, Spark và MongoDB</h2>
-  <p class="lead" style="margin-top:-18px">Người dùng 15 chấm sách 42 được 5 sao. Producer gửi sự kiện này, thêm một bản gửi lại và một sự kiện lỗi để kiểm tra. Các con số trong hình là ví dụ minh họa; giả sử sách 42 đang nằm trong top-10 của user 15, như khi chấm bằng <code>scripts/rate_from_recs.py</code>. Rating phát lại bằng <code>producer.py</code> thì không bao giờ nằm trong top-10 (đã có trong dữ liệu huấn luyện nên đã bị loại khỏi gợi ý), nên không làm đổi danh sách.</p>
+  <p class="lead" style="margin-top:-18px">Người dùng 15 chấm sách 42 được 5 sao. Producer gửi sự kiện này, thêm một bản gửi lại và một sự kiện lỗi để kiểm tra. Các con số trong hình là ví dụ minh họa; giả sử sách 42 đang nằm trong top-10 của user 15, như khi chấm bằng <code>scripts/rate_from_recs.py</code>. Rating phát lại từ <code>ratings.csv</code> (producer không có <code>--file</code>) thì không bao giờ nằm trong top-10 (đã có trong dữ liệu huấn luyện nên đã bị loại khỏi gợi ý). Dữ liệu giả <code>data/fake/stream_ratings.csv</code> (<code>scripts/make_fake_stream.py</code>) gồm cặp user–sách chưa có trong dữ liệu, nên thỉnh thoảng trúng top-10 và sau lần huấn luyện tiếp theo được mô hình học.</p>
 
   <figure>
     <div class="scroll">

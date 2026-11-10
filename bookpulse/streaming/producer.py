@@ -10,8 +10,10 @@ with the watermark of the previous micro-batch, so the first two batches after a
 watermark yet and let late rows through. 30 s at a 5 s trigger leaves room for those first batches
 (the first one takes 6-12 s on a cold JVM).
 
-The replayed (user, book) pairs are already in the training data, so they are never on anyone's
-recommendation list. To rate a book that IS on a user's list, use the app's "Chấm sao" form or scripts/rate_from_recs.py.
+By default the replayed (user, book) pairs are already in the training data, so they are never on anyone's
+recommendation list. For pairs the model has not seen, generate a fake file with scripts/make_fake_stream.py
+and pass it with --file data/fake/stream_ratings.csv. To rate a book that IS on a user's list, use the app's
+"Chấm sao" form or scripts/rate_from_recs.py.
 """
 import argparse
 import json

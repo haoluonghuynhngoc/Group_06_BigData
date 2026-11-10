@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>*,*::before,*::after{box-sizing:border-box}body{margin:0}img{max-width:100%}</style>
+<title>BookPulse: ba cụm xử lý</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; each cluster = diagram (scrolls sideways on phones) + step list + "khi bị hỏi" box.
+   Colours follow the BookPulse architecture diagram: batch blue, speed orange, Hadoop purple, MongoDB green. */
+:root {
+  --bg: #f7f8fa; --surface: #ffffff; --fg: #18212d; --muted: #5a6575; --line: #d5dbe3;
+  --batch: #1d68a8; --batch-t: #e3eef8;
+  --stream: #b75a07; --stream-t: #fbeedd;
+  --hadoop: #6b4fa3; --hadoop-t: #efe9f8;
+  --serve: #1f7a5a; --serve-t: #e2f3ec;
+  --code-bg: #eef1f5;
+  --sans: "Be Vietnam Pro", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11161d; --surface: #18202a; --fg: #e6ebf1; --muted: #9aa6b4; --line: #2c3744;
+  --batch: #6fb0ec; --batch-t: #16283a; --stream: #f0a35a; --stream-t: #33230f;
+  --hadoop: #b39ae6; --hadoop-t: #251d36; --serve: #5fcf9f; --serve-t: #11291f; --code-bg: #1f2833;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #11161d; --surface: #18202a; --fg: #e6ebf1; --muted: #9aa6b4; --line: #2c3744;
+  --batch: #6fb0ec; --batch-t: #16283a; --stream: #f0a35a; --stream-t: #33230f;
+  --hadoop: #b39ae6; --hadoop-t: #251d36; --serve: #5fcf9f; --serve-t: #11291f; --code-bg: #1f2833;
+  color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font: 16px/1.65 var(--sans);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 40px 64px; display: flex; flex-direction: column; gap: 56px; }
+h1, h2, h3 { text-wrap: balance; line-height: 1.25; margin: 0; }
+h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; }
+h2 { font-size: 1.6rem; font-weight: 700; }
+h3 { font-size: 1.05rem; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+code { font: 0.86em var(--mono); background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.lead { color: var(--muted); font-size: 1.05rem; }
+.eyebrow { font: 600 0.75rem var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+header { display: flex; flex-direction: column; gap: 14px; }
+nav { display: flex; flex-wrap: wrap; gap: 10px; }
+nav a { text-decoration: none; font-weight: 600; font-size: 0.92rem; padding: 6px 14px; border-radius: 999px; border: 1.5px solid; }
+nav a:focus-visible, a:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+nav .b { color: var(--batch); background: var(--batch-t); }
+nav .s { color: var(--stream); background: var(--stream-t); }
+nav .h { color: var(--hadoop); background: var(--hadoop-t); }
+
+section { display: flex; flex-direction: column; gap: 20px; scroll-margin-top: 16px; }
+.sec-head { display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 4px solid var(--c); }
+.batch { --c: var(--batch); --ct: var(--batch-t); }
+.stream { --c: var(--stream); --ct: var(--stream-t); }
+.hadoop { --c: var(--hadoop); --ct: var(--hadoop-t); }
+.sec-head h2 { color: var(--c); }
+
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.diagram svg { display: block; min-width: 760px; width: 100%; height: auto; }
+svg text { font-family: var(--sans); fill: var(--fg); }
+svg .t { font-size: 15px; font-weight: 600; }
+svg .s { font-size: 12.5px; fill: var(--muted); }
+svg .m { font-family: var(--mono); font-size: 13px; font-weight: 600; }
+svg .lbl { font-size: 12px; font-weight: 600; }
+svg .box { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; }
+svg .bx-b { fill: var(--batch-t); stroke: var(--batch); stroke-width: 1.6; }
+svg .bx-s { fill: var(--stream-t); stroke: var(--stream); stroke-width: 1.6; }
+svg .bx-h { fill: var(--hadoop-t); stroke: var(--hadoop); stroke-width: 1.6; }
+svg .bx-g { fill: var(--serve-t); stroke: var(--serve); stroke-width: 1.6; }
+svg .a { fill: none; stroke: var(--muted); stroke-width: 1.8; }
+svg .a-b { fill: none; stroke: var(--batch); stroke-width: 2; }
+svg .a-s { fill: none; stroke: var(--stream); stroke-width: 2; }
+svg .a-h { fill: none; stroke: var(--hadoop); stroke-width: 2; }
+svg .a-g { fill: none; stroke: var(--serve); stroke-width: 2; }
+svg .dash { stroke-dasharray: 6 5; }
+svg .hd { fill: var(--muted); }
+svg .badge { fill: var(--c); }
+svg .badge-t { fill: var(--surface); font-size: 11px; font-weight: 700; }
+svg .c-b { fill: var(--batch); } svg .c-s { fill: var(--stream); } svg .c-h { fill: var(--hadoop); } svg .c-g { fill: var(--serve); }
+
+.steps { display: flex; flex-direction: column; gap: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.step { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 14px; padding: 16px 18px; border-top: 1px solid var(--line); }
+.step:first-child { border-top: 0; }
+.tag { align-self: start; font: 700 0.8rem var(--mono); color: var(--surface); background: var(--c); border-radius: 999px; text-align: center; padding: 3px 0; }
+.step-body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.step-body h3 code { font-size: 0.95em; }
+.row { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; }
+.row b { color: var(--muted); font-weight: 600; font-size: 0.9rem; padding-top: 1px; }
+.num { font-variant-numeric: tabular-nums; }
+
+.ask { background: var(--ct); border-radius: 12px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.ask h3 { color: var(--c); }
+.ask ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; }
+.ask li { max-width: 72ch; }
+.ask q { font-style: italic; }
+
+.overview .diagram svg { min-width: 700px; }
+.link { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: 0.88rem; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--k); }
+@media (max-width: 560px) { .step { grid-template-columns: 1fr; gap: 8px; } .tag { justify-self: start; padding: 3px 10px; } .row { grid-template-columns: 1fr; gap: 0; } }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+html { scroll-behavior: smooth; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">BookPulse · Nhóm 06 · BDA501</span>
+  <h1>Ba cụm xử lý của BookPulse</h1>
+  <p class="lead">Batch tính gợi ý theo đợt. Streaming xử lý lượt chấm mới mỗi 5 giây. Hadoop đếm lại để kiểm chứng. Trang này đi qua từng cụm: mỗi bước làm gì, vì sao phải làm vậy, và con số đo được.</p>
+  <nav aria-label="Chọn cụm">
+    <a class="b" href="#batch">Batch</a>
+    <a class="s" href="#stream">Streaming</a>
+    <a class="h" href="#hadoop">Hadoop</a>
+  </nav>
+</header>
+
+<!-- ============ OVERVIEW ============ -->
+<section class="overview" aria-labelledby="ov-h">
+  <div class="sec-head" style="--c: var(--fg)"><span class="eyebrow">Toàn cảnh</span><h2 id="ov-h">Ba cụm nối với nhau thế nào</h2></div>
+  <div class="diagram" role="img" aria-label="ratings.csv đi vào ba cụm: Hadoop kiểm chứng, Batch tính gợi ý, Streaming qua Kafka. Batch và Streaming ghi vào MongoDB, app đọc MongoDB và gửi lượt chấm vào Kafka.">
+  <svg viewBox="0 0 900 330">
+    <defs>
+      <marker id="m" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="mb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-b" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="ms" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-s" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="mh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-h" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="mg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-g" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+    <rect class="box" x="10" y="130" width="150" height="70" rx="10"/>
+    <text class="t" x="85" y="161" text-anchor="middle">ratings.csv</text>
+    <text class="s" x="85" y="182" text-anchor="middle">6 triệu lượt chấm</text>
+
+    <rect class="bx-h" x="250" y="14" width="300" height="62" rx="10"/>
+    <text class="t" x="400" y="41" text-anchor="middle">Hadoop: kiểm chứng</text>
+    <text class="s" x="400" y="61" text-anchor="middle">HDFS + YARN + MapReduce · app không dùng</text>
+
+    <rect class="bx-b" x="250" y="134" width="300" height="62" rx="10"/>
+    <text class="t" x="400" y="161" text-anchor="middle">Batch: tính gợi ý</text>
+    <text class="s" x="400" y="181" text-anchor="middle">Spark · chạy theo đợt · vài phút</text>
+
+    <rect class="bx-s" x="250" y="254" width="300" height="62" rx="10"/>
+    <text class="t" x="400" y="281" text-anchor="middle">Streaming: lượt chấm mới</text>
+    <text class="s" x="400" y="301" text-anchor="middle">Kafka + Spark Streaming · mỗi 5 giây</text>
+
+    <rect class="bx-g" x="640" y="160" width="120" height="120" rx="10"/>
+    <text class="t" x="700" y="216" text-anchor="middle">MongoDB</text>
+    <text class="s" x="700" y="236" text-anchor="middle">gợi ý + số liệu mới</text>
+    <rect class="box" x="800" y="190" width="92" height="60" rx="10"/>
+    <text class="t" x="846" y="225" text-anchor="middle">App</text>
+
+    <path class="a-h" d="M160,150 C200,150 200,45 248,45" marker-end="url(#mh)"/>
+    <path class="a-b" d="M160,165 H248" marker-end="url(#mb)"/>
+    <path class="a-s" d="M160,180 C200,180 200,285 248,285" marker-end="url(#ms)"/>
+    <path class="a-b" d="M550,165 C595,165 595,200 638,200" marker-end="url(#mb)"/>
+    <path class="a-s" d="M550,285 C595,285 595,245 638,245" marker-end="url(#ms)"/>
+    <path class="a-g" d="M760,220 H798" marker-end="url(#mg)"/>
+    <path class="a-s dash" d="M400,254 V200" marker-end="url(#ms)"/>
+    <text class="lbl c-s" x="410" y="232">lưu lại → batch lần sau học</text>
+    <path class="a dash" d="M846,250 V322 H560 V300" marker-end="url(#m)"/>
+    <text class="lbl" x="640" y="316" style="fill: var(--muted)">nút Chấm sao → Kafka</text>
+    <text class="lbl c-h" x="560" y="40">so khớp với Spark SQL</text>
+  </svg>
+  </div>
+  <div class="legend">
+    <span style="--k: var(--batch)">Batch: hệ thống chính, gợi ý cá nhân</span>
+    <span style="--k: var(--stream)">Streaming: hệ thống chính, dữ liệu mới</span>
+    <span style="--k: var(--hadoop)">Hadoop: nhánh kiểm chứng</span>
+    <span style="--k: var(--serve)">MongoDB: nơi app đọc</span>
+  </div>
+  <p>Batch và Streaming là hệ thống chính, theo ý tưởng <b>Lambda</b>: việc đắt (huấn luyện mô hình, khoảng 4 phút) làm theo đợt, việc rẻ (ẩn sách vừa chấm, cộng điểm) làm ngay. Cả hai ghi vào MongoDB để app đọc. Hadoop là nhánh phụ: cùng đọc <code>ratings.csv</code> nhưng chỉ để đếm lại và đối chiếu.</p>
+</section>
+
+<!-- ============ BATCH ============ -->
+<section id="batch" class="batch" aria-labelledby="b-h">
+  <div class="sec-head"><span class="eyebrow">Cụm 1 · Spark · chạy theo đợt</span><h2 id="b-h">Batch: từ 6 triệu lượt chấm đến 30 gợi ý cho mỗi người</h2>
+  <p>Chạy bằng một lệnh <code>bash scripts/run_pipeline.sh</code>. Học kỹ từ toàn bộ lịch sử, soạn sẵn danh sách gợi ý để app chỉ việc đọc.</p></div>
+  <div class="diagram" role="img" aria-label="ratings.csv và kho sự kiện streaming đi vào clean.py, ghi Parquet. Parquet đi vào analytics_sql.py và train_als.py. Mô hình ALS đi vào write_recs.py, ghi collection mới trong MongoDB rồi chuyển meta.active.">
+  <svg viewBox="0 0 960 300">
+    <defs>
+      <marker id="b1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-b" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="b2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-s" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="b3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-g" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+    <rect class="box" x="10" y="40" width="140" height="58" rx="9"/>
+    <text class="m" x="80" y="66" text-anchor="middle">ratings.csv</text>
+    <text class="s" x="80" y="85" text-anchor="middle">5.976.479 dòng</text>
+    <rect class="bx-s" x="10" y="150" width="140" height="58" rx="9"/>
+    <text class="m" x="80" y="176" text-anchor="middle">stream_events</text>
+    <text class="s" x="80" y="195" text-anchor="middle">lượt chấm đã lưu</text>
+
+    <rect class="bx-b" x="200" y="88" width="140" height="64" rx="9"/>
+    <text class="m" x="270" y="115" text-anchor="middle">clean.py</text>
+    <text class="s" x="270" y="135" text-anchor="middle">lọc lỗi · bỏ trùng</text>
+    <rect class="bx-b" x="390" y="88" width="140" height="64" rx="9"/>
+    <text class="t" x="460" y="115" text-anchor="middle">Parquet</text>
+    <text class="s" x="460" y="135" text-anchor="middle">dữ liệu sạch</text>
+    <rect class="bx-b" x="580" y="14" width="160" height="58" rx="9"/>
+    <text class="m" x="660" y="40" text-anchor="middle">analytics_sql.py</text>
+    <text class="s" x="660" y="59" text-anchor="middle">Spark SQL · 6 câu hỏi</text>
+    <rect class="bx-b" x="580" y="160" width="160" height="58" rx="9"/>
+    <text class="m" x="660" y="186" text-anchor="middle">train_als.py</text>
+    <text class="s" x="660" y="205" text-anchor="middle">ALS · ~4 phút</text>
+    <rect class="bx-b" x="580" y="236" width="160" height="54" rx="9"/>
+    <text class="t" x="660" y="260" text-anchor="middle">mô hình ALS</text>
+    <text class="s" x="660" y="278" text-anchor="middle">rank 50 · alpha 1</text>
+    <rect class="bx-b" x="790" y="160" width="160" height="58" rx="9"/>
+    <text class="m" x="870" y="186" text-anchor="middle">write_recs.py</text>
+    <text class="s" x="870" y="205" text-anchor="middle">30 gợi ý + 10 bù / người</text>
+    <rect class="bx-g" x="790" y="236" width="160" height="54" rx="9"/>
+    <text class="t" x="870" y="260" text-anchor="middle">MongoDB</text>
+    <text class="s" x="870" y="278" text-anchor="middle">ghi mới, rồi đổi meta</text>
+
+    <path class="a-b" d="M150,69 C175,69 175,112 198,112" marker-end="url(#b1)"/>
+    <path class="a-s" d="M150,179 C175,179 175,130 198,130" marker-end="url(#b2)"/>
+    <path class="a-b" d="M340,120 H388" marker-end="url(#b1)"/>
+    <path class="a-b" d="M530,110 C555,110 555,43 578,43" marker-end="url(#b1)"/>
+    <path class="a-b" d="M530,130 C555,130 555,189 578,189" marker-end="url(#b1)"/>
+    <path class="a-b" d="M660,218 V234" marker-end="url(#b1)"/>
+    <path class="a-b" d="M740,263 H765 V189 H788" marker-end="url(#b1)"/>
+    <path class="a-g" d="M870,218 V234" marker-end="url(#b3)"/>
+    <circle class="c-b" cx="270" cy="88" r="12"/><text class="badge-t" x="270" y="92" text-anchor="middle">B1</text>
+    <circle class="c-b" cx="660" cy="14" r="12"/><text class="badge-t" x="660" y="18" text-anchor="middle">B2</text>
+    <circle class="c-b" cx="660" cy="160" r="12"/><text class="badge-t" x="660" y="164" text-anchor="middle">B3</text>
+    <circle class="c-b" cx="870" cy="160" r="12"/><text class="badge-t" x="870" y="164" text-anchor="middle">B4</text>
+  </svg>
+  </div>
+
+  <div class="steps">
+    <div class="step"><span class="tag">B1</span><div class="step-body">
+      <h3><code>clean.py</code>: làm sạch và lưu Parquet</h3>
+      <div class="row"><b>Làm gì</b><p>Đọc <code>ratings.csv</code>, bỏ dòng thiếu dữ liệu, số sao ngoài 1–5 và dòng trùng. Gộp thêm lượt chấm mới từ kho <code>stream_events</code> (bỏ trùng theo <code>event_id</code>, cùng người cùng sách thì lấy lượt mới nhất). Ghi ra Parquet, đánh dấu dòng nào đến từ streaming.</p></div>
+      <div class="row"><b>Vì sao</b><p>Dữ liệu bẩn làm mô hình học sai. Parquet lưu theo cột, có nén và schema sẵn, nên các bước sau đọc nhanh hơn CSV nhiều lần (3,9–8,4 lần tùy lần đo). Gộp kho sự kiện là cách để lượt chấm mới đi vào lần huấn luyện sau.</p></div>
+      <div class="row"><b>Con số</b><p class="num">5.976.479 dòng vào và ra (bộ Goodbooks đã được tác giả khử trùng sẵn); 53.424 người dùng, 10.000 sách.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">B2</span><div class="step-body">
+      <h3><code>analytics_sql.py</code>: hiểu dữ liệu bằng Spark SQL</h3>
+      <div class="row"><b>Làm gì</b><p>Đăng ký dữ liệu thành bảng tạm rồi trả lời 6 câu hỏi bằng SQL: sách nhiều lượt chấm nhất, phân bố số sao, số lượt chấm mỗi người, sách điểm cao nhất (có <code>HAVING</code>)… In query plan để xem Spark chạy thế nào.</p></div>
+      <div class="row"><b>Vì sao</b><p>Hiểu dữ liệu trước khi xây mô hình (ví dụ 99% ô người dùng × sách là trống, nên cần ALS). Kiểm chứng: cùng câu hỏi viết bằng SQL và bằng DataFrame cho kết quả giống hệt.</p></div>
+      <div class="row"><b>Con số</b><p class="num">Độ phủ ma trận 1,12%; trung vị 111 lượt chấm mỗi người; query plan dùng BroadcastHashJoin, chỉ một lần shuffle.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">B3</span><div class="step-body">
+      <h3><code>train_als.py</code>: học gu đọc bằng Spark ML</h3>
+      <div class="row"><b>Làm gì</b><p>Chia dữ liệu CSV ngẫu nhiên 80% train / 20% test (seed 42); lượt chấm từ streaming luôn vào train. Thử các bộ tham số trên một phần của train, chọn bộ tốt nhất theo Precision@10, đánh giá một lần trên test, lưu mô hình.</p></div>
+      <div class="row"><b>Vì sao</b><p>ALS chuyên cho ma trận thưa: từ 1% ô đã biết, đoán sở thích ở 99% còn lại. Dùng bản <b>implicit</b> vì người dùng thấy danh sách 10 cuốn chứ không thấy số sao dự đoán, nên thứ hạng quan trọng hơn sai số số sao.</p></div>
+      <div class="row"><b>Con số</b><p class="num">Train 4.780.968 / test 1.195.511 dòng. Precision@10 = 0,204 (10 gợi ý trúng khoảng 2 cuốn người đó thích), gấp 2,6 lần gợi ý sách phổ biến; explicit ALS chỉ 0,008.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">B4</span><div class="step-body">
+      <h3><code>write_recs.py</code>: soạn sẵn gợi ý vào MongoDB</h3>
+      <div class="row"><b>Làm gì</b><p>Với mỗi người: 30 gợi ý từ mô hình (bỏ sách đã đọc) và 10 sách phổ biến chưa đọc để bù. Ghi vào collection <b>mới</b>; kiểm tra đủ số người dùng rồi mới chuyển <code>meta.active</code> sang; giữ bản trước để quay lại.</p></div>
+      <div class="row"><b>Vì sao</b><p>Tính sẵn thì app chỉ đọc một document theo <code>_id</code>, không phải chạy mô hình. Lưu 30 thay vì 10 để khi người dùng chấm một cuốn, app lấy ngay cuốn kế tiếp. Ghi collection mới rồi mới chuyển để app không bao giờ đọc danh sách ghi dở.</p></div>
+      <div class="row"><b>Con số</b><p class="num">53.424 document; đọc một người trung vị dưới 1 mili giây (query plan IDHACK: đọc đúng 1 document).</p></div>
+    </div></div>
+  </div>
+
+  <div class="ask"><h3>Khi bị hỏi về batch</h3><ul>
+    <li><b>Vì sao không huấn luyện lại sau mỗi lượt chấm?</b> <q>Một lần huấn luyện mất khoảng 4 phút trên 4,8 triệu dòng. Việc nhanh như ẩn sách vừa chấm thì streaming làm ngay; học lại gu đọc thì làm theo đợt.</q></li>
+    <li><b>Dữ liệu chia theo thời gian thế nào?</b> <q>Goodbooks không có thời điểm chấm nên rating CSV chia ngẫu nhiên 80/20 với seed cố định; lượt chấm từ streaming là dữ liệu mới nhất nên luôn vào train.</q></li>
+    <li><b>Chấm xong rồi huấn luyện lại thì gợi ý có đổi không?</b> <q>Có, nếu chạy đủ ba bước clean → train → write_recs và chưa reset kho sự kiện. Ví dụ đã thử: user chấm 5 sao Harry Potter tập 1–5 thì gợi ý mới có tập 6, 7 ở đầu danh sách.</q></li>
+  </ul></div>
+</section>
+
+<!-- ============ STREAMING ============ -->
+<section id="stream" class="stream" aria-labelledby="s-h">
+  <div class="sec-head"><span class="eyebrow">Cụm 2 · Kafka + Spark Structured Streaming · chạy liên tục</span><h2 id="s-h">Streaming: lượt chấm mới đi vào hệ thống trong vài giây</h2>
+  <p>Một job <code>streaming/stream_stats.py</code> chạy suốt, cứ 5 giây lấy các sự kiện mới từ Kafka ra xử lý (một micro-batch), rồi ghi kết quả vào MongoDB và kho Parquet.</p></div>
+  <div class="diagram" role="img" aria-label="producer.py, nút Chấm sao và rate_from_recs.py gửi sự kiện vào Kafka. Spark Structured Streaming đọc mỗi 5 giây, chạy 4 query: valid, trending, rejected, archive. Kết quả ghi vào MongoDB và kho Parquet; checkpoint ghi nhớ tiến độ.">
+  <svg viewBox="0 0 960 360">
+    <defs>
+      <marker id="s1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-s" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="s2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="hd" d="M0,0 L10,5 L0,10 z"/></marker>
+      <marker id="s3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-g" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+    <text class="eyebrow" x="10" y="20" style="font-size:11px;font-weight:600;fill:var(--muted)">NGUỒN SỰ KIỆN</text>
+    <rect class="box" x="10" y="34" width="160" height="58" rx="9"/>
+    <text class="m" x="90" y="59" text-anchor="middle">producer.py</text>
+    <text class="s" x="90" y="78" text-anchor="middle">phát dữ liệu giả</text>
+    <rect class="box" x="10" y="108" width="160" height="58" rx="9"/>
+    <text class="t" x="90" y="133" text-anchor="middle">Nút Chấm sao</text>
+    <text class="s" x="90" y="152" text-anchor="middle">trong app</text>
+    <rect class="box" x="10" y="182" width="160" height="58" rx="9"/>
+    <text class="m" x="90" y="207" text-anchor="middle">rate_from_recs.py</text>
+    <text class="s" x="90" y="226" text-anchor="middle">dòng lệnh, dự phòng</text>
+
+    <rect class="bx-s" x="220" y="96" width="140" height="86" rx="9"/>
+    <text class="t" x="290" y="127" text-anchor="middle">Kafka</text>
+    <text class="m" x="290" y="147" text-anchor="middle" style="font-size:11.5px">rating-events</text>
+    <text class="s" x="290" y="166" text-anchor="middle">3 partition · 7 ngày</text>
+
+    <rect class="bx-s" x="410" y="20" width="250" height="250" rx="11"/>
+    <text class="t" x="425" y="45">stream_stats.py</text>
+    <text class="s" x="425" y="64">micro-batch mỗi 5 giây · 4 query</text>
+    <rect class="box" x="425" y="78" width="220" height="40" rx="7"/>
+    <text class="lbl" x="437" y="97">valid</text><text class="s" x="437" y="111">bỏ trùng + watermark 10 phút</text>
+    <rect class="box" x="425" y="126" width="220" height="40" rx="7"/>
+    <text class="lbl" x="437" y="145">trending</text><text class="s" x="437" y="159">cửa sổ 10 phút, trượt 5 phút</text>
+    <rect class="box" x="425" y="174" width="220" height="40" rx="7"/>
+    <text class="lbl" x="437" y="193">rejected</text><text class="s" x="437" y="207">đếm sự kiện lỗi</text>
+    <rect class="box" x="425" y="222" width="220" height="40" rx="7"/>
+    <text class="lbl" x="437" y="241">archive</text><text class="s" x="437" y="255">lưu mọi sự kiện hợp lệ</text>
+
+    <rect class="box" x="410" y="296" width="250" height="52" rx="9"/>
+    <text class="m" x="535" y="318" text-anchor="middle">checkpoints/</text>
+    <text class="s" x="535" y="337" text-anchor="middle">đã đọc Kafka tới đâu + trạng thái</text>
+
+    <rect class="bx-g" x="720" y="40" width="230" height="170" rx="10"/>
+    <text class="t" x="735" y="64">MongoDB · speed view</text>
+    <text class="m" x="735" y="90" style="font-size:12px">user_seen</text><text class="s" x="835" y="90">sách vừa chấm</text>
+    <text class="m" x="735" y="114" style="font-size:12px">rating_stats</text><text class="s" x="835" y="114">điểm TB</text>
+    <text class="m" x="735" y="138" style="font-size:12px">trending</text><text class="s" x="835" y="138">sách đang hot</text>
+    <text class="m" x="735" y="162" style="font-size:12px">online_eval</text><text class="s" x="835" y="162">đoán trúng?</text>
+    <text class="m" x="735" y="186" style="font-size:12px">stream_state</text><text class="s" x="835" y="186">batch đã ghi</text>
+    <rect class="bx-b" x="720" y="232" width="230" height="58" rx="10"/>
+    <text class="m" x="835" y="257" text-anchor="middle">stream_events (Parquet)</text>
+    <text class="s" x="835" y="276" text-anchor="middle">→ batch lần sau (B1)</text>
+
+    <path class="a-s" d="M170,63 C195,63 195,125 218,125" marker-end="url(#s1)"/>
+    <path class="a-s" d="M170,137 H218" marker-end="url(#s1)"/>
+    <path class="a-s" d="M170,211 C195,211 195,152 218,152" marker-end="url(#s1)"/>
+    <path class="a-s" d="M360,139 H408" marker-end="url(#s1)"/>
+    <path class="a dash" d="M535,270 V294" marker-start="url(#s2)" marker-end="url(#s2)"/>
+    <path class="a-g" d="M645,98 H690 V110 H718" marker-end="url(#s3)"/>
+    <path class="a-g" d="M645,146 H690 V140 H718" marker-end="url(#s3)"/>
+    <path class="a-g" d="M645,194 H690 V180 H718" marker-end="url(#s3)"/>
+    <path class="a-s" d="M645,242 H690 V260 H718" marker-end="url(#s1)"/>
+    <circle class="c-s" cx="195" cy="100" r="11"/><text class="badge-t" x="195" y="104" text-anchor="middle">S1</text>
+    <circle class="c-s" cx="384" cy="139" r="11"/><text class="badge-t" x="384" y="143" text-anchor="middle">S2</text>
+    <circle class="c-s" cx="690" cy="64" r="11"/><text class="badge-t" x="690" y="68" text-anchor="middle">S3</text>
+    <circle class="c-s" cx="690" cy="296" r="11"/><text class="badge-t" x="690" y="300" text-anchor="middle">S4</text>
+  </svg>
+  </div>
+
+  <div class="steps">
+    <div class="step"><span class="tag">S1</span><div class="step-body">
+      <h3>Nguồn sự kiện gửi vào Kafka</h3>
+      <div class="row"><b>Làm gì</b><p>Khi demo, <code>producer.py</code> đọc file dữ liệu giả <code>data/fake/stream_ratings.csv</code> do <code>scripts/make_fake_stream.py</code> tạo: 5.000 cặp user–sách <b>chưa có</b> trong <code>ratings.csv</code>, user và sách chọn theo độ hoạt động và độ phổ biến, số sao theo tỷ lệ thật. Vì là cặp mới nên đây là thông tin mô hình chưa thấy. Không có <code>--file</code> thì producer phát lại dòng có sẵn trong <code>ratings.csv</code> (cách dùng cho các bài thử kill -9, ngắt Kafka). Mỗi sự kiện được gắn <code>event_id</code> mới, <code>event_time</code> là lúc gửi, <code>simulated=true</code>, gửi khoảng 20 sự kiện mỗi giây; cố ý kèm 2% bản trùng, 1% sự kiện lỗi (9 sao) và một ít sự kiện trễ 30 phút. Nút <b>Chấm sao</b> trong app gửi lượt chấm cho sách đang được gợi ý.</p></div>
+      <div class="row"><b>Vì sao</b><p>Goodbooks không có người dùng đang hoạt động, nên phải giả lập một luồng sự kiện. Dữ liệu xấu cố ý chèn vào để chứng minh Spark bỏ trùng, loại lỗi và áp watermark đúng. File <code>ratings.csv</code> không bị sửa.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">S2</span><div class="step-body">
+      <h3>Kafka giữ sự kiện, Spark đọc mỗi 5 giây</h3>
+      <div class="row"><b>Làm gì</b><p>Kafka nhận sự kiện vào topic <code>rating-events</code> (3 partition, key là <code>user_id</code>), giữ 7 ngày. Spark Structured Streaming đọc theo offset, mỗi 5 giây một micro-batch, tối đa 20.000 offset một lần.</p></div>
+      <div class="row"><b>Vì sao</b><p>Kafka tách bên gửi khỏi bên xử lý: Spark tắt thì sự kiện vẫn nằm chờ, bật lại đọc tiếp đúng chỗ. Key <code>user_id</code> giữ các lượt chấm của một người theo đúng thứ tự trong một partition.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">S3</span><div class="step-body">
+      <h3>Bốn query xử lý và ghi MongoDB</h3>
+      <div class="row"><b>valid</b><p>Lọc sự kiện hợp lệ, bỏ trùng theo <code>event_id</code>, watermark 10 phút để bỏ sự kiện quá trễ; ghi <code>user_seen</code> (app ẩn sách vừa chấm), <code>rating_stats</code>, <code>online_eval</code>.</p></div>
+      <div class="row"><b>trending</b><p>Đếm theo cửa sổ thời gian dài 10 phút, cứ 5 phút mở cửa sổ mới, tính theo lúc người dùng chấm. App chỉ xếp sách có lượt 4–5 sao, nên lượt 1–3 sao không đẩy sách lên "Sách đang hot".</p></div>
+      <div class="row"><b>rejected</b><p>Đếm sự kiện lỗi (số sao ngoài 1–5, thiếu trường) để biết có bao nhiêu dữ liệu bẩn.</p></div>
+      <div class="row"><b>Vì sao</b><p>Mỗi query có trạng thái và chế độ ghi riêng, mỗi query một checkpoint, nên chạy lại độc lập. Ghi theo kiểu upsert theo <code>_id</code> và đánh dấu batch đã ghi (<code>last_batch</code>), nên một batch bị chạy lại không bị cộng hai lần.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">S4</span><div class="step-body">
+      <h3>Lưu mọi sự kiện ra kho Parquet</h3>
+      <div class="row"><b>Làm gì</b><p>Query <code>archive</code> ghi mọi sự kiện hợp lệ (kể cả sự kiện trễ) vào <code>stream_events</code> bằng file sink của Spark, đúng một lần (exactly-once).</p></div>
+      <div class="row"><b>Vì sao</b><p>Đây là chỗ hai lớp nối nhau: lần batch sau, <code>clean.py</code> gộp kho này vào dữ liệu huấn luyện (S5 → B1), nên mô hình học được lượt chấm mới.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">CP</span><div class="step-body">
+      <h3><code>checkpoints/</code>: không mất khi job chết</h3>
+      <div class="row"><b>Làm gì</b><p>Trước mỗi batch, Spark ghi khoảng offset sẽ đọc; sau khi xong thì đánh dấu đã xong. Trạng thái (bỏ trùng, cửa sổ) cũng được lưu.</p></div>
+      <div class="row"><b>Con số</b><p class="num">Thử <code>kill -9</code> job giữa chừng rồi chạy lại: 1.474 = 1.500 − 26 sự kiện trễ, 0 mất, 0 trùng. Thử tắt Kafka 40 giây rồi MongoDB 30 giây: 3.000 = 3.000.</p></div>
+    </div></div>
+  </div>
+
+  <div class="ask"><h3>Khi bị hỏi về streaming</h3><ul>
+    <li><b>Dữ liệu streaming lấy từ đâu?</b> <q>Bộ dữ liệu không có người dùng đang hoạt động nên nhóm mô phỏng: sinh rating giả cho các cặp user–sách chưa có trong Goodbooks (theo độ phổ biến và tỷ lệ số sao thật), producer gửi với thời điểm hiện tại, đánh dấu simulated=true. Nút Chấm sao trong app tạo lượt chấm mới cho sách đang được gợi ý.</q></li>
+    <li><b>Có exactly-once không?</b> <q>Kafka cộng checkpoint là at-least-once; kho Parquet exactly-once nhờ file sink; MongoDB bỏ qua batch đã ghi nhờ last_batch. Các lượt thử sự cố đều 0 mất, 0 trùng.</q></li>
+    <li><b>Sách đang hot tính từ lúc nào?</b> <q>Theo event_time, tức lúc người dùng chấm; cửa sổ 10 phút trượt 5 phút; sự kiện trễ quá 10 phút bị bỏ; chỉ tính sách có lượt 4–5 sao.</q></li>
+  </ul></div>
+</section>
+
+<!-- ============ HADOOP ============ -->
+<section id="hadoop" class="hadoop" aria-labelledby="h-h">
+  <div class="sec-head"><span class="eyebrow">Cụm 3 · HDFS + YARN + MapReduce · nhánh kiểm chứng</span><h2 id="h-h">Hadoop: đếm lại bằng cách khác để chắc kết quả đúng</h2>
+  <p>Cụm Hadoop chạy riêng (Docker compose <code>bookpulse-hadoop</code>). Thống kê lượt chấm và điểm trung bình của từng cuốn, rồi so với Spark SQL. App không dùng kết quả này.</p></div>
+  <div class="diagram" role="img" aria-label="ratings.csv được đưa lên HDFS thành 3 block. Ba map task chạy mapper và combiner, shuffle gom theo book_id về 2 reducer, ra book_rating_stats 10.000 sách. verify_with_spark so với Spark SQL: khớp 100%.">
+  <svg viewBox="0 0 960 300">
+    <defs>
+      <marker id="h1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="c-h" d="M0,0 L10,5 L0,10 z"/></marker>
+    </defs>
+    <rect class="box" x="10" y="120" width="130" height="58" rx="9"/>
+    <text class="m" x="75" y="146" text-anchor="middle">ratings.csv</text>
+    <text class="s" x="75" y="165" text-anchor="middle">72 MB</text>
+
+    <rect class="bx-h" x="180" y="40" width="130" height="220" rx="10"/>
+    <text class="t" x="245" y="64" text-anchor="middle">HDFS</text>
+    <text class="s" x="245" y="82" text-anchor="middle">block 32 MB</text>
+    <rect class="box" x="198" y="98" width="94" height="40" rx="6"/><text class="lbl" x="245" y="123" text-anchor="middle">block 1</text>
+    <rect class="box" x="198" y="148" width="94" height="40" rx="6"/><text class="lbl" x="245" y="173" text-anchor="middle">block 2</text>
+    <rect class="box" x="198" y="198" width="94" height="40" rx="6"/><text class="lbl" x="245" y="223" text-anchor="middle">block 3</text>
+
+    <rect class="bx-h" x="350" y="98" width="150" height="40" rx="6"/><text class="lbl" x="425" y="123" text-anchor="middle">map + combiner</text>
+    <rect class="bx-h" x="350" y="148" width="150" height="40" rx="6"/><text class="lbl" x="425" y="173" text-anchor="middle">map + combiner</text>
+    <rect class="bx-h" x="350" y="198" width="150" height="40" rx="6"/><text class="lbl" x="425" y="223" text-anchor="middle">map + combiner</text>
+
+    <rect class="box" x="540" y="98" width="110" height="140" rx="9"/>
+    <text class="t" x="595" y="155" text-anchor="middle">shuffle</text>
+    <text class="s" x="595" y="175" text-anchor="middle">gom theo book_id</text>
+
+    <rect class="bx-h" x="690" y="110" width="110" height="44" rx="6"/><text class="lbl" x="745" y="137" text-anchor="middle">reducer 1</text>
+    <rect class="bx-h" x="690" y="182" width="110" height="44" rx="6"/><text class="lbl" x="745" y="209" text-anchor="middle">reducer 2</text>
+
+    <rect class="box" x="830" y="40" width="120" height="70" rx="9"/>
+    <text class="m" x="890" y="66" text-anchor="middle" style="font-size:11.5px">book_rating_stats</text>
+    <text class="s" x="890" y="86" text-anchor="middle">10.000 sách</text>
+    <rect class="bx-g" x="830" y="190" width="120" height="70" rx="9"/>
+    <text class="m" x="890" y="216" text-anchor="middle" style="font-size:11.5px">verify_with_spark</text>
+    <text class="s" x="890" y="236" text-anchor="middle">khớp 100%</text>
+
+    <path class="a-h" d="M140,149 H178" marker-end="url(#h1)"/>
+    <path class="a-h" d="M292,118 H348" marker-end="url(#h1)"/>
+    <path class="a-h" d="M292,168 H348" marker-end="url(#h1)"/>
+    <path class="a-h" d="M292,218 H348" marker-end="url(#h1)"/>
+    <path class="a-h" d="M500,118 H538" marker-end="url(#h1)"/>
+    <path class="a-h" d="M500,168 H538" marker-end="url(#h1)"/>
+    <path class="a-h" d="M500,218 H538" marker-end="url(#h1)"/>
+    <path class="a-h" d="M650,132 H688" marker-end="url(#h1)"/>
+    <path class="a-h" d="M650,204 H688" marker-end="url(#h1)"/>
+    <path class="a-h" d="M800,132 C815,132 815,75 828,75" marker-end="url(#h1)"/>
+    <path class="a-h" d="M800,204 C815,204 815,75 828,75"/>
+    <path class="a dash" d="M890,110 V188" marker-end="url(#h1)"/>
+    <text class="lbl c-h" x="350" y="270">combiner giảm 99,2% bản ghi phải shuffle</text>
+    <text class="s" x="350" y="88">YARN cấp tài nguyên và chạy các task</text>
+  </svg>
+  </div>
+
+  <div class="steps">
+    <div class="step"><span class="tag">H1</span><div class="step-body">
+      <h3>HDFS: lưu file phân tán</h3>
+      <div class="row"><b>Làm gì</b><p><code>hdfs dfs -put</code> đưa <code>ratings.csv</code> (72 MB) lên HDFS với block 32 MB, nên file thành 3 block.</p></div>
+      <div class="row"><b>Vì sao</b><p>Mỗi block là một phần việc (split) để một map task xử lý song song. Ở cluster thật, block được nhân bản sang nhiều máy để chịu lỗi và đưa xử lý tới gần dữ liệu.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">H2</span><div class="step-body">
+      <h3>Map và combiner (Hadoop Streaming, Python)</h3>
+      <div class="row"><b>Làm gì</b><p>Mapper đọc từng dòng, bỏ dòng lỗi, phát ra cặp key = mã sách, value = (số lượt, tổng điểm, phân bố 1–5 sao). Combiner cộng các value ngay phía map.</p></div>
+      <div class="row"><b>Vì sao</b><p>Combiner giảm dữ liệu phải gửi qua mạng. Nó chỉ cộng tổng và số lượt, không cộng điểm trung bình, vì trung bình của trung bình là sai; điểm trung bình chỉ tính một lần ở reducer.</p></div>
+      <div class="row"><b>Con số</b><p class="num">Combiner giảm 99,2% số bản ghi phải shuffle: từ gần 6 triệu xuống 47.087.</p></div>
+    </div></div>
+    <div class="step"><span class="tag">H3</span><div class="step-body">
+      <h3>Shuffle, reduce trên YARN</h3>
+      <div class="row"><b>Làm gì</b><p>Shuffle gom mọi bản ghi cùng mã sách về cùng một reducer; 2 reducer cộng lại và tính điểm trung bình. YARN cấp tài nguyên cho các task.</p></div>
+      <div class="row"><b>Con số</b><p class="num">10.000 sách; job khoảng 52–134 giây tùy lần chạy (lần chạy thử 09/11: 64 giây).</p></div>
+    </div></div>
+    <div class="step"><span class="tag">H4</span><div class="step-body">
+      <h3><code>verify_with_spark.py</code>: đối chiếu</h3>
+      <div class="row"><b>Làm gì</b><p>Tính lại cùng thống kê bằng Spark SQL rồi so hai chiều bằng <code>exceptAll</code>.</p></div>
+      <div class="row"><b>Vì sao</b><p>Hai cách tính độc lập cho cùng kết quả thì cả hai đều đúng. Đây cũng là thành phần MapReduce mà bài cuối kỳ yêu cầu.</p></div>
+      <div class="row"><b>Con số</b><p class="num">0 dòng khác biệt trên 10.000 sách: khớp 100%.</p></div>
+    </div></div>
+  </div>
+
+  <div class="ask"><h3>Khi bị hỏi về Hadoop</h3><ul>
+    <li><b>Đã có Spark sao còn MapReduce?</b> <q>MapReduce là nhánh kiểm chứng và đáp ứng yêu cầu môn học: đếm lại bằng một cách hoàn toàn khác, khớp 100% với Spark SQL. App không dùng kết quả này.</q></li>
+    <li><b>Vì sao combiner không tính trung bình?</b> <q>Trung bình của trung bình là sai khi các nhóm có số lượt khác nhau, nên combiner chỉ cộng tổng và số lượt; reducer mới chia một lần.</q></li>
+  </ul></div>
+</section>
+
+<div class="link">
+  <span class="eyebrow">Tóm lại trong một câu</span>
+  <p>Dữ liệu cũ → <b style="color:var(--batch)">batch</b> học kỹ, soạn sẵn gợi ý → MongoDB → app. Lượt chấm mới → Kafka → <b style="color:var(--stream)">streaming</b> cập nhật trong vài giây → MongoDB → app, đồng thời lưu lại để batch lần sau học. <b style="color:var(--hadoop)">Hadoop</b> đếm lại để kiểm chứng.</p>
+</div>
+</div>
+</body>
+</html>

@@ -91,9 +91,15 @@ Chỉ bắt đầu khi `verify_with_spark.py` ở mục 2 đã xong: không ch�
 # Terminal 2: job streaming (để chạy)
 docker compose exec spark python streaming/stream_stats.py
 # Terminal 3: khi Terminal 2 in "streaming from …"; khoảng 55 giây
+# Tạo dữ liệu giả một lần (khoảng 15 giây; có rồi thì bỏ qua): 5.000 cặp user–sách chưa có trong ratings.csv
+docker compose exec spark python scripts/make_fake_stream.py
 # --late 0.05: 5% số sự kiện gửi sau giây thứ 30 là sự kiện trễ (lần 08/11: 19/1.000)
-docker compose exec spark python streaming/producer.py --limit 1000 --late 0.05
+docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 1000 --late 0.05
 ```
+
+Nói: "Bộ Goodbooks không có người dùng đang hoạt động, nên nhóm sinh rating giả cho các cặp user–sách **chưa có** trong dữ liệu, chọn theo độ phổ biến và tỷ lệ số sao thật. Producer gửi chúng như lượt chấm vừa xảy ra, kèm cố ý 2% bản trùng, 1% sự kiện lỗi và 5% sự kiện trễ để thấy hệ thống loại."
+
+Lần thử 10/11 với đúng lệnh này: producer báo `sent 1000, duplicates 20, invalid 8, late 22, failed 0`; app hiện 978 sự kiện hợp lệ (= 1.000 − 22 trễ), 8 sự kiện lỗi, "Lượt 4–5 sao trúng top-10" 11 / 651. Số lần sau có thể lệch nhẹ (số sự kiện trễ phụ thuộc thời điểm), nhưng luôn có: hợp lệ = 1.000 − số trễ.
 
 Trong lúc producer chạy:
 - Mở http://localhost:4040 → tab **Structured Streaming**: 4 query có tên (`valid`, `rejected`, `events_to_parquet`, `trending`); bấm vào `trending` để thấy tốc độ vào (khoảng 20 sự kiện/giây), thời gian batch (batch đầu 7–12 giây vì JVM còn lạnh, sau đó 3–6 giây), watermark.

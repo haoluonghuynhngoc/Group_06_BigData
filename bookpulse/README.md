@@ -88,6 +88,9 @@ docker compose exec spark python batch/train_als.py             # ALS explicit +
 docker compose exec spark python batch/train_als.py --implicit --ranks 20,50 --regs 0.1 --alphas 1,10
 docker compose exec spark python batch/write_recs.py --books data/goodbooks/books.csv
 docker compose exec spark python streaming/producer.py --limit 2000
+# hoặc phát dữ liệu giả "mới": các cặp user–sách KHÔNG có trong ratings.csv (không cần train lại, số liệu không đổi)
+docker compose exec spark python scripts/make_fake_stream.py   # -> data/fake/stream_ratings.csv (5000 dòng, seed 2026)
+docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 2000
 docker compose exec spark python scripts/nosql_evidence.py     # đọc lại MongoDB và kiểm chứng
 docker compose exec spark python scripts/kafka_audit.py        # đếm lại Kafka và đối chiếu với số đếm streaming trong MongoDB
 ```
