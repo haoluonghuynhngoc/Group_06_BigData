@@ -97,6 +97,8 @@ docker compose exec spark python scripts/make_fake_stream.py
 docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 1000 --late 0.05
 ```
 
+Cách không dùng dòng lệnh: thanh bên trái của app, khung **Giả lập sự kiện** → chọn số sự kiện → **Gửi vào Kafka** (tạo file dữ liệu giả nếu chưa có). Khung này không gửi sự kiện trễ; muốn thấy watermark loại sự kiện trễ thì dùng lệnh producer ở trên với `--late 0.05`.
+
 Nói: "Bộ Goodbooks không có người dùng đang hoạt động, nên nhóm sinh rating giả cho các cặp user–sách **chưa có** trong dữ liệu, chọn theo độ phổ biến và tỷ lệ số sao thật. Producer gửi chúng như lượt chấm vừa xảy ra, kèm cố ý 2% bản trùng, 1% sự kiện lỗi và 5% sự kiện trễ để thấy hệ thống loại."
 
 Lần thử 10/11 với đúng lệnh này: producer báo `sent 1000, duplicates 20, invalid 8, late 22, failed 0`; app hiện 978 sự kiện hợp lệ (= 1.000 − 22 trễ), 8 sự kiện lỗi, "Lượt 4–5 sao trúng top-10" 11 / 651. Số lần sau có thể lệch nhẹ (số sự kiện trễ phụ thuộc thời điểm), nhưng luôn có: hợp lệ = 1.000 − số trễ.

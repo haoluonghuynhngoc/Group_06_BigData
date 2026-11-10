@@ -217,7 +217,7 @@ Chưa làm, nhóm nói thẳng: chạy tập con UCSD, và đánh giá online b�
 
 Kiệt mở app ở localhost:8501, nhập user 1: đây là top-10 của ALS implicit, app đọc một document trong MongoDB. Kéo xuống mục Chấm sao, chọn cuốn số 1, chấm 5 sao rồi gửi. Vài giây sau bấm Làm mới: cuốn đó biến mất, cuốn tiếp theo được đẩy lên, không cần huấn luyện lại.
 
-Tuấn chạy producer với dữ liệu giả 300 sự kiện: trong app, số sự kiện hợp lệ tăng dần, bảng "Sách đang hot" xuất hiện. Mở Spark UI ở localhost:4040, tab Structured Streaming: bốn query, mỗi micro-batch khoảng 5 giây.
+Tuấn mở khung **Giả lập sự kiện** ở thanh bên trái của app, để 300 sự kiện rồi bấm **Gửi vào Kafka**: trong app, số sự kiện hợp lệ tăng dần, bảng "Sách đang hot" xuất hiện. Mở Spark UI ở localhost:4040, tab Structured Streaming: bốn query, mỗi micro-batch khoảng 5 giây.
 
 MapReduce không chạy trực tiếp vì mất 1–2 phút; nếu được hỏi thì mở `reports/mapreduce/` (log job, ảnh YARN, file kết quả) và nói kết quả khớp 100% với Spark SQL.
 
@@ -237,15 +237,13 @@ Chạy trước buổi thuyết trình ít nhất 10 phút, trong thư mục `bo
 docker compose up -d
 docker compose ps                                   # 4 service đều "running"
 bash scripts/reset_streaming.sh --yes               # streaming bắt đầu từ số 0
-ls data/fake/stream_ratings.csv || docker compose exec spark python scripts/make_fake_stream.py
 # Terminal 2, để chạy suốt buổi (chờ in "streaming from …"):
 docker compose exec spark python streaming/stream_stats.py
 ```
 
-Trong lúc demo:
+Trong lúc demo, bước 3 làm ngay trên app: thanh bên trái **Giả lập sự kiện** → Số sự kiện 300 → **Gửi vào Kafka** (khoảng 15 giây, có thanh tiến độ). Không cần chạy `make_fake_stream.py` hay `producer.py`: nếu chưa có file dữ liệu giả, khung này hiện nút **Tạo dữ liệu giả**. Dự phòng bằng dòng lệnh:
 
 ```bash
-# Terminal 3, bước 3 (khoảng 15 giây):
 docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 300
 ```
 

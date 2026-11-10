@@ -91,6 +91,7 @@ docker compose exec spark python streaming/producer.py --limit 2000
 # hoặc phát dữ liệu giả "mới": các cặp user–sách KHÔNG có trong ratings.csv (không cần train lại, số liệu không đổi)
 docker compose exec spark python scripts/make_fake_stream.py   # -> data/fake/stream_ratings.csv (5000 dòng, seed 2026)
 docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 2000
+# hoặc không cần lệnh: app → thanh bên trái "Giả lập sự kiện" → Gửi vào Kafka (tự tạo file dữ liệu giả nếu chưa có)
 docker compose exec spark python scripts/nosql_evidence.py     # đọc lại MongoDB và kiểm chứng
 docker compose exec spark python scripts/kafka_audit.py        # đếm lại Kafka và đối chiếu với số đếm streaming trong MongoDB
 ```

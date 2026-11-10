@@ -1,11 +1,19 @@
 """Streamlit demo: user ID -> top-10 unread books, with live rating statistics from the stream."""
+import json
+import os
+import random
+import time
+import urllib.request
+
 import pandas as pd
 import streamlit as st
 
 from common.events import make_producer, rating_event
+from common.fake import FAKE_CSV, events_for, write_fake
 from common.settings import KAFKA_TOPIC, get_db
 
 TOP_K = 10
+SPARK_UI_HOST = os.getenv("SPARK_UI_HOST", "spark")  # the stream job runs in the spark container
 
 st.set_page_config(page_title="BookPulse", page_icon="📚", layout="wide")
 st.title("📚 BookPulse – gợi ý sách")
@@ -19,6 +27,78 @@ def db():
 @st.cache_resource
 def producer():
     return make_producer()
+
+
+@st.cache_data(ttl=5)
+def stream_job_running():
+    """True when the stream job (Spark app "bookpulse-stream") answers on its Spark UI. Events sent while it is
+    stopped wait in Kafka and are processed when it starts, so the app says so instead of showing nothing."""
+    for port in (4040, 4041):
+        try:
+            with urllib.request.urlopen(f"http://{SPARK_UI_HOST}:{port}/api/v1/applications", timeout=1) as r:
+                if any(a.get("name") == "bookpulse-stream" for a in json.load(r)):
+                    return True
+        except Exception:  # UI not up on this port
+            pass
+    return False
+
+
+@st.cache_data
+def fake_rows(mtime):
+    """data/fake/stream_ratings.csv (reloaded when the file changes; mtime is the cache key)."""
+    return pd.read_csv(FAKE_CSV) if mtime else None
+
+
+# Simulator: does what scripts/make_fake_stream.py + streaming/producer.py --file ... do, from the browser.
+# It only sends events to Kafka; the stream job (streaming/stream_stats.py, must be running) processes them.
+with st.sidebar:
+    st.header("Giả lập sự kiện")
+    st.caption("Gửi lượt chấm giả vào Kafka: cặp user–sách chưa có trong dữ liệu, chọn theo độ phổ biến và tỷ lệ "
+               "số sao thật. Thay cho chạy make_fake_stream.py và producer.py.")
+    if stream_job_running():
+        st.caption("✅ Job streaming đang chạy")
+    else:
+        st.warning("Job streaming chưa chạy: sự kiện gửi đi sẽ nằm chờ trong Kafka, chưa hiện trên app. Bật bằng "
+                   "`docker compose exec spark python streaming/stream_stats.py`, job sẽ xử lý cả sự kiện đang chờ.")
+    fake = fake_rows(FAKE_CSV.stat().st_mtime if FAKE_CSV.exists() else 0)
+    if fake is None:
+        st.info("Chưa có dữ liệu giả (data/fake/stream_ratings.csv).")
+        if st.button("Tạo dữ liệu giả (5.000 lượt)", use_container_width=True):
+            with st.spinner("Đang đọc ratings.csv và sinh dữ liệu, khoảng 15 giây…"):
+                write_fake()
+            st.rerun()
+    else:
+        st.caption(f"Sẵn sàng: {len(fake):,} lượt chấm giả".replace(",", "."))
+        n_send = st.slider("Số sự kiện", 50, 2000, 300, step=50)
+        rate = st.slider("Tốc độ (sự kiện/giây)", 5, 100, 20, step=5)
+        noisy = st.checkbox("Cố ý chèn 2% bản trùng, 1% sự kiện lỗi", value=True,
+                            help="Để thấy job streaming bỏ bản trùng (theo event_id) và loại sự kiện lỗi (rating 9)")
+        if st.button("Gửi vào Kafka", type="primary", use_container_width=True):
+            start = st.session_state.get("fake_cursor", 0)  # continue where the last send stopped
+            rows = fake.iloc[[(start + i) % len(fake) for i in range(n_send)]]
+            rng, counts = random.Random(), {"sent": 0, "duplicates": 0, "invalid": 0}
+            bar = st.progress(0.0)
+            try:
+                prod = producer()
+                for i, row in enumerate(rows.itertuples(index=False)):
+                    events = events_for(row, rng, 0.02 if noisy else 0, 0.01 if noisy else 0)
+                    for ev in events:
+                        prod.send(KAFKA_TOPIC, key=ev["user_id"], value=ev)
+                    counts["sent"] += 1
+                    counts["duplicates"] += sum(1 for ev in events[1:] if ev is events[0])
+                    counts["invalid"] += sum(1 for ev in events if ev["rating"] == 9)
+                    if i % 10 == 9 or i == n_send - 1:
+                        bar.progress((i + 1) / n_send, text=f"{i + 1}/{n_send} sự kiện")
+                    time.sleep(1 / rate)
+                prod.flush(timeout=30)
+                st.session_state["fake_cursor"] = (start + n_send) % len(fake)
+                st.session_state["fake_sent"] = counts
+            except Exception as exc:  # Kafka down or unreachable
+                st.error(f"Không gửi được vào Kafka ({type(exc).__name__}). Kafka có đang chạy không?")
+        if "fake_sent" in st.session_state:
+            c = st.session_state["fake_sent"]
+            st.success(f"Đã gửi {c['sent']} sự kiện, kèm {c['duplicates']} bản trùng và {c['invalid']} sự kiện lỗi. "
+                       "Sau 5–10 giây bấm **Làm mới** để thấy số sự kiện và “Sách đang hot” thay đổi.")
 
 
 meta = db().meta.find_one({"_id": "active"})
@@ -122,9 +202,9 @@ liked = online.get("liked_events", 0)
 c3.metric(f"Lượt 4–5 sao trúng top-{TOP_K}", f"{online.get('hits', 0)} / {liked}" if liked else "—",
           help="Trong các lượt chấm 4–5 sao của người dùng đã có gợi ý, bao nhiêu cuốn nằm trong top-10 của họ")
 if liked:
-    st.caption("producer.py phát lại rating đã có trong dữ liệu huấn luyện; những sách đó đã bị loại khỏi gợi ý "
-               "nên không thể trúng. Một cuốn trúng top-10 chỉ khi người dùng chấm sách đang được gợi ý "
-               "(mục Chấm sao ở trên, hoặc scripts/rate_from_recs.py).")
+    st.caption("Lượt chấm giả (thanh bên trái) là cặp user–sách mới nên thỉnh thoảng trúng; producer.py không có "
+               "--file phát lại rating đã có trong dữ liệu huấn luyện nên không thể trúng. Chấm sách đang được gợi ý "
+               "(mục Chấm sao ở trên) thì trúng.")
 
 st.subheader("Sách đang hot")
 # Sliding windows overlap: the two newest windows both contain the latest events. Show the older of the
@@ -151,4 +231,5 @@ if starts:
     else:
         st.info("Trong cửa sổ này chưa có sách nào được chấm 4–5 sao.")
 else:
-    st.info("Chưa có dữ liệu cửa sổ: chạy streaming/stream_stats.py và streaming/producer.py.")
+    st.info("Chưa có dữ liệu cửa sổ: bật streaming/stream_stats.py rồi gửi sự kiện (thanh bên trái "
+            "“Giả lập sự kiện”, hoặc streaming/producer.py).")
