@@ -34,11 +34,14 @@ services:
     volumes:
       - kafka-data:/var/lib/kafka/data
 
-  # Workbench: every Spark job, the producer and helper scripts run here with `docker compose exec spark ...`
+  # Workbench: every Spark job, the producer and helper scripts run here with `docker compose exec spark ...`.
+  # Its main process is a small control server (port 8600, compose network only) so the app page /setting can
+  # start the stream job, reset and run the demo scripts from buttons (see scripts/control_server.py).
   spark:
     build: .
     image: bookpulse-spark:latest
-    command: sleep infinity
+    command: python scripts/control_server.py
+    init: true   # reap the processes the server and `docker compose exec` start
     volumes:
       - .:/work
       - spark-checkpoints:/work/checkpoints
@@ -62,6 +65,7 @@ services:
     environment:
       MONGO_URI: mongodb://mongo:27017
       KAFKA_BOOTSTRAP: kafka:9092   # the "Chấm sao" form sends rating events to Kafka
+      CONTROL_URL: http://spark:8600   # page /setting: buttons that run commands in the spark container
     ports:
       - "8501:8501"
     depends_on:

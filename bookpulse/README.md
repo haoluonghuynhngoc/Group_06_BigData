@@ -14,7 +14,7 @@ Luồng batch:      CSV → clean.py → Parquet → analytics_sql.py (Spark SQL
                                           → train_als.py (ALS) → write_recs.py → MongoDB
 Luồng streaming:  producer.py → Kafka (rating-events) → stream_stats.py → MongoDB
                                                                      → Parquet (stream_events) → clean.py lần sau
-Phục vụ:          MongoDB → app/app.py (Streamlit, http://localhost:8501)
+Phục vụ:          MongoDB → app/app.py (Streamlit, http://localhost:8501; trang /setting điều khiển demo)
 ```
 
 ## 0. Yêu cầu
@@ -44,7 +44,13 @@ docker compose exec spark python batch/write_recs.py --books data/sample/books.c
 
 Mở http://localhost:8501, nhập user ID (ví dụ 1) để xem top-10.
 
-Luồng streaming: mở **hai cửa sổ terminal**.
+Luồng streaming không cần gõ lệnh: trang **Điều khiển demo** (http://localhost:8501/setting) có nút bật/dừng job
+streaming, xoá dữ liệu streaming đã thử, chấm sách đang được gợi ý (`rate_from_recs.py`), gửi sự kiện đến trễ
+(`producer.py --late`) và chạy `kafka_audit.py` / `nosql_evidence.py`, kèm trạng thái và output của từng lệnh. Các nút
+gọi `scripts/control_server.py`, tiến trình chính của container spark (cổng 8600, chỉ trong mạng compose), chỉ chạy
+đúng các lệnh có sẵn. Sau khi kéo bản này về, chạy `docker compose up -d` một lần để tạo lại container spark.
+
+Bằng dòng lệnh: mở **hai cửa sổ terminal**.
 
 ```bash
 # Terminal 1: job Structured Streaming (Ctrl+C để dừng)
@@ -245,7 +251,7 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
 
 ## 7. Dừng và làm lại từ đầu
 
-Chỉ làm sạch phần streaming (trước khi demo): `bash scripts/reset_streaming.sh` (hỏi xác nhận, `--yes` để bỏ qua;
+Chỉ làm sạch phần streaming (trước khi demo): nút **Xoá dữ liệu** ở trang /setting, hoặc `bash scripts/reset_streaming.sh` (hỏi xác nhận, `--yes` để bỏ qua;
 dừng job streaming và chờ nó dừng hẳn, xóa topic Kafka, checkpoint streaming, kho `stream_events` và các collection
 streaming, giữ nguyên kết quả batch).
 
