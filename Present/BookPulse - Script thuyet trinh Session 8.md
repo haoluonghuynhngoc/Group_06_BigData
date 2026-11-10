@@ -8,20 +8,22 @@ Mọi con số trong script lấy từ `bookpulse/reports/` (lần chạy ngày 
 
 | Người trình bày | Slide | Nội dung | Thời lượng |
 | --- | --- | --- | --- |
-| Lương Huỳnh Ngọc Hảo | 1–6 | Mở đầu, tiến độ, kiến trúc cập nhật, ingestion, Spark SQL, query plan | ~5 phút 30 giây |
-| Nguyễn Tấn Kiệt | 7–9 | Spark ML, hiệu năng theo số core, MongoDB; điều phối hỏi đáp | ~3 phút 30 giây + hỏi đáp |
-| Đinh Trần Quốc Tuấn | 10–13 | Streaming, bên trong job streaming, rủi ro và khắc phục, kế hoạch Buổi 10 | ~4 phút 30 giây |
-| Lương Huỳnh Ngọc Hảo | 14–17 | Cập nhật sau Buổi 8, kiến trúc hiện tại, câu hỏi của giảng viên, cảm ơn | ~3 phút 30 giây |
+| Lương Huỳnh Ngọc Hảo | 1–10 | Mở đầu, nội dung, vì sao chọn đề tài, kiến trúc hiện tại và chi tiết, từ kiến trúc suy ra, tiến độ, ingestion, Spark SQL, query plan | ~8 phút 45 giây |
+| Nguyễn Tấn Kiệt | 11–13 | Spark ML, hiệu năng theo số core, MongoDB; điều phối hỏi đáp | ~3 phút 30 giây + hỏi đáp |
+| Đinh Trần Quốc Tuấn | 14–17 | Streaming, bên trong job streaming, rủi ro và khắc phục, kế hoạch Buổi 10 | ~4 phút 30 giây |
+| Lương Huỳnh Ngọc Hảo | 18 | Cập nhật sau Buổi 8 | ~1 phút 15 giây |
+| Kiệt, Tuấn | 19 | Demo trực tiếp: app, Chấm sao, streaming, Spark UI | ~5 phút |
+| Hảo; Kiệt điều phối hỏi đáp | 20 | Cảm ơn, hỏi đáp | — |
 
-Slide 18 là phụ lục (kiến trúc chi tiết: tên file, collection, bước B1–B4, S1–S5), chỉ mở khi được hỏi.
+Mạch trình bày: **vì sao chọn đề tài (slide 3) → kiến trúc (slide 4, chi tiết ở slide 5) → từ kiến trúc suy ra mỗi khối phải chứng minh gì (slide 6) → tiến độ và bằng chứng cho từng khối (slide 7–17)**. Sơ đồ đề xuất "đã chạy và kế hoạch" của bản trước đã bỏ khỏi bộ slide.
 
-Tổng thời gian nói khoảng 17 phút. Nếu lớp quy định 10–12 phút: Hảo rút slide 6 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 8 còn 30 giây, Tuấn nói slide 11 trong 30 giây (chỉ hai nhánh hợp lệ / lỗi và last_batch), Hảo nói slide 14 trong 45 giây (chỉ đọc cột trạng thái) và slide 15 trong 30 giây (chỉ ba điểm khác slide 3).
+Tổng thời gian nói khoảng 18 phút 30 giây, cộng demo khoảng 5 phút. Câu hỏi của giảng viên "dữ liệu thay đổi thì sao?" không còn slide riêng; trả lời bằng lời theo file Câu hỏi giảng viên Session 8 (có thể chỉ vào slide 4 và phần demo Chấm sao). Nếu lớp quy định 10–12 phút: Hảo rút slide 10 còn 30 giây (chỉ nói câu Parquet nhanh hơn 8,4 lần), Kiệt rút slide 12 còn 30 giây, Tuấn nói slide 15 trong 30 giây (chỉ hai nhánh hợp lệ / lỗi và last_batch), Hảo nói slide 18 trong 45 giây (chỉ đọc cột trạng thái), slide 7 trong 30 giây (chỉ 4 con số) và slide 5 chỉ chỉ nhanh các lớp.
 
 So với Session 5, thông điệp chính của buổi này là: **hệ thống đã chạy thật end-to-end, mọi số trên slide đều là số đo, và khi chạy thật nhóm tìm ra 6 vấn đề: 2 đã sửa xong, 1 đã có thử nghiệm khắc phục kèm số liệu, 3 còn lại có kế hoạch cho Buổi 10.**
 
 ---
 
-## Phần 1 – Lương Huỳnh Ngọc Hảo (slide 1–6)
+## Phần 1 – Lương Huỳnh Ngọc Hảo (slide 1–10)
 
 ### Slide 1 – BookPulse (~20 giây)
 
@@ -29,7 +31,35 @@ Xin chào thầy cô và các bạn. Nhóm 06 gồm Lương Huỳnh Ngọc Hảo
 
 Ở Buổi 5, nhóm trình bày đề xuất BookPulse, khi đó chưa có phần nào chạy. Hôm nay là Team Presentation 2: báo cáo tiến độ. Toàn bộ pipeline batch và streaming đã chạy end-to-end trên bộ Goodbooks-10k, gần 6 triệu rating. Mọi con số nhóm trình bày hôm nay đều là số đo thật, lưu trong thư mục reports của repo.
 
-### Slide 2 – Từ đề xuất đến hệ thống chạy được (~1 phút)
+### Slide 2 – Nội dung trình bày (~30 giây)
+
+Bài đi theo một mạch: vì sao nhóm chọn đề tài này, kiến trúc nào giải được bài toán đó, và từ kiến trúc suy ra mỗi khối phải chứng minh điều gì. Sau đó là tiến độ và bằng chứng cho từng khối: dữ liệu và Spark SQL, rồi Kiệt trình bày mô hình và MongoDB, Tuấn trình bày streaming, rủi ro và kế hoạch. Cuối cùng là phần cập nhật sau Buổi 8 và câu trả lời cho câu hỏi của giảng viên.
+
+### Slide 3 – Vì sao chọn đề tài (~1 phút 15 giây)
+
+Chắc ai cũng từng gặp: đọc xong một cuốn hay, muốn tìm cuốn tiếp theo cùng gu, nhưng lên mạng chỉ thấy danh sách bán chạy, ai vào cũng thấy giống nhau. BookPulse gợi ý riêng cho từng người: An và Bình cùng chấm 5 sao Harry Potter và Chúa tể những chiếc nhẫn, tức là cùng gu; Bình còn thích The Hobbit mà An chưa đọc, nên hệ thống gợi ý The Hobbit cho An. Làm việc đó trên dữ liệu thật thì gặp ba đặc điểm bên phải. Gần 6 triệu lượt chấm của Goodbooks; ma trận người nhân sách trống gần 99%, nên phải dùng thuật toán cho dữ liệu thưa như ALS; và bộ đầy đủ UCSD lớn gấp khoảng 38 lần, vượt sức một máy. Thêm nữa, lượt chấm mới đến liên tục. Ba đặc điểm đó quyết định kiến trúc: Spark để xử lý phân tán, MongoDB để app đọc gợi ý thật nhanh, Kafka cùng Spark Streaming để nhận lượt chấm mới.
+
+### Slide 4 – Kiến trúc hiện tại: kế hoạch đã thành hệ thống (~1 phút)
+
+Đây là kiến trúc của hệ thống bây giờ, cùng bố cục năm cột như sơ đồ đề xuất ở Buổi 5 để thầy cô dễ so. Ba điểm khác so với đề xuất.
+
+Một, khung Hadoop MapReduce phía trên đã chuyển từ kế hoạch sang đã chạy: dữ liệu lên HDFS, job chạy trên YARN, kết quả khớp 100% với Spark SQL.
+
+Hai, ở giữa có kho Parquet nối hai lớp: lớp tốc độ lưu mọi sự kiện hợp lệ vào kho này, và lớp batch gộp chúng ở lần huấn luyện sau. Đây là mũi tên nét đứt "huấn luyện lại" trong sơ đồ đề xuất, nay đã có đường đi thật.
+
+Ba, mũi tên cam dưới cùng: người dùng chấm sao ngay trong app, app chỉ gửi sự kiện vào Kafka, không ghi thẳng vào MongoDB; sự kiện đi qua lớp tốc độ như mọi sự kiện khác.
+
+Phần còn lại vẫn là kế hoạch hoặc giới hạn: chưa chạy bộ UCSD, cluster mới ở mức thiết kế, và huấn luyện lại vẫn chạy bằng tay chứ chưa tự động theo lịch. Sơ đồ chi tiết với tên từng file và collection nằm ở slide phụ lục cuối.
+
+### Slide 5 – Kiến trúc chi tiết: tên file, collection, từng bước (~30 giây)
+
+Sơ đồ chi tiết của hệ thống hiện tại: tên từng file, từng collection MongoDB, các bước batch B1–B4 và stream S1–S5, container Docker. Trên sân khấu chỉ chỉ nhanh các lớp (khoảng 30 giây); chi tiết dùng khi được hỏi sâu về một thành phần. Đọc từ trái sang phải: nguồn và Kafka, lớp batch (xanh), lớp tốc độ (cam), MongoDB với batch view và speed view, rồi app; cụm Hadoop phía trên là nhánh kiểm chứng.
+
+### Slide 6 – Từ kiến trúc suy ra (~1 phút)
+
+Kiến trúc vừa rồi có sáu khối. Mỗi khối đặt ra một câu hỏi mà nhóm phải trả lời bằng số đo, không bằng lời. Làm sạch: dữ liệu bẩn có bị loại đúng không. Spark SQL: truy vấn có đúng và chạy hiệu quả không. Spark ML: gợi ý có tốt hơn cách đơn giản là gợi ý sách phổ biến không. Một máy: tăng số core thì nhanh lên bao nhiêu. MongoDB: app đọc có đủ nhanh không. Streaming: khi job sập giữa chừng thì sự kiện có bị mất hay đếm trùng không. Cột bên phải là kết quả đo và slide trình bày chi tiết; những gì chưa đạt nằm ở slide rủi ro và kế hoạch.
+
+### Slide 7 – Từ đề xuất đến hệ thống chạy được (~1 phút)
 
 Bốn con số tóm tắt tiến độ.
 
@@ -43,17 +73,7 @@ Bốn: luồng streaming xử lý 2.000 sự kiện, có tắt và bật lại g
 
 Khung xanh bên trái là những gì đã chạy và đo được trong Buổi 6 đến 8. Khung cam bên phải là phần còn lại đến Buổi 10: chạy dữ liệu lớn hơn là bộ UCSD, thêm thành phần MapReduce mà bài cuối kỳ yêu cầu, sửa cách đánh giá online, và thiết kế triển khai trên cluster.
 
-### Slide 3 – Kiến trúc cập nhật: đã chạy và kế hoạch (~1 phút 15 giây)
-
-Đây là kiến trúc của Buổi 5, nay ghi rõ phần nào đã chạy và phần nào còn là kế hoạch. Đọc từ trái sang phải theo năm cột: nguồn, thu nhận, xử lý bằng Spark, lưu trữ và phục vụ, rồi ứng dụng. Nét liền là đã chạy và đo ở Buổi 8; khung tím nét đứt là kế hoạch đến Buổi 10.
-
-Khung xanh phía trên là luồng batch: CSV Goodbooks đi qua làm sạch, lưu Parquet, phân tích bằng Spark SQL, huấn luyện ALS, rồi ghi top-30 gợi ý cho mỗi người vào MongoDB. So với Buổi 5 có hai thay đổi. Thứ nhất, nhóm thêm bước Spark SQL để trả lời các câu hỏi phân tích; lát nữa em trình bày. Thứ hai, MongoDB lưu sẵn 30 gợi ý thay vì 10: khi người dùng vừa chấm một cuốn, app chỉ cần bỏ cuốn đó đi và lấy cuốn tiếp theo, không phải huấn luyện lại.
-
-Khung xanh phía dưới là luồng streaming: producer phát lại rating thật thành sự kiện, gửi vào Kafka 3 partition; Spark Structured Streaming cứ 5 giây xử lý một micro-batch, lọc lỗi, bỏ trùng, có watermark và checkpoint, rồi ghi số liệu mới vào MongoDB. App Streamlit đọc cả hai phần từ MongoDB.
-
-Các khung tím là việc còn lại: tập con UCSD để chạy dữ liệu lớn hơn, job Hadoop MapReduce đối chiếu với Spark SQL, bản thiết kế cluster hoặc cloud, và mũi tên giữa hai luồng: lưu sự kiện streaming để lần huấn luyện sau học được, chạy theo lịch. Hiện mọi thứ chạy bằng Docker trên một máy.
-
-### Slide 4 – Ingestion: CSV → làm sạch → Parquet (~1 phút)
+### Slide 8 – Ingestion: CSV → làm sạch → Parquet (~1 phút)
 
 Bước đầu tiên là đọc và làm sạch dữ liệu. Bảng bên trái lấy từ file report của bước clean.
 
@@ -63,7 +83,7 @@ Không loại dòng nào là đúng chứ không phải bước làm sạch khô
 
 Biểu đồ bên phải là phân bố số sao: 4 và 5 sao chiếm gần 69%, 1 sao chỉ 2,1%. Người dùng Goodreads chủ yếu chấm sách họ thích, nên dữ liệu lệch về điểm cao. Điểm này giải thích vì sao đoán điểm trung bình đã cho sai số không lớn lắm.
 
-### Slide 5 – Pipeline Spark SQL (~1 phút 15 giây)
+### Slide 9 – Pipeline Spark SQL (~1 phút 15 giây)
 
 Sau khi làm sạch, nhóm đăng ký dữ liệu thành hai temporary view là ratings và books, rồi trả lời các câu hỏi phân tích bằng Spark SQL. Bên trái là một truy vấn mẫu: nối hai bảng, đếm số lượt chấm và tính điểm trung bình của từng cuốn, lấy 10 cuốn được chấm nhiều nhất.
 
@@ -73,7 +93,7 @@ Ba ô bên dưới là ba con số từ các truy vấn khác. Độ phủ ma tr
 
 Bảng kết quả theo từng cuốn còn được ghi ra Parquet thành bảng book_stats, để dùng cho báo cáo và app.
 
-### Slide 6 – Query plan (~1 phút)
+### Slide 10 – Query plan (~1 phút)
 
 Slide này là physical plan của truy vấn vừa rồi, Spark in ra bằng lệnh EXPLAIN. Đọc từ trên xuống.
 
@@ -87,11 +107,9 @@ Bên phải là lý do nhóm lưu Parquet: cùng một truy vấn GROUP BY trên
 
 *Chuyển lượt:* Tiếp theo, Kiệt trình bày kết quả Spark ML và phần lưu trữ MongoDB.
 
----
+## Phần 2 – Nguyễn Tấn Kiệt (slide 11–13)
 
-## Phần 2 – Nguyễn Tấn Kiệt (slide 7–9)
-
-### Slide 7 – Spark ML: RMSE tốt, nhưng top-10 chưa tốt (~1 phút 30 giây)
+### Slide 11 – Spark ML: RMSE tốt, nhưng top-10 chưa tốt (~1 phút 30 giây)
 
 Cảm ơn Hảo. Em trình bày kết quả của mô hình ALS.
 
@@ -105,7 +123,7 @@ Lý do: ALS dạng explicit học cách đoán đúng số sao, không học cá
 
 Nhóm đã thử hướng sửa là ALS implicit: coi mỗi lượt chấm là một tín hiệu quan tâm, số sao là độ tin cậy. Cột cuối cho thấy Precision@10 lên 0,167, gấp 2,1 lần baseline sách phổ biến. Đây là kết quả thử nghiệm; Tuấn sẽ nói kế hoạch đưa vào hệ thống ở slide rủi ro.
 
-### Slide 8 – Hiệu năng: tăng số core (~1 phút)
+### Slide 12 – Hiệu năng: tăng số core (~1 phút)
 
 Để đo khả năng song song, nhóm chạy lại cùng một lần huấn luyện ALS, rank 10, trên 4,78 triệu dòng, với Spark dùng 1, 2 rồi 4 core.
 
@@ -117,7 +135,7 @@ Về bộ nhớ, container Spark dùng tối đa 4,6 GiB. Nhóm lấy số này 
 
 Nhóm nói rõ đây là local mode trên một máy: đo được mức tăng theo số core, chưa phải mở rộng theo số máy. Mở rộng theo cluster nằm trong thiết kế triển khai cho Buổi 10.
 
-### Slide 9 – NoSQL: MongoDB phục vụ gợi ý cho app (~1 phút)
+### Slide 13 – NoSQL: MongoDB phục vụ gợi ý cho app (~1 phút)
 
 Kết quả gợi ý được ghi vào MongoDB, mỗi người dùng một document. Bên trái là document thật của người dùng số 1: _id là user_id, kèm phiên bản mô hình và mảng recs gồm 30 phần tử, mỗi phần tử có thứ hạng, mã sách và điểm.
 
@@ -129,11 +147,9 @@ Bên phải là app Streamlit đọc trực tiếp từ MongoDB. Đây cũng là
 
 *Chuyển lượt:* Tiếp theo, Tuấn trình bày luồng streaming, các rủi ro và kế hoạch đến Buổi 10.
 
----
+## Phần 3 – Đinh Trần Quốc Tuấn (slide 14–17)
 
-## Phần 3 – Đinh Trần Quốc Tuấn (slide 10–13)
-
-### Slide 10 – Streaming: Kafka → Spark → MongoDB, có restart (~1 phút 15 giây)
+### Slide 14 – Streaming: Kafka → Spark → MongoDB, có restart (~1 phút 15 giây)
 
 Cảm ơn Kiệt. Phần của em là luồng streaming.
 
@@ -145,7 +161,7 @@ Phần quan trọng là thử restart. Nhóm dừng job streaming sau khoảng 4
 
 Về thông lượng, một micro-batch xử lý tối đa 168 dòng mỗi giây. Đầu vào chỉ có 20 sự kiện mỗi giây, nên đây chưa phải giới hạn của hệ thống.
 
-### Slide 11 – Bên trong job streaming (~1 phút)
+### Slide 15 – Bên trong job streaming (~1 phút)
 
 Slide này giải thích vì sao kết quả vừa rồi khớp. Sự kiện từ Kafka được đọc theo schema JSON, rồi qua bước kiểm tra: đủ các trường và số sao từ 1 đến 5.
 
@@ -155,7 +171,7 @@ Nhánh dưới là sự kiện lỗi: chỉ đếm, không tính vào điểm.
 
 Hai cơ chế chống mất và chống trùng. Checkpoint lưu offset Kafka và trạng thái, nên job chết thì đọc tiếp đúng chỗ, không mất; nhưng một batch có thể bị chạy lại, tức at-least-once. Vì vậy mỗi lần ghi xong, job lưu số batch vào stream_state; batch nào bị phát lại sẽ bị bỏ qua, nên không đếm trùng. Đó là lý do thử restart ra đúng 2.000 trên 2.000.
 
-### Slide 12 – Rủi ro, vấn đề hiệu năng và hướng khắc phục (~1 phút 30 giây)
+### Slide 16 – Rủi ro, vấn đề hiệu năng và hướng khắc phục (~1 phút 30 giây)
 
 Đây là các vấn đề nhóm phát hiện khi chạy thật. Mỗi dòng có bằng chứng và hướng khắc phục.
 
@@ -171,7 +187,7 @@ Năm, giới hạn của một máy: 4 core chỉ nhanh 1,95 lần, RAM đã dù
 
 Sáu, nhóm chưa có thành phần MapReduce mà bài cuối kỳ yêu cầu. Kế hoạch là một job Hadoop Streaming đếm rating theo sách, rồi đối chiếu với kết quả Spark SQL.
 
-### Slide 13 – Kế hoạch hoàn thiện đến Buổi 10 (~45 giây)
+### Slide 17 – Kế hoạch hoàn thiện đến Buổi 10 (~45 giây)
 
 Kế hoạch đến Buổi 10 chia theo người.
 
@@ -185,11 +201,9 @@ Sản phẩm nộp Buổi 10 gồm báo cáo cuối kỳ, repo kèm README và c
 
 *Chuyển lượt:* Hảo cập nhật kế hoạch này đã làm được đến đâu.
 
----
+## Phần 4 – Cập nhật, demo, cảm ơn (slide 18–20)
 
-## Phần 4 – Lương Huỳnh Ngọc Hảo (slide 14–17)
-
-### Slide 14 – Cập nhật sau Buổi 8 (~1 phút 15 giây)
+### Slide 18 – Cập nhật sau Buổi 8 (~1 phút 15 giây)
 
 Cảm ơn Tuấn. Slide này cập nhật kế hoạch vừa rồi đã làm được đến đâu, tính đến ngày 9/11.
 
@@ -199,29 +213,15 @@ Làm một phần: đưa sự kiện streaming vào lần huấn luyện sau đ�
 
 Chưa làm, nhóm nói thẳng: chạy tập con UCSD, và đánh giá online bằng dữ liệu giữ lại. Hai mục này được ghi rõ trong phần giới hạn của báo cáo cuối kỳ.
 
-### Slide 15 – Kiến trúc hiện tại: kế hoạch đã thành hệ thống (~1 phút)
+### Slide 19 – Demo trực tiếp (~5 phút, Kiệt và Tuấn)
 
-Đây là kiến trúc của hệ thống bây giờ, cùng bố cục năm cột như slide 3 để thầy cô dễ so. Ba điểm khác so với slide 3.
+Kiệt mở app ở localhost:8501, nhập user 1: đây là top-10 của ALS implicit, app đọc một document trong MongoDB. Kéo xuống mục Chấm sao, chọn cuốn số 1, chấm 5 sao rồi gửi. Vài giây sau bấm Làm mới: cuốn đó biến mất, cuốn tiếp theo được đẩy lên, không cần huấn luyện lại.
 
-Một, khung Hadoop MapReduce phía trên đã chuyển từ kế hoạch sang đã chạy: dữ liệu lên HDFS, job chạy trên YARN, kết quả khớp 100% với Spark SQL.
+Tuấn chạy producer với dữ liệu giả 300 sự kiện: trong app, số sự kiện hợp lệ tăng dần, bảng "Sách đang hot" xuất hiện. Mở Spark UI ở localhost:4040, tab Structured Streaming: bốn query, mỗi micro-batch khoảng 5 giây.
 
-Hai, ở giữa có kho Parquet nối hai lớp: lớp tốc độ lưu mọi sự kiện hợp lệ vào kho này, và lớp batch gộp chúng ở lần huấn luyện sau. Đây là mũi tên nét đứt "huấn luyện lại" ở slide 3, nay đã có đường đi thật.
+MapReduce không chạy trực tiếp vì mất 1–2 phút; nếu được hỏi thì mở `reports/mapreduce/` (log job, ảnh YARN, file kết quả) và nói kết quả khớp 100% với Spark SQL.
 
-Ba, mũi tên cam dưới cùng: người dùng chấm sao ngay trong app, app chỉ gửi sự kiện vào Kafka, không ghi thẳng vào MongoDB; sự kiện đi qua lớp tốc độ như mọi sự kiện khác.
-
-Phần còn lại vẫn là kế hoạch hoặc giới hạn: chưa chạy bộ UCSD, cluster mới ở mức thiết kế, và huấn luyện lại vẫn chạy bằng tay chứ chưa tự động theo lịch. Sơ đồ chi tiết với tên từng file và collection nằm ở slide phụ lục cuối.
-
-### Slide 16 – Câu hỏi của giảng viên: dữ liệu thay đổi thì sao? (~1 phút)
-
-Ở Buổi 8, thầy cô hỏi: dữ liệu lưu sẵn 10 cuốn gợi ý cho mỗi người, nhưng dữ liệu sẽ thay đổi, vậy hệ thống xử lý thế nào. Nhóm chia thay đổi thành hai tốc độ.
-
-Thay đổi nhanh đi qua streaming, xử lý trong vài giây. Người dùng chấm một cuốn đang nằm trong top-10 thì app ẩn cuốn đó và lấy cuốn tiếp theo trong 30 cuốn đã lưu. Đọc gần hết danh sách thì app bù bằng sách phổ biến người đó chưa đọc, nên luôn đủ 10 cuốn. Điểm trung bình của sách được cộng dồn tổng điểm và số lượt rồi mới chia.
-
-Thay đổi chậm như gu đọc đổi, người dùng mới, sách mới thì cần huấn luyện lại, và việc này chạy theo đợt. Sự kiện streaming được lưu ra Parquet, bước làm sạch gộp vào dữ liệu huấn luyện, lấy rating mới nhất, rồi huấn luyện lại. Mô hình mới ghi sang collection mới, xong mới chuyển meta.active, nên app không gián đoạn.
-
-Sau câu hỏi của thầy cô, nhóm phát hiện rating từ streaming chưa được đưa vào lần huấn luyện sau, nên đã bổ sung và kiểm thử: gửi 5 rating mới qua Kafka thì dữ liệu huấn luyện tăng đúng 5 dòng và 5 cuốn đó biến khỏi gợi ý. Không huấn luyện lại sau mỗi sự kiện vì một lần huấn luyện mất khoảng 4 phút: cập nhật số liệu rẻ nên làm ngay, học lại mô hình đắt nên làm theo đợt.
-
-### Slide 17 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
+### Slide 20 – Xin cảm ơn (~15 giây, sau đó hỏi đáp)
 
 Phần trình bày của nhóm đến đây là hết. Mã nguồn và toàn bộ số đo nằm trên GitHub của nhóm. Cảm ơn thầy cô và các bạn đã lắng nghe, nhóm rất mong nhận câu hỏi và góp ý.
 
@@ -229,25 +229,28 @@ Phần trình bày của nhóm đến đây là hết. Mã nguồn và toàn b�
 
 ---
 
-## Phụ lục
+## Chuẩn bị demo (slide 19)
 
-### Slide 18 – Phụ lục · Kiến trúc chi tiết
-
-Sơ đồ chi tiết của hệ thống hiện tại: tên từng file, từng collection MongoDB, các bước batch B1–B4 và stream S1–S5, container Docker. Chỉ mở khi được hỏi sâu về một thành phần. Đọc từ trái sang phải: nguồn và Kafka, lớp batch (xanh), lớp tốc độ (cam), MongoDB với batch view và speed view, rồi app; cụm Hadoop phía trên là nhánh kiểm chứng.
-
----
-
-## Chuẩn bị demo (nếu giảng viên yêu cầu)
-
-Chạy trước buổi thuyết trình ít nhất 10 phút:
+Chạy trước buổi thuyết trình ít nhất 10 phút, trong thư mục `bookpulse/`:
 
 ```bash
-cd "D:\Big Data\Group_06_BigData\bookpulse"
 docker compose up -d
-docker compose ps                    # 4 service đều "running"
+docker compose ps                                   # 4 service đều "running"
+bash scripts/reset_streaming.sh --yes               # streaming bắt đầu từ số 0
+ls data/fake/stream_ratings.csv || docker compose exec spark python scripts/make_fake_stream.py
+# Terminal 2, để chạy suốt buổi (chờ in "streaming from …"):
+docker compose exec spark python streaming/stream_stats.py
 ```
 
-- App: mở http://localhost:8501, nhập user 1 (top-10 Calvin and Hobbes) rồi thử user 2, 3.
-- Streaming trực tiếp (hai terminal): `docker compose exec spark python streaming/stream_stats.py` và `docker compose exec spark python streaming/producer.py --limit 300`. Bấm "Làm mới" trong app để thấy số sự kiện tăng.
-- Bằng chứng nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne({}, {popular: 0})"`.
-- Spark UI: http://localhost:4040, chỉ có khi một job Spark đang chạy.
+Trong lúc demo:
+
+```bash
+# Terminal 3, bước 3 (khoảng 15 giây):
+docker compose exec spark python streaming/producer.py --file data/fake/stream_ratings.csv --limit 300
+```
+
+- App: http://localhost:8501, user 1. Mục Chấm sao: cuốn #1, 5 sao, Gửi lượt chấm; chờ 5–10 giây rồi bấm Làm mới.
+- Job streaming phải đang chạy trước khi bấm Chấm sao; nếu chưa chạy, sự kiện vẫn nằm chờ trong Kafka và được xử lý khi bật job.
+- Spark UI: http://localhost:4040, chỉ có khi job streaming đang chạy.
+- Dự phòng: app lỗi thì mở `bookpulse/docs/img/app_implicit_user1.png`; MapReduce mở `bookpulse/reports/mapreduce/`.
+- Sau buổi: chạy lại `bash scripts/reset_streaming.sh --yes` để buổi Session 10 bắt đầu từ số 0.

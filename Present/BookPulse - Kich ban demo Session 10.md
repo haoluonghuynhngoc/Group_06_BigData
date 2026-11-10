@@ -68,7 +68,7 @@ Chỉ vào:
 ## 4. Spark ML + MongoDB (Kiệt, ~2 phút)
 
 - App: nhập user **1**, rồi **2**, rồi **3**: mỗi người một danh sách khác nhau. User 2 nghiêng về sách phi hư cấu, phát triển bản thân (The Last Lecture, The 7 Habits…, Freakonomics); user 3 nghiêng về tác phẩm kinh điển hay học ở trường (Fahrenheit 451, Romeo and Juliet, Macbeth). Không nói là ba thể loại tách bạch: Animal Farm có trong cả ba danh sách (mô hình hơi nghiêng về sách nổi tiếng). Dòng chú thích ghi "ALS implicit · phiên bản mô hình …".
-- Nói lý do chọn implicit: Precision@10 0,204 so với explicit 0,008 và sách phổ biến 0,078 (slide 7). Nếu bị hỏi: mô hình phục vụ fit trên toàn bộ tập train (80% dữ liệu).
+- Nói lý do chọn implicit: Precision@10 0,204 so với explicit 0,008 và sách phổ biến 0,078 (slide 10). Nếu bị hỏi: mô hình phục vụ fit trên toàn bộ tập train (80% dữ liệu).
 - MongoDB (khoảng 3 giây):
 
 ```bash
