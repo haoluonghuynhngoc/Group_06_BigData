@@ -11,7 +11,7 @@ cd "D:\Big Data\Group_06_BigData\bookpulse"
 export MSYS_NO_PATHCONV=1
 docker compose up -d                                  # spark, kafka, mongo, app
 docker compose ps                                     # 4 service "running"
-cd mapreduce/hadoop && docker compose up -d && cd ../..
+cd mapreduce/hadoop && docker compose up -d && cd ../..    # chỉ `stop`/`start` cụm Hadoop, KHÔNG `down`: down xoá container, lần up sau phải build lại image (nhiều dòng "pull access denied" rồi mới Building), tạo volume mới và HDFS trống cho tới khi run_hadoop.sh upload lại
 docker compose -f mapreduce/hadoop/docker-compose.yml logs client | grep "BOOKPULSE HADOOP READY"   # phải in ra dòng này; chưa có thì chờ rồi chạy lại
 docker compose -f mapreduce/hadoop/docker-compose.yml exec -T client hdfs dfsadmin -safemode wait   # chờ đến "Safe mode is OFF"
 bash scripts/reset_streaming.sh --yes                 # streaming bắt đầu từ số 0
@@ -23,7 +23,7 @@ Tùy chọn, làm trước buổi (khoảng 3 phút): `bash scripts/stream_fault
 Tùy chọn, **không** làm trong demo trực tiếp (khoảng 5 phút): `bash scripts/stream_outage_test.sh` tắt Kafka 40 giây rồi MongoDB 30 giây trong lúc producer gửi 3.000 sự kiện và job streaming đang chạy, rồi chạy `kafka_audit.py`. Script tự reset streaming lúc bắt đầu; chạy xong thì chạy lại `bash scripts/reset_streaming.sh --yes` để demo bắt đầu từ số 0. Kết quả ghi vào `reports/streaming/outage_test_<thời điểm>/` (`events.log` là dòng thời gian).
 
 Kiểm tra nhanh:
-- http://localhost:8501: app (nền sáng) hiện "ALS implicit · phiên bản mô hình 20261106_125827" và top-10 của user 1: #1 The Guernsey Literary and Potato Peel Pie Society, #2 The Great Gatsby, #3 The Catcher in the Rye.
+- http://localhost:8501: app (nền sáng) hiện "ALS implicit · phiên bản mô hình <bản mới nhất, xem `db.meta.findOne()`; 15/11: 20261114_190600>" và top-10 của user 1: #1 The Catcher in the Rye, #2 The Joy Luck Club, #3 The Guernsey Literary and Potato Peel Pie Society (sau mỗi lần bấm Train lại, danh sách có thể đổi nhẹ; kiểm tra lại dòng này trước buổi).
 - http://localhost:8088: YARN có 1 NodeManager.
 - Mở sẵn 3 terminal Git Bash ở thư mục `bookpulse/` (đã `export MSYS_NO_PATHCONV=1`) và các tab trình duyệt: app (8501), YARN (8088), HDFS (9870).
 - Máy cần đủ RAM: tắt bớt ứng dụng khác. Nếu máy chậm, chạy MapReduce trước giờ demo và chỉ trình bày kết quả (mục 6).
@@ -42,7 +42,7 @@ Khi job xong:
 - Chỉ trên màn hình: `3 block(s)`, `map 100% reduce 100%`, counter `Combine input records` 5.976.479 → `Combine output records` 47.087 (giảm 99,2%).
 - Số map task có thể là 3 hoặc 4 (bản speculative), thời gian cũng khác nhau giữa các lần chạy; kết quả thì giống hệt.
 - YARN UI (8088): application `BookPulse-book-rating-stats` ở trạng thái FINISHED.
-- Kiểm chứng (khoảng 30 giây):
+- Kiểm chứng (khoảng 15 giây; lần tập 15/11: 14 giây):
 
 ```bash
 docker compose exec spark python mapreduce/verify_with_spark.py | grep -E 'rows_only|"match"|combiner_reduction'
@@ -55,8 +55,9 @@ Nói: "`rows_only_in_mapreduce` và `rows_only_in_spark` đều bằng 0, `match
 Không chạy lại (mất khoảng 2 phút); mở kết quả đã có:
 
 ```bash
-ls -t reports/analytics_sql_*.json | head -1 | xargs grep -A4 -E '"join_check"|"sql_vs_dataframe"|"csv_vs_parquet_seconds"'
-ls -t reports/sql_plan_*.txt | head -1 | xargs head -22
+# Tên file cố định: mọi report có cùng mtime sau khi checkout git, nên `ls -t | head -1` trả về file 04/11 (sai: không có join_check, plan Inner join)
+grep -A4 -E '"join_check"|"sql_vs_dataframe"|"csv_vs_parquet_seconds"' reports/analytics_sql_20261106_123956.json
+head -22 reports/sql_plan_20261106_123938.txt
 ```
 
 Chỉ vào:
@@ -67,7 +68,7 @@ Chỉ vào:
 
 ## 4. Spark ML + MongoDB (Kiệt, ~2 phút)
 
-- App: nhập user **1**, rồi **2**, rồi **3**: mỗi người một danh sách khác nhau. User 2 nghiêng về sách phi hư cấu, phát triển bản thân (The Last Lecture, The 7 Habits…, Freakonomics); user 3 nghiêng về tác phẩm kinh điển hay học ở trường (Fahrenheit 451, Romeo and Juliet, Macbeth). Không nói là ba thể loại tách bạch: Animal Farm có trong cả ba danh sách (mô hình hơi nghiêng về sách nổi tiếng). Dòng chú thích ghi "ALS implicit · phiên bản mô hình …".
+- App: nhập user **1**, rồi **2**, rồi **22**: mỗi người một danh sách khác nhau (bản 20261114_190600, kiểm tra lại trước buổi vì mỗi lần bấm Train lại danh sách đổi nhẹ). User 1: The Catcher in the Rye, The Joy Luck Club, Guernsey, The Diary of a Young Girl, The Da Vinci Code…; user 2 nghiêng về kinh điển học ở trường và phi hư cấu (Freakonomics, To Kill a Mockingbird, Animal Farm, Huckleberry Finn, Lord of the Flies, 1984); user 22 gần như toàn Stephen King (The Shining, Misery, Carrie, Pet Sematary, rồi A Game of Thrones). Không nói là ba thể loại tách bạch: Animal Farm và Lord of the Flies có trong danh sách của cả user 1 và 2 (mô hình hơi nghiêng về sách nổi tiếng). Dòng chú thích ghi "ALS implicit · phiên bản mô hình …". (User 3 không dùng nữa vì hai cuốn đầu trùng user 1.)
 - Nói lý do chọn implicit: Precision@10 0,204 so với explicit 0,008 và sách phổ biến 0,078 (slide 10). Nếu bị hỏi: mô hình phục vụ fit trên toàn bộ tập train (80% dữ liệu).
 - MongoDB (khoảng 3 giây):
 
@@ -79,9 +80,9 @@ docker compose exec mongo mongosh bookpulse --quiet --eval '
   print(db[c].find({_id: 1}).explain("executionStats").queryPlanner.winningPlan.stage)'
 ```
 
-Nói: "Mỗi người dùng một document; truy vấn theo `_id` dùng IDHACK, đọc đúng một document." Ba gợi ý đầu của user 1: 195 (0,84), 5 (0,84), 8 (0,79).
+Nói: "Mỗi người dùng một document; truy vấn theo `_id` dùng IDHACK, đọc đúng một document." Ba gợi ý đầu của user 1 (bản 20261114_190600): 8 (0,80), 118 (0,77), 195 (0,75).
 
-*Nếu được hỏi về `previous_collection`: database đang demo do code trước khi sửa ghi (phiên bản 20261106_125827), nên `meta` chưa có trường này; bản trước `recommendations_20261105_173716` vẫn còn trong database. Trường này có từ lần chạy `write_recs.py` sau 08/11 (đã thử trên `bookpulse_test`, xem `reports/superseded/write_recs_gate_test_20261108/`).*
+*Nếu được hỏi về `previous_collection`: `meta` ghi bản đang dùng và bản dùng trước đó (15/11: `recommendations_20261114_190600`, trước là `_20261114_190214`); quay lại bằng cách đặt `recs_collection` về bản trước. Cổng kiểm tra đủ 53.424 user trước khi chuyển đã chạy thật ở mỗi lần bấm Train lại (`reports/retrain_*.json`, `write_recs_*.json`).*
 
 ## 5. Streaming (Tuấn, ~3,5 phút)
 
@@ -101,19 +102,19 @@ Cách không dùng dòng lệnh: thanh bên trái của app, khung **Giả lập
 
 Nói: "Bộ Goodbooks không có người dùng đang hoạt động, nên nhóm sinh rating giả cho các cặp user–sách **chưa có** trong dữ liệu, chọn theo độ phổ biến và tỷ lệ số sao thật. Producer gửi chúng như lượt chấm vừa xảy ra, kèm cố ý 2% bản trùng, 1% sự kiện lỗi và 5% sự kiện trễ để thấy hệ thống loại."
 
-Lần thử 10/11 với đúng lệnh này: producer báo `sent 1000, duplicates 20, invalid 8, late 22, failed 0`; app hiện 978 sự kiện hợp lệ (= 1.000 − 22 trễ), 8 sự kiện lỗi, "Lượt 4–5 sao trúng top-10" 11 / 651. Số lần sau có thể lệch nhẹ (số sự kiện trễ phụ thuộc thời điểm), nhưng luôn có: hợp lệ = 1.000 − số trễ.
+Số trùng/lỗi/trễ đổi theo lần chạy (lần tập 15/11: `sent 1000, duplicates 23, invalid 10, late 11`; lần 10/11: 20 / 8 / 22), nên KHÔNG đọc số cố định mà đọc công thức: hợp lệ trên app = 1.000 − số `late` producer in; sự kiện lỗi = số `invalid`; "Lượt 4–5 sao trúng top-10" khác 0 ngay trong lúc producer chạy vì dữ liệu giả là cặp chưa có trong train (15/11: 6 / 656 trước khi chấm sao; 10/11: 11 / 651). Bằng chứng có file: `reports/kafka_audit_20261114_19*.json`, `nosql_evidence_20261114_19*.json` (lượt 15/11).
 
 Trong lúc producer chạy:
-- Mở http://localhost:4040 → tab **Structured Streaming**: 4 query có tên (`valid`, `rejected`, `events_to_parquet`, `trending`); bấm vào `trending` để thấy tốc độ vào (khoảng 20 sự kiện/giây), thời gian batch (batch đầu 7–12 giây vì JVM còn lạnh, sau đó 3–6 giây), watermark.
+- Mở http://localhost:4040 → tab **Structured Streaming**: 4 query có tên (`valid`, `rejected`, `events_to_parquet`, `trending`); bấm vào `trending` để thấy tốc độ vào (khoảng 20 sự kiện/giây), thời gian batch (lần tập 15/11 với cache Ivy ấm: job sẵn sàng sau 9 giây, batch dài nhất 3 giây; máy lạnh: batch đầu 7–12 giây), watermark.
 - App → bấm **Làm mới**: số sự kiện tăng, cột "Điểm TB (stream)", mục **"Sách đang hot"** xuất hiện (chỉ sách có lượt 4–5 sao, xếp theo số lượt 4–5 sao; lượt 1–3 sao không đẩy sách lên bảng, K37).
-- Chỉ số "Lượt 4–5 sao trúng top-10" hiện **0 / N**. Nói: "Producer phát lại rating đã có trong dữ liệu huấn luyện, mà gợi ý đã loại mọi sách người dùng đã chấm, nên các sự kiện này không thể trúng. Dòng chú thích dưới chỉ số giải thích điều đó."
+- Chỉ số "Lượt 4–5 sao trúng top-10" đã khác 0 (dữ liệu giả có thể trúng). **Đọc to con số này trước khi chấm sao** để lát nữa chỉ ra "+2". (Chỉ khi phát lại `ratings.csv` chỉ số mới luôn 0/N, vì sách đó đã bị loại khỏi gợi ý; ảnh `app_trending.png` 08/11 với 2 / 672 là lượt như vậy.)
 
-**Sách vừa chấm biến khỏi top-10 (chấm ngay trong app).** Khi producer báo `done`, nhập user **1** trong app, chỉ vào #1 The Guernsey Literary and Potato Peel Pie Society. Kéo xuống mục **Chấm sao**: chọn sách "#1 · The Guernsey…", số sao ★★★★★, bấm **Gửi lượt chấm**. App báo "Đã gửi vào Kafka: user 1 chấm 5 sao cho #1 · …". Muốn chấm thêm #2 The Great Gatsby thì chọn "#2 · The Great Gatsby" rồi bấm gửi lần nữa (chưa cần làm mới).
+**Sách vừa chấm biến khỏi top-10 (chấm ngay trong app).** Khi producer báo `done`, nhập user **1** trong app, chỉ vào #1 (15/11: The Catcher in the Rye). Kéo xuống mục **Chấm sao**: chọn sách "#1 · …", số sao ★★★★★, bấm **Gửi lượt chấm**. App báo "Đã gửi: user 1 chấm 5 sao cho #1 · The Catcher in the Rye." (app chỉ gửi sự kiện vào Kafka). Muốn chấm thêm #2 (The Joy Luck Club) thì chọn "#2 · …" rồi bấm gửi lần nữa (chưa cần làm mới).
 
 Chờ 5–10 giây (một trigger), bấm **Làm mới**. Chỉ vào:
-- Cuốn vừa chấm đã biến mất, các cuốn sau dồn lên, cuốn mới vào cuối danh sách, lấy từ 30 gợi ý đã lưu. Nếu chấm cả #1 và #2: The Catcher in the Rye lên #1, hai cuốn mới vào #9–10 (lần chạy 08/11: The Immortal Life of Henrietta Lacks, The Da Vinci Code).
-- Dòng chú thích: "… lượt chấm mới qua streaming, N cuốn trong số đó đã bị ẩn khỏi danh sách".
-- Chỉ số "Lượt 4–5 sao trúng top-10" tăng đúng bằng số lượt vừa chấm (lần chạy 08/11 chấm 2 cuốn: 2 / 672).
+- Cuốn vừa chấm đã biến mất, các cuốn sau dồn lên, cuốn mới vào cuối danh sách, lấy từ 30 gợi ý đã lưu. Nếu chấm cả #1 và #2 (bản 20261114_190600): Guernsey lên #1, hai cuốn #11–12 của danh sách đã lưu vào #9–10 (xem trước bằng `db[c].findOne({_id: 1}).recs.slice(10, 12)` trong mongosh).
+- Dòng chú thích trên bảng: "ALS implicit · phiên bản mô hình … · đã ẩn 2 cuốn vừa chấm".
+- Chỉ số "Lượt 4–5 sao trúng top-10" tăng đúng bằng số lượt vừa chấm (15/11: 6 / 656 → 8 / 658).
 
 Nói: "Nút này không ghi MongoDB. App chỉ gửi một sự kiện chấm sao vào Kafka, giống producer; job Spark Structured Streaming kiểm tra, bỏ trùng rồi ghi `user_seen` trong MongoDB; app đọc lại thì ẩn cuốn đó và đẩy cuốn tiếp theo lên, không cần huấn luyện lại."
 
@@ -135,6 +136,14 @@ Nói: "Script đếm lại toàn bộ topic Kafka rồi đọc MongoDB: `valid_e
 
 Kết thúc: Ctrl+C ở Terminal 2.
 
+**Tuỳ chọn, nếu còn thời gian hoặc bị hỏi "khi nào mô hình học rating mới": nút Train lại.** Trang /setting, mục
+**6 · Train lại với rating mới** → bấm **Train lại** (user so sánh: 1). Script `scripts/retrain.py` tự dừng job streaming,
+chạy `clean.py` (gộp kho sự kiện, bỏ trùng), `train_als.py --implicit` một bộ tham số, `write_recs.py` (phiên bản mới,
+chuyển `meta.active`), rồi bật lại job; đo 15/11: khoảng 3 phút (164–179 giây), log hiện ngay trên trang. Bấm rồi nói
+tiếp phần kiểm chứng, quay lại khi xong: app hiện "phiên bản mô hình" mới, danh sách user 1 đổi (cuốn vừa chấm không còn trong 30 gợi ý vì đã
+thành rating), report `reports/retrain_*.json` ghi top-10 trước/sau và thời gian từng bước. Nói: "Streaming không train
+theo từng sự kiện; mô hình học lại theo đợt, bằng nút này hoặc theo lịch, khoảng 3 phút trên máy này."
+
 ## 6. Phương án dự phòng
 
 | Sự cố | Cách xử lý |
@@ -147,7 +156,7 @@ Kết thúc: Ctrl+C ở Terminal 2.
 | App không hiện thay đổi code | `docker compose restart app` |
 | App báo "Không gửi được vào Kafka" khi bấm Gửi lượt chấm | Kafka chưa chạy hoặc container app cũ chưa có biến `KAFKA_BOOTSTRAP`: `docker compose up -d kafka app`, rồi bấm lại; hoặc dùng `rate_from_recs.py` |
 | Sau khi chấm sao (nút trong app hoặc `rate_from_recs.py`) app chưa đổi | Job streaming phải đang chạy; chờ thêm một trigger rồi bấm Làm mới. Nếu vẫn không: ảnh `docs/img/app_after_rate_from_recs.png` (trước đó: `docs/img/app_implicit_user1.png`) |
-| App không hiện streaming | Ảnh `reports/streaming/app_trending.png` (cả trang: 983 / 10 / 2 / 672 và "Sách đang hot") |
+| App không hiện streaming | Ảnh `reports/streaming/app_trending.png` (cả trang: 983 / 10 / 2 / 672 và "Sách đang hot"; lượt 08/11 phát lại `ratings.csv`, nên chỉ 2 lượt trúng) |
 | Một phép so của `kafka_audit.py` ra `false` | Thường do sự kiện trễ đến khi job chưa có watermark (1–2 batch đầu sau khi khởi động mới, checkpoint trống). Nói thẳng điều đó, rồi trình bày `reports/kafka_audit_20261107_221105.json` và `_220738.json` (đều `true`) |
 | Job streaming báo lỗi topic | Job tự tạo topic; nếu vẫn lỗi: `bash scripts/reset_streaming.sh --yes` rồi chạy lại |
 | Job streaming dừng với lỗi "checkpoint and stream_state do not match" | Checkpoint bị xóa hoặc chuyển chỗ mà MongoDB vẫn giữ `stream_state`; job cố ý dừng thay vì bỏ qua batch. Chạy `bash scripts/reset_streaming.sh --yes` rồi chạy lại |
@@ -165,7 +174,7 @@ docker compose ps                                              # 4. stack chính
 git status --short reports/                                    # 5. tìm file report mới của lần tập
 ```
 
-Mỗi lần tập sinh thêm file trong `reports/` (`kafka_audit_*`, `stream_progress_*`, `mapreduce_verify_*`, `reports/mapreduce/*_<thời điểm>*`, có thể cả `nosql_evidence_*`). Chuyển chúng vào `reports/superseded/rehearsal_<ngày>/` để `reports/` chỉ giữ các lần chạy chính thức:
+**Không bao giờ di chuyển hay xoá** `clean_*`, `train_als_*`, `train_als_implicit_*`, `write_recs_*`, `retrain_*` của lần chạy sinh ra mô hình đang phục vụ (report của lần train 10/11 đã mất vì dọn nhầm). Mỗi lần tập sinh thêm file trong `reports/` (`kafka_audit_*`, `stream_progress_*`, `mapreduce_verify_*`, `reports/mapreduce/*_<thời điểm>*`, có thể cả `nosql_evidence_*`). Chuyển chúng vào `reports/superseded/rehearsal_<ngày>/` để `reports/` chỉ giữ các lần chạy chính thức:
 
 ```bash
 mkdir -p reports/superseded/rehearsal_<ngày>

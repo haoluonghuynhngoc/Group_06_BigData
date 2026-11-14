@@ -15,3 +15,8 @@ ENV JAVA_HOME=/opt/java \
 WORKDIR /work
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Pre-fetch the Spark-Kafka connector into the Ivy cache at build time, so the stream job starts without Internet
+# (the ivy-cache volume is seeded from this directory when it is first created).
+RUN python -c "from pyspark.sql import SparkSession; SparkSession.builder.master('local[1]')\
+    .config('spark.jars.packages', 'org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3').getOrCreate().stop()"

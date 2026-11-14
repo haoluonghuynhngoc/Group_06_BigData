@@ -1,0 +1,205 @@
+{
+  "started": "2026-11-14T19:04:14.878983+00:00",
+  "total_seconds": 178.8,
+  "step_seconds": {
+    "stop_stream": 1.0,
+    "clean": 25.7,
+    "train_als_implicit": 74.2,
+    "write_recs": 64.8,
+    "start_stream": 12.0
+  },
+  "stream_job": {
+    "was_running": true,
+    "stop": "stopped (SIGINT)",
+    "restart": "started"
+  },
+  "archive_before_clean": {
+    "rows": 2,
+    "distinct_events": 1
+  },
+  "clean": {
+    "output_rows": 5976480,
+    "output_rows_from_stream": 1,
+    "stream_events": {
+      "path": "/work/data/parquet/stream_events",
+      "archived_rows": 2,
+      "distinct_events": 1,
+      "real_events": 0,
+      "simulated_events": 1,
+      "exclude_simulated": false,
+      "events": 1,
+      "distinct_pairs": 1,
+      "pairs_updating_a_csv_rating": 0,
+      "new_pairs": 1,
+      "older_versions_replaced": 0
+    }
+  },
+  "train": {
+    "rows": {
+      "train": 4780732,
+      "test": 1195748,
+      "streamed_in_train": 1
+    },
+    "best_params": {
+      "rank": 50,
+      "regParam": 0.1,
+      "alpha": 1.0
+    },
+    "ranking_test": {
+      "als": {
+        "precision@10": 0.2021,
+        "recall@10": 0.1352,
+        "users_evaluated": 1000,
+        "distinct_books_recommended": 971
+      },
+      "baseline_popular": {
+        "precision@10": 0.0799,
+        "recall@10": 0.0539,
+        "users_evaluated": 1000,
+        "distinct_books_recommended": 38
+      }
+    },
+    "fit_seconds": 41.1
+  },
+  "write_recs": {
+    "model_version": "20261114_190600",
+    "collection": "recommendations_20261114_190600",
+    "users_written": 53424,
+    "previous_collection": "recommendations_20261114_190214"
+  },
+  "user": 22,
+  "before": {
+    "model_version": "20261114_190214",
+    "recs_collection": "recommendations_20261114_190214",
+    "top10": [
+      {
+        "rank": 1,
+        "book_id": 72,
+        "score": 0.7701,
+        "title": "The Shining (The Shining #1)"
+      },
+      {
+        "rank": 2,
+        "book_id": 243,
+        "score": 0.7453,
+        "title": "Misery"
+      },
+      {
+        "rank": 3,
+        "book_id": 237,
+        "score": 0.7431,
+        "title": "Carrie"
+      },
+      {
+        "rank": 4,
+        "book_id": 305,
+        "score": 0.7385,
+        "title": "Pet Sematary"
+      },
+      {
+        "rank": 5,
+        "book_id": 39,
+        "score": 0.7038,
+        "title": "A Game of Thrones (A Song of Ice and Fire, #1)"
+      },
+      {
+        "rank": 6,
+        "book_id": 556,
+        "score": 0.6678,
+        "title": "Cujo"
+      },
+      {
+        "rank": 7,
+        "book_id": 553,
+        "score": 0.6675,
+        "title": "Needful Things"
+      },
+      {
+        "rank": 8,
+        "book_id": 675,
+        "score": 0.6562,
+        "title": "Firestarter"
+      },
+      {
+        "rank": 9,
+        "book_id": 578,
+        "score": 0.6521,
+        "title": "Christine"
+      },
+      {
+        "rank": 10,
+        "book_id": 104,
+        "score": 0.6429,
+        "title": "The Road"
+      }
+    ]
+  },
+  "after": {
+    "model_version": "20261114_190600",
+    "recs_collection": "recommendations_20261114_190600",
+    "top10": [
+      {
+        "rank": 1,
+        "book_id": 72,
+        "score": 0.7701,
+        "title": "The Shining (The Shining #1)"
+      },
+      {
+        "rank": 2,
+        "book_id": 243,
+        "score": 0.7453,
+        "title": "Misery"
+      },
+      {
+        "rank": 3,
+        "book_id": 237,
+        "score": 0.7431,
+        "title": "Carrie"
+      },
+      {
+        "rank": 4,
+        "book_id": 305,
+        "score": 0.7385,
+        "title": "Pet Sematary"
+      },
+      {
+        "rank": 5,
+        "book_id": 39,
+        "score": 0.7038,
+        "title": "A Game of Thrones (A Song of Ice and Fire, #1)"
+      },
+      {
+        "rank": 6,
+        "book_id": 556,
+        "score": 0.6678,
+        "title": "Cujo"
+      },
+      {
+        "rank": 7,
+        "book_id": 553,
+        "score": 0.6675,
+        "title": "Needful Things"
+      },
+      {
+        "rank": 8,
+        "book_id": 675,
+        "score": 0.6562,
+        "title": "Firestarter"
+      },
+      {
+        "rank": 9,
+        "book_id": 578,
+        "score": 0.6521,
+        "title": "Christine"
+      },
+      {
+        "rank": 10,
+        "book_id": 104,
+        "score": 0.6429,
+        "title": "The Road"
+      }
+    ]
+  },
+  "top10_books_changed": 0,
+  "exclude_simulated": false
+}

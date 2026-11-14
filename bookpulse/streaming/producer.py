@@ -20,16 +20,12 @@ import json
 import random
 import time
 import uuid
-from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 from kafka import KafkaProducer
 
+from common.events import rating_event
 from common.settings import DATA_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC
-
-
-def now_utc(minutes_ago=0.0):
-    return (datetime.now(timezone.utc) - timedelta(minutes=minutes_ago)).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 
 
 def main():
@@ -72,9 +68,7 @@ def main():
     for row in sample.itertuples(index=False):
         late = (args.late > 0 and time.time() - started >= args.late_after_seconds
                 and rng.random() < args.late)
-        event = {"event_id": uuid.uuid4().hex, "user_id": int(row.user_id), "book_id": int(row.book_id),
-                 "rating": int(row.rating), "event_time": now_utc(args.late_minutes if late else 0),
-                 "simulated": True}
+        event = rating_event(row.user_id, row.book_id, row.rating, minutes_ago=args.late_minutes if late else 0)
         counts["late"] += late
         producer.send(KAFKA_TOPIC, key=event["user_id"], value=event).add_errback(failed)
         counts["sent"] += 1

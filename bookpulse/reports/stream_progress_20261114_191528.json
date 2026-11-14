@@ -1,0 +1,278 @@
+{
+  "settings": {
+    "watermark": "10 minutes",
+    "window": "10 minutes",
+    "slide": "5 minutes",
+    "trigger": "5 seconds",
+    "topic": "rating-events"
+  },
+  "written": "2026-11-14T19:15:30.432232+00:00",
+  "queries": {
+    "valid": {
+      "query_id": "3f4c76ba-2405-4202-839c-6b3b847d965d",
+      "batches": 1,
+      "input_rows": 0,
+      "max_input_rows_per_second": 0,
+      "max_processed_rows_per_second": 0,
+      "max_batch_duration_ms": 490,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 0,
+      "watermark_now": "2026-11-13T11:57:09.495Z",
+      "last_progress": {
+        "id": "3f4c76ba-2405-4202-839c-6b3b847d965d",
+        "runId": "ee574072-3b72-471b-98c3-1ca1012c2058",
+        "name": "valid",
+        "timestamp": "2026-11-14T19:15:28.211Z",
+        "batchId": 3,
+        "numInputRows": 0,
+        "inputRowsPerSecond": 0.0,
+        "processedRowsPerSecond": 0.0,
+        "durationMs": {
+          "latestOffset": 420,
+          "triggerExecution": 490
+        },
+        "eventTime": {
+          "watermark": "2026-11-13T11:57:09.495Z"
+        },
+        "stateOperators": [],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "numInputRows": 0,
+            "inputRowsPerSecond": 0.0,
+            "processedRowsPerSecond": 0.0,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "rejected": {
+      "query_id": "b6082b72-9d93-4099-8242-e672568e5edf",
+      "batches": 1,
+      "input_rows": 0,
+      "max_input_rows_per_second": 0,
+      "max_processed_rows_per_second": 0,
+      "max_batch_duration_ms": 490,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 0,
+      "watermark_now": null,
+      "last_progress": {
+        "id": "b6082b72-9d93-4099-8242-e672568e5edf",
+        "runId": "ecfd19ff-8a15-4abb-9740-c026ecbe7158",
+        "name": "rejected",
+        "timestamp": "2026-11-14T19:15:28.211Z",
+        "batchId": 2,
+        "numInputRows": 0,
+        "inputRowsPerSecond": 0.0,
+        "processedRowsPerSecond": 0.0,
+        "durationMs": {
+          "latestOffset": 420,
+          "triggerExecution": 490
+        },
+        "stateOperators": [],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "numInputRows": 0,
+            "inputRowsPerSecond": 0.0,
+            "processedRowsPerSecond": 0.0,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "events": {
+      "query_id": "52024c63-f632-4699-8334-36b322ab847f",
+      "batches": 1,
+      "input_rows": 0,
+      "max_input_rows_per_second": 0,
+      "max_processed_rows_per_second": 0,
+      "max_batch_duration_ms": 399,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 0,
+      "watermark_now": null,
+      "last_progress": {
+        "id": "52024c63-f632-4699-8334-36b322ab847f",
+        "runId": "275f9654-5604-4755-bc15-458a8e9ffba2",
+        "name": "events_to_parquet",
+        "timestamp": "2026-11-14T19:15:28.303Z",
+        "batchId": 2,
+        "numInputRows": 0,
+        "inputRowsPerSecond": 0.0,
+        "processedRowsPerSecond": 0.0,
+        "durationMs": {
+          "latestOffset": 387,
+          "triggerExecution": 399
+        },
+        "stateOperators": [],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "numInputRows": 0,
+            "inputRowsPerSecond": 0.0,
+            "processedRowsPerSecond": 0.0,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "FileSink[/work/data/parquet/stream_events]",
+          "numOutputRows": -1
+        }
+      }
+    },
+    "trending": {
+      "query_id": "eb2bec4f-bb27-4463-99d4-14794e943973",
+      "batches": 1,
+      "input_rows": 0,
+      "max_input_rows_per_second": 0,
+      "max_processed_rows_per_second": 0,
+      "max_batch_duration_ms": 366,
+      "rows_dropped_by_watermark": 0,
+      "duplicates_dropped": 0,
+      "state_rows_now": 0,
+      "watermark_now": "2026-11-13T11:57:09.495Z",
+      "last_progress": {
+        "id": "eb2bec4f-bb27-4463-99d4-14794e943973",
+        "runId": "05568451-4221-457d-9025-cdf1e4459b67",
+        "name": "trending",
+        "timestamp": "2026-11-14T19:15:28.336Z",
+        "batchId": 3,
+        "numInputRows": 0,
+        "inputRowsPerSecond": 0.0,
+        "processedRowsPerSecond": 0.0,
+        "durationMs": {
+          "latestOffset": 354,
+          "triggerExecution": 366
+        },
+        "eventTime": {
+          "watermark": "2026-11-13T11:57:09.495Z"
+        },
+        "stateOperators": [],
+        "sources": [
+          {
+            "description": "KafkaV2[Subscribe[rating-events]]",
+            "startOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "endOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "latestOffset": {
+              "rating-events": {
+                "2": 0,
+                "1": 0,
+                "0": 2
+              }
+            },
+            "numInputRows": 0,
+            "inputRowsPerSecond": 0.0,
+            "processedRowsPerSecond": 0.0,
+            "metrics": {
+              "avgOffsetsBehindLatest": "0.0",
+              "maxOffsetsBehindLatest": "0",
+              "minOffsetsBehindLatest": "0"
+            }
+          }
+        ],
+        "sink": {
+          "description": "ForeachBatchSink",
+          "numOutputRows": -1
+        }
+      }
+    }
+  }
+}

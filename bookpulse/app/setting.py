@@ -7,6 +7,7 @@ command there; the page shows its status and output. The commands themselves are
   rate recs       scripts/rate_from_recs.py --user U --n N --rating R
   late events     streaming/producer.py --file data/fake/stream_ratings.csv --late P
   checks          scripts/kafka_audit.py, scripts/nosql_evidence.py
+  retrain         scripts/retrain.py --user U [--exclude-simulated]  (stop stream -> clean -> ALS -> write_recs -> stream)
 """
 import json
 import os
@@ -152,3 +153,17 @@ with c1:
     task_box("kafka_audit", "Xong.")
 with c2:
     task_box("nosql_evidence", "Xong.")
+
+# 6. Retrain with the streamed ratings ------------------------------------------------------------------------------
+st.subheader("6 · Train lại với rating mới")
+st.caption("Streaming chỉ ẩn sách và cập nhật thống kê; mô hình ALS chỉ đổi khi train lại. Nút này chạy cả vòng: "
+           "dừng job streaming → clean.py gộp kho sự kiện (bỏ trùng theo event_id) → train ALS implicit (rank 50, "
+           "alpha 1, một bộ tham số) → write_recs.py ghi phiên bản mới và chuyển meta.active → bật lại job streaming. "
+           "Đo 15/11: khoảng 3 phút (máy 12 core); trong lúc đó app vẫn phục vụ bản cũ, sự kiện mới chờ trong Kafka.")
+c1, c2, c3 = st.columns([2, 3, 2])
+retrain_user = c1.number_input("User so sánh trước/sau", min_value=1, value=1, step=1, key="retrain_user")
+exclude_sim = c2.checkbox("Bỏ sự kiện mô phỏng (simulated=true) khỏi dữ liệu train", value=False)
+c3.write("")
+if c3.button("Train lại", type="primary", use_container_width=True):
+    run("retrain", user=int(retrain_user), exclude_simulated=bool(exclude_sim))
+task_box("retrain", "Xong: app đã chuyển sang phiên bản mô hình mới (report reports/retrain_*.json).", lines=60)

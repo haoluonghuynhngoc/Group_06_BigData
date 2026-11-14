@@ -25,18 +25,29 @@ from kafka import KafkaConsumer
 from common.settings import KAFKA_BOOTSTRAP, KAFKA_TOPIC, STREAM_EVENTS_DIR, get_db, save_report
 
 
+def parse_json(value):
+    """A message that is not JSON (or not an object) counts as invalid instead of stopping the audit."""
+    try:
+        parsed = json.loads(value.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--late-minutes", type=float, default=10,
-                        help="an event is 'late' when Kafka received it this much after its event_time "
-                             "(the streaming job's watermark delay)")
+                        help="an event is 'late' when the producer sent it (Kafka message timestamp) this much "
+                             "after its event_time (the streaming job's watermark delay). This approximates "
+                             "Spark's rule (event_time < max event_time seen - watermark); the two agree because "
+                             "the demo's late events are 30 minutes old, far beyond the 10-minute watermark")
     parser.add_argument("--no-mongo", action="store_true", help="only count Kafka, skip the MongoDB check")
     parser.add_argument("--no-archive", action="store_true", help="skip the Parquet archive check")
     args = parser.parse_args()
 
     consumer = KafkaConsumer(KAFKA_TOPIC, bootstrap_servers=KAFKA_BOOTSTRAP, auto_offset_reset="earliest",
                              enable_auto_commit=False, group_id=None, consumer_timeout_ms=10000,
-                             value_deserializer=lambda v: json.loads(v.decode("utf-8")))
+                             value_deserializer=parse_json)
     total, seen, valid_ids, invalid, valid_messages = 0, set(), set(), 0, 0
     late_valid_ids = set()
     partitions = {}

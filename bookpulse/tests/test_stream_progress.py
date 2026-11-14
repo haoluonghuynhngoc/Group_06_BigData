@@ -44,10 +44,6 @@ class ProgressLogTest(unittest.TestCase):
         self.assertEqual(q["max_batch_duration_ms"], 2000)
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 class FakeStateCollection:
     def __init__(self, doc):
         self.doc = doc
@@ -78,3 +74,13 @@ class AlreadyAppliedTest(unittest.TestCase):
         from streaming.stream_stats import already_applied
         with self.assertRaises(RuntimeError):
             already_applied(FakeDb(last_batch=57), "valid_events", 0)
+
+    def test_mongodb_reset_but_checkpoint_kept_stops(self):
+        # stream_state dropped (MongoDB reset) while the checkpoint still says batch 57: batches 0..56 would vanish
+        from streaming.stream_stats import already_applied
+        with self.assertRaises(RuntimeError):
+            already_applied(FakeDb(), "valid_events", 57)
+
+
+if __name__ == "__main__":
+    unittest.main()

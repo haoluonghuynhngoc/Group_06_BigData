@@ -24,10 +24,11 @@ from pathlib import Path
 
 from common.fake import FAKE_CSV
 from common.settings import ROOT
+from common.stream_job import STREAM_JOB, stream_running
+from common.stream_job import stop_stream as stop_stream_job
 
 PORT = int(os.getenv("CONTROL_PORT", "8600"))
 LOG_DIR = Path("/tmp/bookpulse-control")
-STREAM_JOB = "streaming/stream_stats.py"
 PY = sys.executable
 
 
@@ -50,14 +51,13 @@ ACTIONS = {
                        "--seed", num(p, "seed", random.randrange(10**6), 0, 10**9)],
     "kafka_audit": lambda p: [PY, "scripts/kafka_audit.py"],
     "nosql_evidence": lambda p: [PY, "scripts/nosql_evidence.py"],
+    # the whole loop stream archive -> clean -> train ALS -> write_recs -> stream job back (about 3 minutes on 12 cores, 6-8 on 4)
+    "retrain": lambda p: [PY, "scripts/retrain.py", "--user", num(p, "user", 1, 1, 10**7),
+                          "--eval-users", num(p, "eval_users", 1000, 100, 10000)]
+                         + (["--exclude-simulated"] if p.get("exclude_simulated") else []),
 }
 TASKS = {}  # name -> {"proc", "started", "log"}
 LOCK = threading.Lock()
-
-
-def stream_running():
-    """The stream job may also have been started by hand with docker compose exec, so look for the process."""
-    return subprocess.run(["pgrep", "-f", STREAM_JOB], capture_output=True).returncode == 0
 
 
 def tail(path, lines):
@@ -88,6 +88,11 @@ def start(name, params):
             return 409, {"error": "the stream job is already running"}
         if name == "reset" and [n for n in busy if n != "start_stream"]:
             return 409, {"error": f"wait until {', '.join(busy)} has finished"}
+        # retrain stops and restarts the stream job itself and needs the RAM: nothing else may run meanwhile
+        if name == "retrain" and [n for n in busy if n != "start_stream"]:
+            return 409, {"error": f"wait until {', '.join(n for n in busy if n != 'start_stream')} has finished"}
+        if "retrain" in busy and name != "retrain":
+            return 409, {"error": "retrain is running (about 3 minutes); wait until it has finished"}
         try:
             argv = ACTIONS[name](params)
         except (TypeError, ValueError) as exc:
@@ -107,14 +112,7 @@ def stop_stream():
     if not stream_running():
         return 409, {"error": "the stream job is not running"}
 
-    def stop():
-        subprocess.run(["pkill", "-INT", "-f", STREAM_JOB])
-        for _ in range(30):
-            if not stream_running():
-                return
-            time.sleep(1)
-        subprocess.run(["pkill", "-9", "-f", STREAM_JOB])
-    threading.Thread(target=stop, daemon=True).start()
+    threading.Thread(target=stop_stream_job, daemon=True).start()
     return 200, {"stopping": True}
 
 

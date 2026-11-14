@@ -1,0 +1,203 @@
+{
+  "started": "2026-11-14T19:00:31.165546+00:00",
+  "total_seconds": 164.4,
+  "step_seconds": {
+    "clean": 27.6,
+    "train_als_implicit": 71.3,
+    "write_recs": 64.7
+  },
+  "stream_job": {
+    "was_running": false,
+    "stop": "was not running",
+    "restart": "left stopped"
+  },
+  "archive_before_clean": {
+    "rows": 2,
+    "distinct_events": 1
+  },
+  "clean": {
+    "output_rows": 5976480,
+    "output_rows_from_stream": 1,
+    "stream_events": {
+      "path": "/work/data/parquet/stream_events",
+      "archived_rows": 2,
+      "distinct_events": 1,
+      "real_events": 0,
+      "simulated_events": 1,
+      "exclude_simulated": false,
+      "events": 1,
+      "distinct_pairs": 1,
+      "pairs_updating_a_csv_rating": 0,
+      "new_pairs": 1,
+      "older_versions_replaced": 0
+    }
+  },
+  "train": {
+    "rows": {
+      "train": 4780732,
+      "test": 1195748,
+      "streamed_in_train": 1
+    },
+    "best_params": {
+      "rank": 50,
+      "regParam": 0.1,
+      "alpha": 1.0
+    },
+    "ranking_test": {
+      "als": {
+        "precision@10": 0.2021,
+        "recall@10": 0.1352,
+        "users_evaluated": 1000,
+        "distinct_books_recommended": 971
+      },
+      "baseline_popular": {
+        "precision@10": 0.0799,
+        "recall@10": 0.0539,
+        "users_evaluated": 1000,
+        "distinct_books_recommended": 38
+      }
+    },
+    "fit_seconds": 38.5
+  },
+  "write_recs": {
+    "model_version": "20261114_190214",
+    "collection": "recommendations_20261114_190214",
+    "users_written": 53424,
+    "previous_collection": "recommendations_20261110_212851"
+  },
+  "user": 1,
+  "before": {
+    "model_version": "20261110_212851",
+    "recs_collection": "recommendations_20261110_212851",
+    "top10": [
+      {
+        "rank": 1,
+        "book_id": 8,
+        "score": 0.773,
+        "title": "The Catcher in the Rye"
+      },
+      {
+        "rank": 2,
+        "book_id": 118,
+        "score": 0.765,
+        "title": "The Joy Luck Club"
+      },
+      {
+        "rank": 3,
+        "book_id": 195,
+        "score": 0.7507,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 4,
+        "book_id": 15,
+        "score": 0.7357,
+        "title": "The Diary of a Young Girl"
+      },
+      {
+        "rank": 5,
+        "book_id": 26,
+        "score": 0.7228,
+        "title": "The Da Vinci Code (Robert Langdon, #2)"
+      },
+      {
+        "rank": 6,
+        "book_id": 291,
+        "score": 0.7121,
+        "title": "Cutting for Stone"
+      },
+      {
+        "rank": 7,
+        "book_id": 14,
+        "score": 0.6907,
+        "title": "Animal Farm"
+      },
+      {
+        "rank": 8,
+        "book_id": 28,
+        "score": 0.663,
+        "title": "Lord of the Flies"
+      },
+      {
+        "rank": 9,
+        "book_id": 172,
+        "score": 0.6337,
+        "title": "Anna Karenina"
+      },
+      {
+        "rank": 10,
+        "book_id": 186,
+        "score": 0.633,
+        "title": "The Other Boleyn Girl (The Plantagenet and Tudor Novels, #9)"
+      }
+    ]
+  },
+  "after": {
+    "model_version": "20261114_190214",
+    "recs_collection": "recommendations_20261114_190214",
+    "top10": [
+      {
+        "rank": 1,
+        "book_id": 8,
+        "score": 0.7971,
+        "title": "The Catcher in the Rye"
+      },
+      {
+        "rank": 2,
+        "book_id": 118,
+        "score": 0.7688,
+        "title": "The Joy Luck Club"
+      },
+      {
+        "rank": 3,
+        "book_id": 195,
+        "score": 0.7505,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 4,
+        "book_id": 15,
+        "score": 0.7505,
+        "title": "The Diary of a Young Girl"
+      },
+      {
+        "rank": 5,
+        "book_id": 26,
+        "score": 0.7296,
+        "title": "The Da Vinci Code (Robert Langdon, #2)"
+      },
+      {
+        "rank": 6,
+        "book_id": 14,
+        "score": 0.7159,
+        "title": "Animal Farm"
+      },
+      {
+        "rank": 7,
+        "book_id": 291,
+        "score": 0.7111,
+        "title": "Cutting for Stone"
+      },
+      {
+        "rank": 8,
+        "book_id": 28,
+        "score": 0.6879,
+        "title": "Lord of the Flies"
+      },
+      {
+        "rank": 9,
+        "book_id": 63,
+        "score": 0.6471,
+        "title": "Wuthering Heights"
+      },
+      {
+        "rank": 10,
+        "book_id": 58,
+        "score": 0.6439,
+        "title": "The Adventures of Huckleberry Finn"
+      }
+    ]
+  },
+  "top10_books_changed": 2,
+  "exclude_simulated": false
+}

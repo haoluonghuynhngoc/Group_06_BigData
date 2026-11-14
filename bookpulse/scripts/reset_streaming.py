@@ -11,39 +11,22 @@ data/parquet/ratings until batch/clean.py runs again (run_pipeline.sh does that)
 The app page "Điều khiển demo" (/setting) runs this through scripts/control_server.py.
 """
 import shutil
-import subprocess
 import time
 
 from kafka.admin import KafkaAdminClient
 from kafka.errors import UnknownTopicOrPartitionError
 
 from common.settings import CHECKPOINT_DIR, KAFKA_BOOTSTRAP, KAFKA_TOPIC, STREAM_EVENTS_DIR, get_db
+from common.stream_job import stop_stream
 
-STREAM_JOB = "streaming/stream_stats.py"
 CHECKPOINTS = ["stream_valid", "stream_rejected", "stream_trending", "stream_events_archive", "stream_events"]
 COLLECTIONS = ["rating_stats", "user_seen", "online_eval", "stream_state", "trending"]
 
 
-def running():
-    return subprocess.run(["pgrep", "-f", STREAM_JOB], capture_output=True).returncode == 0
-
-
 def main():
     print("[1/5] stop a running stream job (if any)")
-    if running():
-        subprocess.run(["pkill", "-INT", "-f", STREAM_JOB])
-        # Wait until it has really stopped, so no batch commits into a checkpoint we are about to delete
-        for _ in range(30):
-            if not running():
-                break
-            time.sleep(1)
-        else:
-            print("  still running after 30 s, killing it")
-            subprocess.run(["pkill", "-9", "-f", STREAM_JOB])
-            time.sleep(1)
-        print("  stopped")
-    else:
-        print("  no stream job running")
+    # Wait until it has really stopped, so no batch commits into a checkpoint we are about to delete
+    print("  " + stop_stream())
 
     print(f"[2/5] delete the Kafka topic {KAFKA_TOPIC}")
     admin = KafkaAdminClient(bootstrap_servers=KAFKA_BOOTSTRAP)

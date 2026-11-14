@@ -1,0 +1,42 @@
+{
+  "spark_master": "local[*]",
+  "implicit": true,
+  "rows": {
+    "train": 4780732,
+    "test": 1195748,
+    "streamed_in_train": 1
+  },
+  "grid": [
+    {
+      "rank": 50,
+      "regParam": 0.1,
+      "alpha": 1.0
+    }
+  ],
+  "best_params": {
+    "rank": 50,
+    "regParam": 0.1,
+    "alpha": 1.0
+  },
+  "rmse_test": {
+    "baseline_global_mean": 0.992,
+    "baseline_item_mean": 0.9544
+  },
+  "ranking_test": {
+    "als": {
+      "precision@10": 0.2021,
+      "recall@10": 0.1352,
+      "users_evaluated": 1000,
+      "distinct_books_recommended": 971
+    },
+    "baseline_popular": {
+      "precision@10": 0.0799,
+      "recall@10": 0.0539,
+      "users_evaluated": 1000,
+      "distinct_books_recommended": 38
+    }
+  },
+  "fit_seconds": 38.5,
+  "total_seconds": 67.0,
+  "model_path": "/work/models/als_implicit"
+}

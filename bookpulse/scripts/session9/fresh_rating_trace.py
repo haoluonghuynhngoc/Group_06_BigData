@@ -23,6 +23,7 @@ import uuid
 from datetime import datetime, timezone
 
 from common.events import make_producer
+from common.recs import visible_top10
 from common.settings import KAFKA_TOPIC, ROOT, STREAM_EVENTS_DIR, get_db
 
 TOP_K = 10
@@ -31,15 +32,6 @@ OUT_DIR = ROOT / "evidence" / "session9"
 
 def now():
     return datetime.now(timezone.utc)
-
-
-def visible_top10(db, meta, user_id):
-    """Same rule as app/home.py: stored ALS recs minus books in user_seen, first 10."""
-    seen = {d["book_id"] for d in db.user_seen.find({"user_id": user_id}, {"book_id": 1})}
-    doc = db[meta["recs_collection"]].find_one({"_id": user_id})
-    if doc is None:
-        return [], seen
-    return [r["book_id"] for r in doc["recs"] if r["book_id"] not in seen][:TOP_K], seen
 
 
 def archive_rows(event_id):
@@ -64,7 +56,8 @@ def main():
         raise SystemExit("meta.active not found: run batch/write_recs.py first")
     titles = lambda ids: {b["_id"]: b.get("title") for b in db.books.find({"_id": {"$in": list(ids)}})}
 
-    before, seen_before = visible_top10(db, meta, args.user)
+    before = [r["book_id"] for r in visible_top10(db, args.user, TOP_K)["top10"]]
+    seen_before = db.user_seen.count_documents({"user_id": args.user})
     if not before:
         raise SystemExit(f"user {args.user} has no visible recommendations")
     book_id = before[0]
@@ -93,7 +86,8 @@ def main():
         raise SystemExit("user_seen did not receive the event: is streaming/stream_stats.py running?")
     time.sleep(12)  # let the trending/archive queries commit their next micro-batch too
 
-    after, seen_after = visible_top10(db, meta, args.user)
+    after = [r["book_id"] for r in visible_top10(db, args.user, TOP_K)["top10"]]
+    seen_after = db.user_seen.count_documents({"user_id": args.user})
     stats_after = db.rating_stats.find_one({"_id": book_id}) or {}
     state_after = db.stream_state.find_one({"_id": "valid_events"}) or {}
     online_after = db.online_eval.find_one({"_id": f"hit_rate@{TOP_K}"}) or {}
@@ -112,12 +106,12 @@ def main():
                          "note": "stream job trigger is 5 seconds, so the latency is bounded by ~1-2 triggers"},
         "book": {"book_id": book_id, "title": t.get(book_id), "rank_before": 1},
         "mongodb_before": {"model_version": meta["model_version"], "recs_collection": meta["recs_collection"],
-                           "user_seen_pairs_for_user": len(seen_before),
+                           "user_seen_pairs_for_user": seen_before,
                            "rating_stats_for_book": {k: stats_before.get(k) for k in ("n_ratings", "avg_rating")},
                            "valid_events_counted": state_before.get("events", 0),
                            "online_eval": {k: online_before.get(k) for k in ("liked_events", "hits")}},
         "mongodb_after": {"model_version": meta_after["model_version"], "recs_collection": meta_after["recs_collection"],
-                          "user_seen_pairs_for_user": len(seen_after),
+                          "user_seen_pairs_for_user": seen_after,
                           "rating_stats_for_book": {k: stats_after.get(k) for k in ("n_ratings", "avg_rating")},
                           "valid_events_counted": state_after.get("events", 0),
                           "online_eval": {k: online_after.get(k) for k in ("liked_events", "hits")}},

@@ -1,0 +1,88 @@
+{
+  "mapreduce_output": "/work/reports/mapreduce/hadoop_output_20261114_192509.tsv",
+  "input": "/work/data/goodbooks/ratings.csv",
+  "books_mapreduce": 10000,
+  "books_spark": 10000,
+  "ratings_counted_mapreduce": 5976479,
+  "rows_only_in_mapreduce": 0,
+  "rows_only_in_spark": 0,
+  "max_abs_avg_rating_diff": 5e-05,
+  "match": true,
+  "top5_most_rated": [
+    {
+      "book_id": 1,
+      "n_ratings": 22806,
+      "sum_rating": 97603,
+      "avg_rating": 4.2797,
+      "n_liked": 18926,
+      "n1": 231,
+      "n2": 636,
+      "n3": 3013,
+      "n4": 7569,
+      "n5": 11357
+    },
+    {
+      "book_id": 2,
+      "n_ratings": 21850,
+      "sum_rating": 95077,
+      "avg_rating": 4.3514,
+      "n_liked": 18308,
+      "n1": 207,
+      "n2": 553,
+      "n3": 2782,
+      "n4": 6122,
+      "n5": 12186
+    },
+    {
+      "book_id": 4,
+      "n_ratings": 19088,
+      "sum_rating": 82639,
+      "avg_rating": 4.3294,
+      "n_liked": 16045,
+      "n1": 164,
+      "n2": 548,
+      "n3": 2331,
+      "n4": 5839,
+      "n5": 10206
+    },
+    {
+      "book_id": 3,
+      "n_ratings": 16931,
+      "sum_rating": 54422,
+      "avg_rating": 3.2143,
+      "n_liked": 7683,
+      "n1": 2698,
+      "n2": 2649,
+      "n3": 3901,
+      "n4": 3692,
+      "n5": 3991
+    },
+    {
+      "book_id": 5,
+      "n_ratings": 16604,
+      "sum_rating": 62634,
+      "avg_rating": 3.7722,
+      "n_liked": 10459,
+      "n1": 485,
+      "n2": 1401,
+      "n3": 4259,
+      "n4": 5725,
+      "n5": 4734
+    }
+  ],
+  "hadoop_counters": {
+    "Launched map tasks": 3,
+    "Launched reduce tasks": 2,
+    "Map input records": 5976480,
+    "Map output records": 5976479,
+    "Combine input records": 5976479,
+    "Combine output records": 47087,
+    "Reduce input groups": 10000,
+    "Reduce shuffle bytes": 1206873,
+    "Reduce input records": 47087,
+    "Reduce output records": 10000,
+    "elapsed_seconds": 38
+  },
+  "hdfs_blocks": "/bookpulse/input/ratings.csv 72126826 bytes, replicated: replication=1, 3 block(s):  OK\n Total blocks (validated):\t3 (avg. block size 24042275 B)",
+  "combiner_reduction": 0.9921
+}

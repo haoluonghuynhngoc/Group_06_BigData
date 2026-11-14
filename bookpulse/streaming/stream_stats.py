@@ -6,7 +6,9 @@ Per micro-batch it writes three things:
   online_eval   online hit rate: share of liked events (4-5 stars) whose book was in the user's top-10
 
 Spark + Kafka + checkpoint gives at-least-once delivery, so a batch can be replayed after a restart.
-The last applied batch id is stored in MongoDB and a replayed batch is skipped, so counts are not doubled.
+The last applied batch id is stored in MongoDB and a replayed batch is skipped, and inside a batch every
+rating_stats / online_eval document records the last batch it absorbed, so a crash in the middle of the
+writes cannot count part of a batch twice either (apply_valid_rows).
 
 A third query archives every valid event to Parquet (data/parquet/stream_events, partitioned by
 event_date): stateless, no watermark, no de-duplication, so a rating that arrives late is NOT lost from
@@ -57,8 +59,13 @@ def already_applied(db, key, batch_id):
     Only the last batch can be replayed, so batch_id is last_batch or last_batch + 1. A smaller batch_id
     means the checkpoint and MongoDB no longer belong together (checkpoint deleted or moved, MongoDB
     kept): skipping would silently drop every batch up to last_batch, so stop with an error instead.
+    The mirror case (MongoDB reset, checkpoint kept: no state but batch_id > 0) stops as well.
     """
     state = db.stream_state.find_one({"_id": key})
+    if state is None and batch_id > 0:
+        raise RuntimeError(f"{key}: batch {batch_id} but no stream_state in MongoDB: the checkpoint was kept while "
+                           "MongoDB was reset; batches 0.." f"{batch_id - 1} would be lost silently. Reset both with "
+                           "scripts/reset_streaming.py")
     last = -1 if state is None else state.get("last_batch", -1)
     if batch_id < last:
         raise RuntimeError(f"{key}: batch {batch_id} < last_batch {last} in MongoDB: checkpoint and "
@@ -73,7 +80,7 @@ def mark_applied(db, key, batch_id, **inc):
     db.stream_state.update_one({"_id": key}, update, upsert=True)
 
 
-def update_online_eval(db, rows):
+def update_online_eval(db, rows, batch_id):
     meta = db.meta.find_one({"_id": "active"})
     if meta is None:
         return
@@ -83,11 +90,14 @@ def update_online_eval(db, rows):
            for d in db[meta["recs_collection"]].find({"_id": {"$in": users}}, {"recs": {"$slice": TOP_K}})}
     known = [r for r in liked if r["user_id"] in top]
     hits = sum(1 for r in known if r["book_id"] in top[r["user_id"]])
+    key = {"_id": f"hit_rate@{TOP_K}"}
+    db.online_eval.update_one(key, {"$setOnInsert": {"liked_events": 0, "hits": 0, "cold_start_events": 0,
+                                                     "last_batch": -1}}, upsert=True)
     db.online_eval.update_one(
-        {"_id": f"hit_rate@{TOP_K}"},
+        {**key, "$or": [{"last_batch": {"$lt": batch_id}}, {"last_batch": {"$exists": False}}]},
         {"$inc": {"liked_events": len(known), "hits": hits, "cold_start_events": len(liked) - len(known)},
-         "$set": {"model_version": meta["model_version"], "updated": datetime.now(timezone.utc)}},
-        upsert=True,
+         "$set": {"model_version": meta["model_version"], "updated": datetime.now(timezone.utc),
+                  "last_batch": batch_id}},
     )
 
 
@@ -108,33 +118,52 @@ def ensure_topic(partitions):
         admin.close()
 
 
+def apply_valid_rows(db, rows, batch_id):
+    """Write one micro-batch to the speed view so that writing the same batch twice changes nothing.
+
+    rating_stats and online_eval accumulate ($add / $inc), so every document remembers the last batch it
+    absorbed (last_batch) and the update is filtered on last_batch < batch_id: a batch replayed after a
+    crash in the middle of these writes only touches the documents it had not reached before. user_seen
+    is an upsert of the same values and idempotent by itself. MongoDB is atomic per document, so no
+    transaction is needed. (Before 15/11 the three writes ran before mark_applied with no such guard, so a
+    crash between them could count part of a batch twice.)
+    """
+    if not rows:
+        return
+    per_book = {}
+    for r in rows:
+        s, n = per_book.get(r["book_id"], (0, 0))
+        per_book[r["book_id"]] = (s + r["rating"], n + 1)
+    now = datetime.now(timezone.utc)
+    not_yet_applied = {"$or": [{"last_batch": {"$lt": batch_id}}, {"last_batch": {"$exists": False}}]}
+    db.rating_stats.bulk_write([  # 1. make sure the documents exist (idempotent)
+        UpdateOne({"_id": book_id}, {"$setOnInsert": {"rating_sum": 0, "n_ratings": 0, "avg_rating": 0.0,
+                                                     "last_batch": -1}}, upsert=True)
+        for book_id in per_book
+    ], ordered=False)
+    db.rating_stats.bulk_write([  # 2. add this batch to each document at most once
+        UpdateOne({"_id": book_id, **not_yet_applied}, [
+            {"$set": {"rating_sum": {"$add": ["$rating_sum", s]}, "n_ratings": {"$add": ["$n_ratings", n]},
+                      "last_batch": batch_id, "updated": now}},
+            {"$set": {"avg_rating": {"$divide": ["$rating_sum", "$n_ratings"]}}},
+        ])
+        for book_id, (s, n) in per_book.items()
+    ], ordered=False)
+    db.user_seen.bulk_write([
+        UpdateOne({"_id": f"{r['user_id']}_{r['book_id']}"},
+                  {"$set": {"user_id": r["user_id"], "book_id": r["book_id"], "rating": r["rating"],
+                            "event_time": r["event_time"]}}, upsert=True)
+        for r in rows
+    ], ordered=False)
+    update_online_eval(db, rows, batch_id)
+
+
 def process_valid(df, batch_id):
     db = get_db()
     if already_applied(db, "valid_events", batch_id):
         return
     rows = df.select("user_id", "book_id", "rating", "event_time").collect()
-    if rows:
-        per_book = {}
-        for r in rows:
-            s, n = per_book.get(r["book_id"], (0, 0))
-            per_book[r["book_id"]] = (s + r["rating"], n + 1)
-        now = datetime.now(timezone.utc)
-        db.rating_stats.bulk_write([
-            UpdateOne({"_id": book_id}, [
-                {"$set": {"rating_sum": {"$add": [{"$ifNull": ["$rating_sum", 0]}, s]},
-                          "n_ratings": {"$add": [{"$ifNull": ["$n_ratings", 0]}, n]},
-                          "updated": now}},
-                {"$set": {"avg_rating": {"$divide": ["$rating_sum", "$n_ratings"]}}},
-            ], upsert=True)
-            for book_id, (s, n) in per_book.items()
-        ], ordered=False)
-        db.user_seen.bulk_write([
-            UpdateOne({"_id": f"{r['user_id']}_{r['book_id']}"},
-                      {"$set": {"user_id": r["user_id"], "book_id": r["book_id"], "rating": r["rating"],
-                                "event_time": r["event_time"]}}, upsert=True)
-            for r in rows
-        ], ordered=False)
-        update_online_eval(db, rows)
+    apply_valid_rows(db, rows, batch_id)
     mark_applied(db, "valid_events", batch_id, events=len(rows))
 
 

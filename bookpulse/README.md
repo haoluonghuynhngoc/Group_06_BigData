@@ -4,7 +4,7 @@ Toàn bộ hệ thống chạy bằng Docker trên một máy: Spark (batch + St
 thành phần MapReduce chạy trên một cụm Hadoop riêng (HDFS + YARN), là nhánh kiểm chứng, xem mục 8. Hệ thống tổ chức
 theo ý tưởng Lambda: lớp batch, lớp tốc độ, lớp phục vụ; chưa hợp nhất batch view và speed view thành một số liệu,
 app chỉ gộp lúc đọc (ẩn sách trong `user_seen`). Sơ đồ: tổng quan [docs/img/architecture_overview.png](docs/img/architecture_overview.png)
-(slide 3), chi tiết [docs/img/architecture_detail.png](docs/img/architecture_detail.png) (slide 17, phụ lục) và bản
+(slide 4), chi tiết [docs/img/architecture_detail.png](docs/img/architecture_detail.png) (slide 5) và bản
 tương tác [docs/kien-truc.html](docs/kien-truc.html).
 
 ```
@@ -46,9 +46,12 @@ Mở http://localhost:8501, nhập user ID (ví dụ 1) để xem top-10.
 
 Luồng streaming không cần gõ lệnh: trang **Điều khiển demo** (http://localhost:8501/setting) có nút bật/dừng job
 streaming, xoá dữ liệu streaming đã thử, chấm sách đang được gợi ý (`rate_from_recs.py`), gửi sự kiện đến trễ
-(`producer.py --late`) và chạy `kafka_audit.py` / `nosql_evidence.py`, kèm trạng thái và output của từng lệnh. Các nút
-gọi `scripts/control_server.py`, tiến trình chính của container spark (cổng 8600, chỉ trong mạng compose), chỉ chạy
-đúng các lệnh có sẵn. Sau khi kéo bản này về, chạy `docker compose up -d` một lần để tạo lại container spark.
+(`producer.py --late`), chạy `kafka_audit.py` / `nosql_evidence.py`, và **Train lại với rating mới**
+(`scripts/retrain.py`: dừng job streaming → `clean.py` gộp kho sự kiện → `train_als.py --implicit` một bộ tham số →
+`write_recs.py` chuyển phiên bản → bật lại job; đo 15/11: 164–179 giây trên máy 12 core, ước 6–8 phút trên 4 core;
+report `reports/retrain_*.json` ghi top-10 của một user trước/sau và thời gian từng bước), kèm trạng thái và output của từng lệnh. Các nút gọi `scripts/control_server.py`, tiến trình chính của
+container spark (cổng 8600, chỉ trong mạng compose), chỉ chạy đúng các lệnh có sẵn. Sau khi kéo bản này về, chạy
+`docker compose up -d` một lần để tạo lại container spark.
 
 Bằng dòng lệnh: mở **hai cửa sổ terminal**.
 
@@ -165,6 +168,13 @@ Xem nhanh: `docker compose exec mongo mongosh bookpulse --eval "db.meta.findOne(
 - **Top-30, app lọc còn 10:** người dùng không thấy lại cuốn vừa đọc mà không phải huấn luyện lại ALS.
   Khi đã đọc gần hết danh sách, app bù bằng `fallback` (sách phổ biến người đó chưa chấm) để luôn đủ 10 cuốn;
   cột "Nguồn" ghi rõ cuốn nào do ALS, cuốn nào là bù.
+- **Streaming không huấn luyện lại theo từng sự kiện; train lại theo đợt bằng nút hoặc theo lịch:** một lần
+  train mất khoảng 3 phút trên máy 12 core (đo 15/11: clean 26–28 s, fit 71–74 s, write_recs 65 s; ước 6–8 phút trên 4 core) và cần dừng job streaming (hai driver 4 GB không vừa RAM), nên `scripts/retrain.py` gom cả
+  vòng (dừng job → `clean.py` → `train_als.py --implicit --ranks 50 --regs 0.1 --alphas 1` → `write_recs.py` → bật lại
+  job) thành một lệnh, chạy từ nút "Train lại với rating mới" ở trang /setting hoặc bằng
+  `docker compose exec spark python scripts/retrain.py --user 1`. Production: cron/Airflow gọi cùng script khi kho
+  `stream_events` có đủ sự kiện mới hoặc theo lịch đêm. Cập nhật vector người dùng tức thì (fold-in, giữ nguyên vector
+  sách) là bước tiếp theo, chưa làm.
 - **Rating từ streaming vào lần huấn luyện sau:** `stream_stats.py` lưu **mọi** sự kiện hợp lệ (kể cả trùng
   và đến trễ) ra `data/parquet/stream_events` (file sink, không trạng thái, exactly-once nhờ `_spark_metadata`
   + checkpoint). `clean.py` bỏ trùng chính xác theo `event_id` rồi gộp với CSV; cùng một cặp (user, book) thì
