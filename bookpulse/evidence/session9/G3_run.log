@@ -1,0 +1,23 @@
+19:06:31 reset streaming state
+19:06:32 start the stream job (runs 150 s)
+19:07:08 send one fresh rating (user 1, 5 stars) and trace it
+    "latency_seconds_kafka_to_mongodb": 2.0,
+    "duplicate_dropped_in_speed_layer": true,
+    "book_hidden_from_top10": true,
+    "next_book_moved_up": true,
+    "online_hit_counted": true,
+    "als_recommendations_unchanged_until_retrain": true
+  "archive_parquet_rows_with_this_event_id": 2,
+19:07:24 waiting for the stream job to stop
+19:09:14 kafka_audit: Kafka vs MongoDB vs archive
+  "messages": 2,
+  "distinct_event_ids": 1,
+  "repeated_messages": 1,
+    "valid_events_counted": 1,
+    "expected_valid_minus_late": 1,
+    "no_loss_no_double_count": true,
+    "rows": 2,
+    "distinct_event_ids": 1,
+    "exactly_once": true
+19:09:26 done -> evidence/session9
+g3 exit 0

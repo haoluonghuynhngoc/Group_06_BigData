@@ -1,0 +1,52 @@
+{
+  "test": "G2 ranking test (hold-out, Top-10 relevance vs popularity baseline)",
+  "status": "measured",
+  "measured_on": "2026-11-13 12:05:02",
+  "split": {
+    "method": "seeded random 80/20 of CSV ratings (no timestamps in Goodbooks-10k, so no temporal split); streamed ratings always in train",
+    "seed": 42,
+    "train_rows": 4780731,
+    "test_rows": 1195748,
+    "streamed_in_train": 0
+  },
+  "relevance_definition": "book rated 4 or 5 stars by the user in the TEST set",
+  "candidate_universe": "10,000 books minus books the user rated in TRAIN (seen-item exclusion); ALS scores its top 200 candidates per user, then the 10 best unseen",
+  "eligible_denominator": {
+    "users_sampled_from_test": 5000,
+    "users_with_ge1_relevant_test_book": 4995,
+    "note": "metrics are averaged over the eligible users only"
+  },
+  "serving_model": {
+    "path": "/work/models/als_implicit",
+    "implicitPrefs": true,
+    "rank": 50,
+    "note": "the model write_recs.py wrote to MongoDB"
+  },
+  "results": {
+    "als_implicit_serving": {
+      "precision@10": 0.2008,
+      "recall@10": 0.133,
+      "ndcg@10": 0.2348,
+      "users_evaluated": 4995,
+      "users_with_at_least_one_hit": 3938,
+      "distinct_books_recommended": 1208
+    },
+    "als_explicit": {
+      "precision@10": 0.0078,
+      "recall@10": 0.0063,
+      "ndcg@10": 0.0074,
+      "users_evaluated": 4995,
+      "users_with_at_least_one_hit": 332,
+      "distinct_books_recommended": 1296
+    },
+    "baseline_most_popular": {
+      "precision@10": 0.0777,
+      "recall@10": 0.0511,
+      "ndcg@10": 0.0881,
+      "users_evaluated": 4995,
+      "users_with_at_least_one_hit": 2179,
+      "distinct_books_recommended": 38
+    }
+  },
+  "ndcg_lift_over_popularity": 2.67
+}

@@ -1,0 +1,176 @@
+{
+  "test": "G3 fresh rating: Kafka -> Structured Streaming -> MongoDB -> app view; retrain boundary",
+  "status": "measured",
+  "measured_on": "2026-11-13T12:07:09.605108+00:00",
+  "event": {
+    "event_id": "e7b82b7f11634e3281b08cd8429e1fef",
+    "user_id": 1,
+    "book_id": 5,
+    "rating": 5,
+    "event_time": "2026-11-13 12:07:09.495",
+    "simulated": true
+  },
+  "sent_twice_same_event_id": true,
+  "kafka_records": [
+    {
+      "partition": 0,
+      "offset": 0
+    },
+    {
+      "partition": 0,
+      "offset": 1
+    }
+  ],
+  "timeline_utc": {
+    "sent": "2026-11-13T12:07:09.605108+00:00",
+    "visible_in_user_seen": "2026-11-13T12:07:11.650048+00:00",
+    "latency_seconds_kafka_to_mongodb": 2.0,
+    "note": "stream job trigger is 5 seconds, so the latency is bounded by ~1-2 triggers"
+  },
+  "book": {
+    "book_id": 5,
+    "title": "The Great Gatsby",
+    "rank_before": 1
+  },
+  "mongodb_before": {
+    "model_version": "20261110_212851",
+    "recs_collection": "recommendations_20261110_212851",
+    "user_seen_pairs_for_user": 0,
+    "rating_stats_for_book": {
+      "n_ratings": null,
+      "avg_rating": null
+    },
+    "valid_events_counted": 0,
+    "online_eval": {
+      "liked_events": null,
+      "hits": null
+    }
+  },
+  "mongodb_after": {
+    "model_version": "20261110_212851",
+    "recs_collection": "recommendations_20261110_212851",
+    "user_seen_pairs_for_user": 1,
+    "rating_stats_for_book": {
+      "n_ratings": 1,
+      "avg_rating": 5.0
+    },
+    "valid_events_counted": 1,
+    "online_eval": {
+      "liked_events": 1,
+      "hits": 1
+    }
+  },
+  "checks": {
+    "duplicate_dropped_in_speed_layer": true,
+    "book_hidden_from_top10": true,
+    "next_book_moved_up": true,
+    "online_hit_counted": true,
+    "als_recommendations_unchanged_until_retrain": true
+  },
+  "visible_top10_before": [
+    {
+      "rank": 1,
+      "book_id": 5,
+      "title": "The Great Gatsby"
+    },
+    {
+      "rank": 2,
+      "book_id": 8,
+      "title": "The Catcher in the Rye"
+    },
+    {
+      "rank": 3,
+      "book_id": 118,
+      "title": "The Joy Luck Club"
+    },
+    {
+      "rank": 4,
+      "book_id": 195,
+      "title": "The Guernsey Literary and Potato Peel Pie Society"
+    },
+    {
+      "rank": 5,
+      "book_id": 15,
+      "title": "The Diary of a Young Girl"
+    },
+    {
+      "rank": 6,
+      "book_id": 26,
+      "title": "The Da Vinci Code (Robert Langdon, #2)"
+    },
+    {
+      "rank": 7,
+      "book_id": 291,
+      "title": "Cutting for Stone"
+    },
+    {
+      "rank": 8,
+      "book_id": 14,
+      "title": "Animal Farm"
+    },
+    {
+      "rank": 9,
+      "book_id": 28,
+      "title": "Lord of the Flies"
+    },
+    {
+      "rank": 10,
+      "book_id": 172,
+      "title": "Anna Karenina"
+    }
+  ],
+  "visible_top10_after": [
+    {
+      "rank": 1,
+      "book_id": 8,
+      "title": "The Catcher in the Rye"
+    },
+    {
+      "rank": 2,
+      "book_id": 118,
+      "title": "The Joy Luck Club"
+    },
+    {
+      "rank": 3,
+      "book_id": 195,
+      "title": "The Guernsey Literary and Potato Peel Pie Society"
+    },
+    {
+      "rank": 4,
+      "book_id": 15,
+      "title": "The Diary of a Young Girl"
+    },
+    {
+      "rank": 5,
+      "book_id": 26,
+      "title": "The Da Vinci Code (Robert Langdon, #2)"
+    },
+    {
+      "rank": 6,
+      "book_id": 291,
+      "title": "Cutting for Stone"
+    },
+    {
+      "rank": 7,
+      "book_id": 14,
+      "title": "Animal Farm"
+    },
+    {
+      "rank": 8,
+      "book_id": 28,
+      "title": "Lord of the Flies"
+    },
+    {
+      "rank": 9,
+      "book_id": 172,
+      "title": "Anna Karenina"
+    },
+    {
+      "rank": 10,
+      "book_id": 186,
+      "title": "The Other Boleyn Girl (The Plantagenet and Tudor Novels, #9)"
+    }
+  ],
+  "archive_parquet_rows_with_this_event_id": 2,
+  "retrain_boundary": "The ALS factors and the stored top-30 do NOT change from the stream. The event is in data/parquet/stream_events; batch/clean.py merges it (dedup by event_id, from_stream=true), train_als.py keeps it in train, write_recs.py writes recommendations_<new version> and switches meta.active. Measured on 10/11/2026 (Q&A 36): after that sequence a user who rated Harry Potter 1-5 got volumes 6 and 7 at #1-#2."
+}

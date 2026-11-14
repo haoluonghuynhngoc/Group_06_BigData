@@ -1,0 +1,205 @@
+{
+  "test": "G1 implicit semantics: how 1-star and 5-star records enter ALS",
+  "status": "measured",
+  "measured_on": "2026-11-13 12:05:26",
+  "serving_configuration": {
+    "implicitPrefs": true,
+    "alpha": 1.0,
+    "rank": 50,
+    "regParam": 0.1,
+    "maxIter": 10,
+    "nonnegative": true,
+    "coldStartStrategy": "drop",
+    "ratingCol": "rating (1-5 stars, used as the implicit 'count')"
+  },
+  "transform_table_current_scheme": [
+    {
+      "stars": 1,
+      "preference_p": 1,
+      "confidence_c=1+alpha*r": 2.0,
+      "share_of_train_rows_pct": 2.08
+    },
+    {
+      "stars": 2,
+      "preference_p": 1,
+      "confidence_c=1+alpha*r": 3.0,
+      "share_of_train_rows_pct": 6.0
+    },
+    {
+      "stars": 3,
+      "preference_p": 1,
+      "confidence_c=1+alpha*r": 4.0,
+      "share_of_train_rows_pct": 22.94
+    },
+    {
+      "stars": 4,
+      "preference_p": 1,
+      "confidence_c=1+alpha*r": 5.0,
+      "share_of_train_rows_pct": 35.8
+    },
+    {
+      "stars": 5,
+      "preference_p": 1,
+      "confidence_c=1+alpha*r": 6.0,
+      "share_of_train_rows_pct": 33.18
+    }
+  ],
+  "reading": "Spark implicit ALS sets p = 1 for every observed (user, book) pair and weights the squared error by c = 1 + alpha * rating; unobserved pairs have p = 0, c = 1. A 1-star rating is therefore a POSITIVE signal with weight 2, a 5-star one weight 6: the ratio is 3x, but the sign is the same. 1-2 star rows are 8.08% of train.",
+  "alternative_scheme": "liked-only: keep only ratings >= 4 as positive interactions (same hyper-parameters, same split, same seen set and same test users); fitted here, not saved",
+  "candidate_user": {
+    "user_id": 1,
+    "train_ratings": 89,
+    "train_ratings_1_2_stars": 8,
+    "top10_current_scheme": [
+      {
+        "rank": 1,
+        "book_id": 45,
+        "score": 0.8594,
+        "title": "Life of Pi"
+      },
+      {
+        "rank": 2,
+        "book_id": 150,
+        "score": 0.8428,
+        "title": "The Red Tent"
+      },
+      {
+        "rank": 3,
+        "book_id": 5,
+        "score": 0.7943,
+        "title": "The Great Gatsby"
+      },
+      {
+        "rank": 4,
+        "book_id": 8,
+        "score": 0.773,
+        "title": "The Catcher in the Rye"
+      },
+      {
+        "rank": 5,
+        "book_id": 118,
+        "score": 0.765,
+        "title": "The Joy Luck Club"
+      },
+      {
+        "rank": 6,
+        "book_id": 195,
+        "score": 0.7507,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 7,
+        "book_id": 10,
+        "score": 0.7464,
+        "title": "Pride and Prejudice"
+      },
+      {
+        "rank": 8,
+        "book_id": 15,
+        "score": 0.7357,
+        "title": "The Diary of a Young Girl"
+      },
+      {
+        "rank": 9,
+        "book_id": 26,
+        "score": 0.7228,
+        "title": "The Da Vinci Code (Robert Langdon, #2)"
+      },
+      {
+        "rank": 10,
+        "book_id": 291,
+        "score": 0.7121,
+        "title": "Cutting for Stone"
+      }
+    ],
+    "top10_alternative_scheme": [
+      {
+        "rank": 1,
+        "book_id": 195,
+        "score": 0.7444,
+        "title": "The Guernsey Literary and Potato Peel Pie Society"
+      },
+      {
+        "rank": 2,
+        "book_id": 150,
+        "score": 0.6819,
+        "title": "The Red Tent"
+      },
+      {
+        "rank": 3,
+        "book_id": 15,
+        "score": 0.6517,
+        "title": "The Diary of a Young Girl"
+      },
+      {
+        "rank": 4,
+        "book_id": 291,
+        "score": 0.6507,
+        "title": "Cutting for Stone"
+      },
+      {
+        "rank": 5,
+        "book_id": 5,
+        "score": 0.6444,
+        "title": "The Great Gatsby"
+      },
+      {
+        "rank": 6,
+        "book_id": 45,
+        "score": 0.6432,
+        "title": "Life of Pi"
+      },
+      {
+        "rank": 7,
+        "book_id": 9,
+        "score": 0.6164,
+        "title": "Angels & Demons  (Robert Langdon, #1)"
+      },
+      {
+        "rank": 8,
+        "book_id": 186,
+        "score": 0.5986,
+        "title": "The Other Boleyn Girl (The Plantagenet and Tudor Novels, #9)"
+      },
+      {
+        "rank": 9,
+        "book_id": 265,
+        "score": 0.5786,
+        "title": "A Tree Grows in Brooklyn"
+      },
+      {
+        "rank": 10,
+        "book_id": 144,
+        "score": 0.5772,
+        "title": "Unbroken: A World War II Story of Survival, Resilience, and Redemption"
+      }
+    ],
+    "books_in_both_top10": 6
+  },
+  "alternative_fit": {
+    "train_rows_used": 3297772,
+    "fit_seconds": 47.6
+  },
+  "alternative_metrics_same_test_users": {
+    "precision@10": 0.1995,
+    "recall@10": 0.132,
+    "ndcg@10": 0.2356,
+    "users_evaluated": 4995,
+    "users_with_at_least_one_hit": 3945,
+    "distinct_books_recommended": 1086
+  },
+  "current_metrics_same_test_users": {
+    "precision@10": 0.2008,
+    "recall@10": 0.133,
+    "ndcg@10": 0.2348,
+    "users_evaluated": 4995,
+    "users_with_at_least_one_hit": 3938,
+    "distinct_books_recommended": 1208
+  },
+  "top10_overlap_current_vs_alternative": {
+    "mean_books_in_common_of_10": 5.0,
+    "users_with_identical_top10": 28,
+    "users_compared": 5000
+  },
+  "total_seconds": 105.2
+}

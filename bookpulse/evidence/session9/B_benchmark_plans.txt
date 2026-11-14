@@ -1,0 +1,321 @@
+===== A0 baseline: broadcast hash join, shuffle.partitions=8  {'spark.sql.autoBroadcastJoinThreshold': '10485760', 'spark.sql.shuffle.partitions': '8'}
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- TakeOrderedAndProject (11)
+   +- HashAggregate (10)
+      +- Exchange (9)
+         +- HashAggregate (8)
+            +- Project (7)
+               +- BroadcastHashJoin LeftOuter BuildRight (6)
+                  :- Scan parquet  (1)
+                  +- BroadcastExchange (5)
+                     +- Project (4)
+                        +- Filter (3)
+                           +- Scan csv  (2)
+
+
+(1) Scan parquet 
+Output [2]: [book_id#1, rating#2]
+Batched: true
+Location: InMemoryFileIndex [file:/work/data/parquet/ratings]
+ReadSchema: struct<book_id:int,rating:int>
+
+(2) Scan csv 
+Output [2]: [book_id#8, title#18]
+Batched: false
+Location: InMemoryFileIndex [file:/work/data/goodbooks/books.csv]
+ReadSchema: struct<book_id:string,title:string>
+
+(3) Filter
+Input [2]: [book_id#8, title#18]
+Condition : (atleastnnonnulls(1, cast(book_id#8 as int)) AND isnotnull(cast(book_id#8 as int)))
+
+(4) Project
+Output [2]: [cast(book_id#8 as int) AS book_id#54, title#18]
+Input [2]: [book_id#8, title#18]
+
+(5) BroadcastExchange
+Input [2]: [book_id#54, title#18]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=118]
+
+(6) BroadcastHashJoin
+Left keys [1]: [book_id#1]
+Right keys [1]: [book_id#54]
+Join type: LeftOuter
+Join condition: None
+
+(7) Project
+Output [3]: [book_id#1, rating#2, coalesce(title#18, UNKNOWN) AS _groupingexpression#89]
+Input [4]: [book_id#1, rating#2, book_id#54, title#18]
+
+(8) HashAggregate
+Input [3]: [book_id#1, rating#2, _groupingexpression#89]
+Keys [2]: [book_id#1, _groupingexpression#89]
+Functions [2]: [partial_count(1), partial_avg(rating#2)]
+Aggregate Attributes [3]: [count#90L, sum#91, count#92L]
+Results [5]: [book_id#1, _groupingexpression#89, count#93L, sum#94, count#95L]
+
+(9) Exchange
+Input [5]: [book_id#1, _groupingexpression#89, count#93L, sum#94, count#95L]
+Arguments: hashpartitioning(book_id#1, _groupingexpression#89, 8), ENSURE_REQUIREMENTS, [plan_id=123]
+
+(10) HashAggregate
+Input [5]: [book_id#1, _groupingexpression#89, count#93L, sum#94, count#95L]
+Keys [2]: [book_id#1, _groupingexpression#89]
+Functions [2]: [count(1), avg(rating#2)]
+Aggregate Attributes [2]: [count(1)#87L, avg(rating#2)#88]
+Results [4]: [book_id#1, _groupingexpression#89 AS title#79, count(1)#87L AS n_ratings#80L, round(avg(rating#2)#88, 3) AS avg_rating#81]
+
+(11) TakeOrderedAndProject
+Input [4]: [book_id#1, title#79, n_ratings#80L, avg_rating#81]
+Arguments: 10, [n_ratings#80L DESC NULLS LAST, book_id#1 ASC NULLS FIRST], [book_id#1, title#79, n_ratings#80L, avg_rating#81]
+
+(12) AdaptiveSparkPlan
+Output [4]: [book_id#1, title#79, n_ratings#80L, avg_rating#81]
+Arguments: isFinalPlan=false
+
+
+
+===== A1 variant: sort-merge join (broadcast disabled), shuffle.partitions=8  {'spark.sql.autoBroadcastJoinThreshold': '-1', 'spark.sql.shuffle.partitions': '8'}
+== Physical Plan ==
+AdaptiveSparkPlan (14)
++- TakeOrderedAndProject (13)
+   +- HashAggregate (12)
+      +- HashAggregate (11)
+         +- Project (10)
+            +- SortMergeJoin LeftOuter (9)
+               :- Sort (3)
+               :  +- Exchange (2)
+               :     +- Scan parquet  (1)
+               +- Sort (8)
+                  +- Exchange (7)
+                     +- Project (6)
+                        +- Filter (5)
+                           +- Scan csv  (4)
+
+
+(1) Scan parquet 
+Output [2]: [book_id#1, rating#2]
+Batched: true
+Location: InMemoryFileIndex [file:/work/data/parquet/ratings]
+ReadSchema: struct<book_id:int,rating:int>
+
+(2) Exchange
+Input [2]: [book_id#1, rating#2]
+Arguments: hashpartitioning(book_id#1, 8), ENSURE_REQUIREMENTS, [plan_id=718]
+
+(3) Sort
+Input [2]: [book_id#1, rating#2]
+Arguments: [book_id#1 ASC NULLS FIRST], false, 0
+
+(4) Scan csv 
+Output [2]: [book_id#8, title#18]
+Batched: false
+Location: InMemoryFileIndex [file:/work/data/goodbooks/books.csv]
+ReadSchema: struct<book_id:string,title:string>
+
+(5) Filter
+Input [2]: [book_id#8, title#18]
+Condition : (atleastnnonnulls(1, cast(book_id#8 as int)) AND isnotnull(cast(book_id#8 as int)))
+
+(6) Project
+Output [2]: [cast(book_id#8 as int) AS book_id#54, title#18]
+Input [2]: [book_id#8, title#18]
+
+(7) Exchange
+Input [2]: [book_id#54, title#18]
+Arguments: hashpartitioning(book_id#54, 8), ENSURE_REQUIREMENTS, [plan_id=719]
+
+(8) Sort
+Input [2]: [book_id#54, title#18]
+Arguments: [book_id#54 ASC NULLS FIRST], false, 0
+
+(9) SortMergeJoin
+Left keys [1]: [book_id#1]
+Right keys [1]: [book_id#54]
+Join type: LeftOuter
+Join condition: None
+
+(10) Project
+Output [3]: [book_id#1, rating#2, coalesce(title#18, UNKNOWN) AS _groupingexpression#202]
+Input [4]: [book_id#1, rating#2, book_id#54, title#18]
+
+(11) HashAggregate
+Input [3]: [book_id#1, rating#2, _groupingexpression#202]
+Keys [2]: [book_id#1, _groupingexpression#202]
+Functions [2]: [partial_count(1), partial_avg(rating#2)]
+Aggregate Attributes [3]: [count#203L, sum#204, count#205L]
+Results [5]: [book_id#1, _groupingexpression#202, count#206L, sum#207, count#208L]
+
+(12) HashAggregate
+Input [5]: [book_id#1, _groupingexpression#202, count#206L, sum#207, count#208L]
+Keys [2]: [book_id#1, _groupingexpression#202]
+Functions [2]: [count(1), avg(rating#2)]
+Aggregate Attributes [2]: [count(1)#200L, avg(rating#2)#201]
+Results [4]: [book_id#1, _groupingexpression#202 AS title#192, count(1)#200L AS n_ratings#193L, round(avg(rating#2)#201, 3) AS avg_rating#194]
+
+(13) TakeOrderedAndProject
+Input [4]: [book_id#1, title#192, n_ratings#193L, avg_rating#194]
+Arguments: 10, [n_ratings#193L DESC NULLS LAST, book_id#1 ASC NULLS FIRST], [book_id#1, title#192, n_ratings#193L, avg_rating#194]
+
+(14) AdaptiveSparkPlan
+Output [4]: [book_id#1, title#192, n_ratings#193L, avg_rating#194]
+Arguments: isFinalPlan=false
+
+
+
+===== B variant: broadcast hash join, shuffle.partitions=1  {'spark.sql.autoBroadcastJoinThreshold': '10485760', 'spark.sql.shuffle.partitions': '1'}
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- TakeOrderedAndProject (11)
+   +- HashAggregate (10)
+      +- Exchange (9)
+         +- HashAggregate (8)
+            +- Project (7)
+               +- BroadcastHashJoin LeftOuter BuildRight (6)
+                  :- Scan parquet  (1)
+                  +- BroadcastExchange (5)
+                     +- Project (4)
+                        +- Filter (3)
+                           +- Scan csv  (2)
+
+
+(1) Scan parquet 
+Output [2]: [book_id#1, rating#2]
+Batched: true
+Location: InMemoryFileIndex [file:/work/data/parquet/ratings]
+ReadSchema: struct<book_id:int,rating:int>
+
+(2) Scan csv 
+Output [2]: [book_id#8, title#18]
+Batched: false
+Location: InMemoryFileIndex [file:/work/data/goodbooks/books.csv]
+ReadSchema: struct<book_id:string,title:string>
+
+(3) Filter
+Input [2]: [book_id#8, title#18]
+Condition : (atleastnnonnulls(1, cast(book_id#8 as int)) AND isnotnull(cast(book_id#8 as int)))
+
+(4) Project
+Output [2]: [cast(book_id#8 as int) AS book_id#54, title#18]
+Input [2]: [book_id#8, title#18]
+
+(5) BroadcastExchange
+Input [2]: [book_id#54, title#18]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=1346]
+
+(6) BroadcastHashJoin
+Left keys [1]: [book_id#1]
+Right keys [1]: [book_id#54]
+Join type: LeftOuter
+Join condition: None
+
+(7) Project
+Output [3]: [book_id#1, rating#2, coalesce(title#18, UNKNOWN) AS _groupingexpression#291]
+Input [4]: [book_id#1, rating#2, book_id#54, title#18]
+
+(8) HashAggregate
+Input [3]: [book_id#1, rating#2, _groupingexpression#291]
+Keys [2]: [book_id#1, _groupingexpression#291]
+Functions [2]: [partial_count(1), partial_avg(rating#2)]
+Aggregate Attributes [3]: [count#292L, sum#293, count#294L]
+Results [5]: [book_id#1, _groupingexpression#291, count#295L, sum#296, count#297L]
+
+(9) Exchange
+Input [5]: [book_id#1, _groupingexpression#291, count#295L, sum#296, count#297L]
+Arguments: hashpartitioning(book_id#1, _groupingexpression#291, 1), ENSURE_REQUIREMENTS, [plan_id=1351]
+
+(10) HashAggregate
+Input [5]: [book_id#1, _groupingexpression#291, count#295L, sum#296, count#297L]
+Keys [2]: [book_id#1, _groupingexpression#291]
+Functions [2]: [count(1), avg(rating#2)]
+Aggregate Attributes [2]: [count(1)#289L, avg(rating#2)#290]
+Results [4]: [book_id#1, _groupingexpression#291 AS title#281, count(1)#289L AS n_ratings#282L, round(avg(rating#2)#290, 3) AS avg_rating#283]
+
+(11) TakeOrderedAndProject
+Input [4]: [book_id#1, title#281, n_ratings#282L, avg_rating#283]
+Arguments: 10, [n_ratings#282L DESC NULLS LAST, book_id#1 ASC NULLS FIRST], [book_id#1, title#281, n_ratings#282L, avg_rating#283]
+
+(12) AdaptiveSparkPlan
+Output [4]: [book_id#1, title#281, n_ratings#282L, avg_rating#283]
+Arguments: isFinalPlan=false
+
+
+
+===== B variant: broadcast hash join, shuffle.partitions=64  {'spark.sql.autoBroadcastJoinThreshold': '10485760', 'spark.sql.shuffle.partitions': '64'}
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- TakeOrderedAndProject (11)
+   +- HashAggregate (10)
+      +- Exchange (9)
+         +- HashAggregate (8)
+            +- Project (7)
+               +- BroadcastHashJoin LeftOuter BuildRight (6)
+                  :- Scan parquet  (1)
+                  +- BroadcastExchange (5)
+                     +- Project (4)
+                        +- Filter (3)
+                           +- Scan csv  (2)
+
+
+(1) Scan parquet 
+Output [2]: [book_id#1, rating#2]
+Batched: true
+Location: InMemoryFileIndex [file:/work/data/parquet/ratings]
+ReadSchema: struct<book_id:int,rating:int>
+
+(2) Scan csv 
+Output [2]: [book_id#8, title#18]
+Batched: false
+Location: InMemoryFileIndex [file:/work/data/goodbooks/books.csv]
+ReadSchema: struct<book_id:string,title:string>
+
+(3) Filter
+Input [2]: [book_id#8, title#18]
+Condition : (atleastnnonnulls(1, cast(book_id#8 as int)) AND isnotnull(cast(book_id#8 as int)))
+
+(4) Project
+Output [2]: [cast(book_id#8 as int) AS book_id#54, title#18]
+Input [2]: [book_id#8, title#18]
+
+(5) BroadcastExchange
+Input [2]: [book_id#54, title#18]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=1933]
+
+(6) BroadcastHashJoin
+Left keys [1]: [book_id#1]
+Right keys [1]: [book_id#54]
+Join type: LeftOuter
+Join condition: None
+
+(7) Project
+Output [3]: [book_id#1, rating#2, coalesce(title#18, UNKNOWN) AS _groupingexpression#404]
+Input [4]: [book_id#1, rating#2, book_id#54, title#18]
+
+(8) HashAggregate
+Input [3]: [book_id#1, rating#2, _groupingexpression#404]
+Keys [2]: [book_id#1, _groupingexpression#404]
+Functions [2]: [partial_count(1), partial_avg(rating#2)]
+Aggregate Attributes [3]: [count#405L, sum#406, count#407L]
+Results [5]: [book_id#1, _groupingexpression#404, count#408L, sum#409, count#410L]
+
+(9) Exchange
+Input [5]: [book_id#1, _groupingexpression#404, count#408L, sum#409, count#410L]
+Arguments: hashpartitioning(book_id#1, _groupingexpression#404, 64), ENSURE_REQUIREMENTS, [plan_id=1938]
+
+(10) HashAggregate
+Input [5]: [book_id#1, _groupingexpression#404, count#408L, sum#409, count#410L]
+Keys [2]: [book_id#1, _groupingexpression#404]
+Functions [2]: [count(1), avg(rating#2)]
+Aggregate Attributes [2]: [count(1)#402L, avg(rating#2)#403]
+Results [4]: [book_id#1, _groupingexpression#404 AS title#394, count(1)#402L AS n_ratings#395L, round(avg(rating#2)#403, 3) AS avg_rating#396]
+
+(11) TakeOrderedAndProject
+Input [4]: [book_id#1, title#394, n_ratings#395L, avg_rating#396]
+Arguments: 10, [n_ratings#395L DESC NULLS LAST, book_id#1 ASC NULLS FIRST], [book_id#1, title#394, n_ratings#395L, avg_rating#396]
+
+(12) AdaptiveSparkPlan
+Output [4]: [book_id#1, title#394, n_ratings#395L, avg_rating#396]
+Arguments: isFinalPlan=false
+
+

@@ -1,0 +1,142 @@
+{
+  "measured_on": "2026-11-13 12:04:26",
+  "status": "measured",
+  "environment": {
+    "spark_master": "local[*]",
+    "cores_visible_to_spark": 12,
+    "spark_version": "3.5.3",
+    "driver_memory": "4g",
+    "container": "bookpulse-spark (Docker Desktop, shared with mongo/kafka/app)"
+  },
+  "input": {
+    "ratings_rows": 5976479,
+    "ratings_parquet_files": 8,
+    "books_rows": 10000,
+    "query": "Q4 of batch/analytics_sql.py"
+  },
+  "method": "one warm-up run, then 3 timed runs per configuration, median reported; only the listed setting changes between baseline and variant",
+  "results": [
+    {
+      "name": "A0 baseline: broadcast hash join, shuffle.partitions=8",
+      "settings": {
+        "spark.sql.autoBroadcastJoinThreshold": "10485760",
+        "spark.sql.shuffle.partitions": "8"
+      },
+      "runs_seconds": [
+        0.829,
+        0.862,
+        0.771
+      ],
+      "median_seconds": 0.829,
+      "operators": [
+        "Scan",
+        "Scan",
+        "Filter",
+        "Project",
+        "BroadcastExchange",
+        "BroadcastHashJoin",
+        "Project",
+        "HashAggregate",
+        "Exchange",
+        "HashAggregate",
+        "TakeOrderedAndProject",
+        "AdaptiveSparkPlan"
+      ],
+      "shuffle_exchanges": 1,
+      "broadcast_exchanges": 1,
+      "join": "BroadcastHashJoin"
+    },
+    {
+      "name": "A1 variant: sort-merge join (broadcast disabled), shuffle.partitions=8",
+      "settings": {
+        "spark.sql.autoBroadcastJoinThreshold": "-1",
+        "spark.sql.shuffle.partitions": "8"
+      },
+      "runs_seconds": [
+        1.287,
+        1.179,
+        1.583
+      ],
+      "median_seconds": 1.287,
+      "operators": [
+        "Scan",
+        "Exchange",
+        "Sort",
+        "Scan",
+        "Filter",
+        "Project",
+        "Exchange",
+        "Sort",
+        "SortMergeJoin",
+        "Project",
+        "HashAggregate",
+        "HashAggregate",
+        "TakeOrderedAndProject",
+        "AdaptiveSparkPlan"
+      ],
+      "shuffle_exchanges": 2,
+      "broadcast_exchanges": 0,
+      "join": "SortMergeJoin"
+    },
+    {
+      "name": "B variant: broadcast hash join, shuffle.partitions=1",
+      "settings": {
+        "spark.sql.autoBroadcastJoinThreshold": "10485760",
+        "spark.sql.shuffle.partitions": "1"
+      },
+      "runs_seconds": [
+        0.792,
+        0.782,
+        0.716
+      ],
+      "median_seconds": 0.782,
+      "operators": [
+        "Scan",
+        "Scan",
+        "Filter",
+        "Project",
+        "BroadcastExchange",
+        "BroadcastHashJoin",
+        "Project",
+        "HashAggregate",
+        "Exchange",
+        "HashAggregate",
+        "TakeOrderedAndProject",
+        "AdaptiveSparkPlan"
+      ],
+      "shuffle_exchanges": 1,
+      "broadcast_exchanges": 1,
+      "join": "BroadcastHashJoin"
+    },
+    {
+      "name": "B variant: broadcast hash join, shuffle.partitions=64",
+      "settings": {
+        "spark.sql.autoBroadcastJoinThreshold": "10485760",
+        "spark.sql.shuffle.partitions": "64"
+      },
+      "runs_seconds": [
+        0.705,
+        0.736,
+        0.716
+      ],
+      "median_seconds": 0.716,
+      "operators": [
+        "Scan",
+        "Scan",
+        "Filter",
+        "Project",
+        "BroadcastExchange",
+        "BroadcastHashJoin",
+        "Project",
+        "HashAggregate",
+        "Exchange",
+        "HashAggregate",
+        "TakeOrderedAndProject",
+        "AdaptiveSparkPlan"
+      ],
+      "shuffle_exchanges": 1,
+      "broadcast_exchanges": 1,
+      "join": "BroadcastHashJoin"
+    }
+  ]
+}

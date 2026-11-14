@@ -1,0 +1,38 @@
+{
+  "topic": "rating-events",
+  "messages": 2,
+  "messages_per_partition": {
+    "0": 2
+  },
+  "distinct_event_ids": 1,
+  "repeated_messages": 1,
+  "distinct_valid_events": 1,
+  "distinct_valid_late_events": 0,
+  "late_threshold_minutes": 10,
+  "invalid_messages": 0,
+  "valid_messages": 2,
+  "mongo_check": {
+    "valid_events_counted": 1,
+    "expected_valid_minus_late": 1,
+    "sum_n_ratings_in_rating_stats": 1,
+    "rejected_events_counted": 0,
+    "user_seen_pairs": 1,
+    "trending_windows": 2,
+    "trending_sum_n_ratings": 2,
+    "expected_trending_2x": 2,
+    "no_loss_no_double_count": true,
+    "rejected_match": true,
+    "trending_match": true
+  },
+  "archive_check": {
+    "present": true,
+    "committed_batches": 2,
+    "committed_files": 1,
+    "uncommitted_files_on_disk": 0,
+    "rows": 2,
+    "expected_rows_valid_messages": 2,
+    "distinct_event_ids": 1,
+    "expected_distinct_valid_events": 1,
+    "exactly_once": true
+  }
+}

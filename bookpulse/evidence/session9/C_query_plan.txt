@@ -1,0 +1,75 @@
+== Physical Plan ==
+AdaptiveSparkPlan (12)
++- TakeOrderedAndProject (11)
+   +- HashAggregate (10)
+      +- Exchange (9)
+         +- HashAggregate (8)
+            +- Project (7)
+               +- BroadcastHashJoin LeftOuter BuildRight (6)
+                  :- Scan parquet  (1)
+                  +- BroadcastExchange (5)
+                     +- Project (4)
+                        +- Filter (3)
+                           +- Scan csv  (2)
+
+
+(1) Scan parquet 
+Output [2]: [book_id#1, rating#2]
+Batched: true
+Location: InMemoryFileIndex [file:/work/data/parquet/ratings]
+ReadSchema: struct<book_id:int,rating:int>
+
+(2) Scan csv 
+Output [2]: [book_id#6, title#16]
+Batched: false
+Location: InMemoryFileIndex [file:/work/data/goodbooks/books.csv]
+ReadSchema: struct<book_id:string,title:string>
+
+(3) Filter
+Input [2]: [book_id#6, title#16]
+Condition : (atleastnnonnulls(1, cast(book_id#6 as int)) AND isnotnull(cast(book_id#6 as int)))
+
+(4) Project
+Output [2]: [cast(book_id#6 as int) AS book_id#52, title#16]
+Input [2]: [book_id#6, title#16]
+
+(5) BroadcastExchange
+Input [2]: [book_id#52, title#16]
+Arguments: HashedRelationBroadcastMode(List(cast(input[0, int, true] as bigint)),false), [plan_id=2034]
+
+(6) BroadcastHashJoin
+Left keys [1]: [book_id#1]
+Right keys [1]: [book_id#52]
+Join type: LeftOuter
+Join condition: None
+
+(7) Project
+Output [3]: [book_id#1, rating#2, coalesce(title#16, UNKNOWN) AS _groupingexpression#520]
+Input [4]: [book_id#1, rating#2, book_id#52, title#16]
+
+(8) HashAggregate
+Input [3]: [book_id#1, rating#2, _groupingexpression#520]
+Keys [2]: [book_id#1, _groupingexpression#520]
+Functions [2]: [partial_count(1), partial_avg(rating#2)]
+Aggregate Attributes [3]: [count#521L, sum#522, count#523L]
+Results [5]: [book_id#1, _groupingexpression#520, count#524L, sum#525, count#526L]
+
+(9) Exchange
+Input [5]: [book_id#1, _groupingexpression#520, count#524L, sum#525, count#526L]
+Arguments: hashpartitioning(book_id#1, _groupingexpression#520, 8), ENSURE_REQUIREMENTS, [plan_id=2039]
+
+(10) HashAggregate
+Input [5]: [book_id#1, _groupingexpression#520, count#524L, sum#525, count#526L]
+Keys [2]: [book_id#1, _groupingexpression#520]
+Functions [2]: [count(1), avg(rating#2)]
+Aggregate Attributes [2]: [count(1)#518L, avg(rating#2)#519]
+Results [4]: [book_id#1, _groupingexpression#520 AS title#510, count(1)#518L AS n_ratings#511L, round(avg(rating#2)#519, 3) AS avg_rating#512]
+
+(11) TakeOrderedAndProject
+Input [4]: [book_id#1, title#510, n_ratings#511L, avg_rating#512]
+Arguments: 10, [n_ratings#511L DESC NULLS LAST, book_id#1 ASC NULLS FIRST], [book_id#1, title#510, n_ratings#511L, avg_rating#512]
+
+(12) AdaptiveSparkPlan
+Output [4]: [book_id#1, title#510, n_ratings#511L, avg_rating#512]
+Arguments: isFinalPlan=false
+
